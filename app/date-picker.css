@@ -1,0 +1,608 @@
+/* Custom styles for the day picker */
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #000;
+  --rdp-background-color: rgba(0, 0, 0, 0.1);
+  --rdp-accent-color-dark: #000;
+  --rdp-background-color-dark: rgba(0, 0, 0, 0.2);
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  --rdp-outline-selected: 2px solid rgba(0, 0, 0, 0.75);
+  margin: 0;
+}
+
+.rdp-day_selected,
+.rdp-day_selected:focus-visible,
+.rdp-day_selected:hover {
+  background-color: var(--rdp-accent-color);
+  color: white;
+}
+
+.rdp-day_range_start,
+.rdp-day_range_end {
+  border-radius: 100%;
+}
+
+.rdp-day_range_middle {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: black;
+}
+
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: var(--rdp-background-color);
+}
+
+.calendar-container {
+  min-width: 280px;
+}
+
+.rdp-months {
+  justify-content: center;
+}
+
+.rdp-head_cell {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.rdp-day {
+  border-radius: 100%;
+  font-size: 0.875rem;
+}
+
+.rdp-nav {
+  display: none;
+}
+
+/* Custom styles for the calendar */
+.custom-calendar {
+  font-family: inherit;
+  width: 320px;
+}
+
+.custom-calendar .rdrMonth {
+  width: 100%;
+}
+
+.custom-calendar .rdrDay {
+  height: 40px;
+}
+
+.custom-calendar .rdrDayNumber {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.custom-calendar .rdrDayToday .rdrDayNumber span:after {
+  display: none;
+}
+
+.custom-calendar .rdrSelected {
+  background-color: #000;
+}
+
+.custom-calendar .rdrDayDisabled {
+  opacity: 0.5;
+}
+
+.custom-calendar .rdrMonthName {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0.5rem 0;
+}
+
+.custom-calendar .rdrWeekDay {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.custom-calendar .rdrNextPrevButton {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 100%;
+  padding: 0;
+  margin: 0 5px;
+  width: 32px;
+  height: 32px;
+}
+
+.custom-calendar .rdrNextPrevButton:hover {
+  background: #f3f4f6;
+}
+
+/* Custom styles for the date range picker */
+.rdrCalendarWrapper {
+  font-size: 14px;
+  color: #000000;
+  background-color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.rdrDateDisplayWrapper {
+  display: none;
+}
+
+.rdrMonthAndYearWrapper {
+  height: 60px;
+  padding-top: 10px;
+  align-items: center;
+}
+
+.rdrMonthAndYearPickers {
+  display: none;
+}
+
+.rdrMonthsHorizontal {
+  gap: 24px;
+}
+
+.rdrMonth {
+  width: 300px;
+  padding: 0;
+}
+
+.rdrMonthName {
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  padding: 0.5rem 0;
+  color: #000;
+  text-transform: capitalize;
+}
+
+.rdrWeekDays {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.rdrWeekDay {
+  font-weight: 500;
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  padding: 0;
+  flex: 1;
+  text-align: center;
+  line-height: 2.667em;
+}
+
+.rdrDays {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.rdrDay {
+  height: 40px;
+  width: 40px;
+  flex-basis: 40px;
+  margin: 0;
+  padding: 0;
+}
+
+.rdrDayNumber {
+  font-weight: 400;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.rdrDayNumber span {
+  color: #000000;
+  font-size: 14px;
+}
+
+.rdrDayDisabled .rdrDayNumber span {
+  color: #d1d5db;
+}
+
+.rdrDayToday .rdrDayNumber span:after {
+  display: none;
+}
+
+.rdrStartEdge,
+.rdrEndEdge {
+  border-radius: 100%;
+  color: #ffffff;
+  background-color: #000000;
+}
+
+.rdrStartEdge .rdrDayNumber span,
+.rdrEndEdge .rdrDayNumber span {
+  color: #ffffff;
+}
+
+.rdrInRange {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #000000;
+}
+
+.rdrDayHovered {
+  border-radius: 100%;
+}
+
+.rdrDayHovered .rdrDayNumber:after {
+  content: "";
+  border: 1px solid #000000;
+  border-radius: 100%;
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+}
+
+.rdrNextPrevButton {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 100%;
+  padding: 0;
+  margin: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rdrNextPrevButton:hover {
+  background: #f3f4f6;
+}
+
+.rdrNextPrevButton i {
+  border-width: 0;
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rdrNextPrevButton i:before,
+.rdrNextPrevButton i:after {
+  display: none;
+}
+
+.rdrNextButton i:before {
+  content: "→";
+}
+
+.rdrPprevButton i:before {
+  content: "←";
+}
+
+.rdrDayStartPreview,
+.rdrDayEndPreview,
+.rdrDayInPreview {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.rdrDayStartOfMonth .rdrInRange,
+.rdrDayStartOfMonth .rdrEndEdge,
+.rdrDayStartOfWeek .rdrInRange,
+.rdrDayStartOfWeek .rdrEndEdge {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.rdrDayEndOfMonth .rdrInRange,
+.rdrDayEndOfMonth .rdrStartEdge,
+.rdrDayEndOfWeek .rdrInRange,
+.rdrDayEndOfWeek .rdrStartEdge {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.rdrCalendarWrapper:not(.rdrDateRangeWrapper) .rdrDayHovered .rdrDayNumber:after {
+  border-radius: 100%;
+}
+
+.rdrDayStartOfMonth .rdrDayInPreview,
+.rdrDayStartOfMonth .rdrDayEndPreview,
+.rdrDayStartOfWeek .rdrDayInPreview,
+.rdrDayStartOfWeek .rdrDayEndPreview {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.rdrDayEndOfMonth .rdrDayInPreview,
+.rdrDayEndOfMonth .rdrDayStartPreview,
+.rdrDayEndOfWeek .rdrDayInPreview,
+.rdrDayEndOfWeek .rdrDayStartPreview {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Additional styles to match the image exactly */
+.custom-date-range-picker .rdrMonths {
+  display: flex;
+  justify-content: space-between;
+}
+
+.custom-date-range-picker .rdrMonth {
+  width: 280px;
+}
+
+.custom-date-range-picker .rdrDay {
+  height: 36px;
+  width: 36px;
+  flex-basis: 36px;
+}
+
+.custom-date-range-picker .rdrDayPassive {
+  opacity: 0.5;
+}
+
+.custom-date-range-picker .rdrDayNumber span {
+  font-size: 14px;
+}
+
+.custom-date-range-picker .rdrWeekDay {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.custom-date-range-picker .rdrMonthName {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.custom-date-range-picker .rdrStartEdge,
+.custom-date-range-picker .rdrEndEdge {
+  background-color: #000;
+}
+
+.custom-date-range-picker .rdrInRange {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.custom-date-range-picker .rdrDayStartPreview,
+.custom-date-range-picker .rdrDayEndPreview,
+.custom-date-range-picker .rdrDayInPreview {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.custom-date-range-picker .rdrDayHovered .rdrDayNumber:after {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.custom-date-range-picker .rdrDayDisabled {
+  background-color: transparent;
+}
+
+.custom-date-range-picker .rdrDayDisabled .rdrDayNumber span {
+  color: #d1d5db;
+}
+
+.custom-date-range-picker .rdrMonthAndYearWrapper {
+  padding-top: 10px;
+  margin-bottom: 10px;
+}
+
+.custom-date-range-picker .rdrMonthAndYearPickers select {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+.custom-date-range-picker .rdrNextPrevButton {
+  margin: 0 5px;
+}
+
+/* Modern minimalistic date picker styles */
+.modern-date-picker .rdrCalendarWrapper {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #000000;
+  background-color: #ffffff;
+  font-size: 14px;
+}
+
+.modern-date-picker .rdrDateDisplayWrapper {
+  display: none;
+}
+
+.modern-date-picker .rdrMonthAndYearWrapper {
+  height: 60px;
+  padding-top: 10px;
+  align-items: center;
+}
+
+.modern-date-picker .rdrMonthAndYearPickers {
+  display: none;
+}
+
+.modern-date-picker .rdrMonthsHorizontal {
+  gap: 24px;
+}
+
+.modern-date-picker .rdrMonth {
+  width: 300px;
+  padding: 0;
+}
+
+.modern-date-picker .rdrMonthName {
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  padding: 0.5rem 0;
+  color: #000;
+  text-transform: capitalize;
+}
+
+.modern-date-picker .rdrWeekDays {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.modern-date-picker .rdrWeekDay {
+  font-weight: 500;
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  padding: 0;
+  flex: 1;
+  text-align: center;
+  line-height: 2.667em;
+}
+
+.modern-date-picker .rdrDays {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.modern-date-picker .rdrDay {
+  height: 40px;
+  width: 40px;
+  flex-basis: 40px;
+  margin: 0;
+  padding: 0;
+}
+
+.modern-date-picker .rdrDayNumber {
+  font-weight: 400;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.modern-date-picker .rdrDayNumber span {
+  color: #000000;
+  font-size: 14px;
+}
+
+.modern-date-picker .rdrDayDisabled .rdrDayNumber span {
+  color: #d1d5db;
+}
+
+.modern-date-picker .rdrDayToday .rdrDayNumber span:after {
+  display: none;
+}
+
+.modern-date-picker .rdrStartEdge,
+.modern-date-picker .rdrEndEdge {
+  border-radius: 100%;
+  color: #ffffff;
+  background-color: #000000;
+}
+
+.modern-date-picker .rdrStartEdge .rdrDayNumber span,
+.modern-date-picker .rdrEndEdge .rdrDayNumber span {
+  color: #ffffff;
+}
+
+.modern-date-picker .rdrInRange {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #000000;
+}
+
+.modern-date-picker .rdrDayHovered {
+  border-radius: 100%;
+}
+
+.modern-date-picker .rdrDayHovered .rdrDayNumber:after {
+  content: "";
+  border: 1px solid #000000;
+  border-radius: 100%;
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+}
+
+.modern-date-picker .rdrNextPrevButton {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 100%;
+  padding: 0;
+  margin: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modern-date-picker .rdrNextPrevButton:hover {
+  background: #f3f4f6;
+}
+
+.modern-date-picker .rdrNextPrevButton i {
+  border-width: 0;
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modern-date-picker .rdrNextPrevButton i:before,
+.modern-date-picker .rdrNextPrevButton i:after {
+  display: none;
+}
+
+.modern-date-picker .rdrNextButton i:before {
+  content: "→";
+}
+
+.modern-date-picker .rdrPprevButton i:before {
+  content: "←";
+}
+
+.modern-date-picker .rdrDayStartPreview,
+.modern-date-picker .rdrDayEndPreview,
+.modern-date-picker .rdrDayInPreview {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.modern-date-picker .rdrDayStartOfMonth .rdrInRange,
+.modern-date-picker .rdrDayStartOfMonth .rdrEndEdge,
+.modern-date-picker .rdrDayStartOfWeek .rdrInRange,
+.modern-date-picker .rdrDayStartOfWeek .rdrEndEdge {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.modern-date-picker .rdrDayEndOfMonth .rdrInRange,
+.modern-date-picker .rdrDayEndOfMonth .rdrStartEdge,
+.modern-date-picker .rdrDayEndOfWeek .rdrInRange,
+.modern-date-picker .rdrDayEndOfWeek .rdrStartEdge {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.modern-date-picker .rdrCalendarWrapper:not(.rdrDateRangeWrapper) .rdrDayHovered .rdrDayNumber:after {
+  border-radius: 100%;
+}
+
+.modern-date-picker .rdrDayStartOfMonth .rdrDayInPreview,
+.modern-date-picker .rdrDayStartOfMonth .rdrDayEndPreview,
+.modern-date-picker .rdrDayStartOfWeek .rdrDayInPreview,
+.modern-date-picker .rdrDayStartOfWeek .rdrDayEndPreview {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.modern-date-picker .rdrDayEndOfMonth .rdrDayInPreview,
+.modern-date-picker .rdrDayEndOfMonth .rdrDayStartPreview,
+.modern-date-picker .rdrDayEndOfWeek .rdrDayInPreview,
+.modern-date-picker .rdrDayEndOfWeek .rdrDayStartPreview {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
