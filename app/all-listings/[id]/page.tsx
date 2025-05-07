@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen overflow-x-hidden flex flex-col">
   
       <main className="flex-1">
         <div className="container mx-auto px-4 py-6">
@@ -44,19 +44,19 @@ export default function Home() {
                       Location
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="overview">
+                  
                     <PropertyOverview />
                     <PropertyAmenities />
                     <PropertyTransportation />
                     <PropertyRooms />
-                  </TabsContent>
-                  <TabsContent value="reviews">
+                
+              
                     <PropertyReviews/>
-                  </TabsContent>
-                  <TabsContent value="location">
+                
+                
                     <PropertyLocation />
                     <PropertyThingsToKnow/>
-                  </TabsContent>
+             
                 </Tabs>
               </div>
               <PropertyNearby />

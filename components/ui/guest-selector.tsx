@@ -51,7 +51,7 @@ export default function GuestSelector({
   if (!isOpen) return null
 
   return (
-    <div ref={containerRef} className="absolute top-full mt-2 right-0 bg-white rounded-xl shadow-lg p-6 w-80 z-50">
+    <div ref={containerRef} className="absolute top-full mt-2 right-0 bg-white rounded-xl shadow-lg p-6 w-80  z-50 border">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

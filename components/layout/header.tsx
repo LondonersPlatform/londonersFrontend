@@ -9,26 +9,28 @@ import GuestSelector from "@/components/ui/guest-selector";
 import LoginModal from "@/components/sections/login-modal";
 import { DatePickerWithRange } from "../ui/DateRangePicker";
 import { Input } from "../ui/input";
-
-
+import { useAuth } from "@/context/auth-context";
+import { ProfileDropdown } from "./components/ProfileDropdown";
+import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 
 export default function Header() {
   const [checkInOpen, setCheckInOpen] = useState(false);
   const [checkOutOpen, setCheckOutOpen] = useState(false);
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
-  const [guests, setGuests] = useState({ adults: 1, children: 0, infants: 0 })
-  
-  const [searchOpen, setSearchOpen] = useState(false)
+  const [guests, setGuests] = useState({ adults: 1, children: 0, infants: 0 });
 
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const getTotalGuests = () => {
     const total = guests.adults + guests.children + guests.infants;
     return total === 0
       ? "Add guests"
       : `${total} guest${total !== 1 ? "s" : ""}`;
   };
-
-
+  const { session, isLoading } = useAuth();
+  console.log(session, "sessionsessionsession");
   return (
     <>
       <header className="container mx-auto flex items-center justify-between py-4 px-4 md:px-6">
@@ -42,7 +44,7 @@ export default function Header() {
           />
         </Link>
         <div className="   flex items-center">
-          <nav className="hidden border rounded-full px-4 p-0 md:flex items-center  space-x-6">
+          <nav className="hidden border rounded-full px-4 p-0 lg:flex items-center  space-x-6">
             <div className="relative border-e-2 pe-6">
               <div
                 className="flex items-center text-sm cursor-pointer"
@@ -52,13 +54,9 @@ export default function Header() {
                   setGuestsOpen(false);
                 }}
               >
-                <DatePickerWithRange/>
-      
-      
+                <DatePickerWithRange />
               </div>
             </div>
-
-        
 
             <div className="relative pe-6">
               <div
@@ -95,70 +93,102 @@ export default function Header() {
               variant="primary"
               className="hidden mt-2 md:flex items-center rounded-full px-4 py-2 my-2 text-sm"
               onClick={() => setSearchOpen(!searchOpen)}
-           >
+            >
               <Search className="mr-2 h-4 w-4" />
               Search
             </Button>
-
-
           </nav>
         </div>
         <div className="flex items-center space-x-4">
+          {!isLoading && session ? (
+            <ProfileDropdown session={session} isLoading={isLoading} />
+          ) : (
+            <Button
+              variant="secondary"
+              className="rounded-full px-6 py-2 text-sm font-medium"
+              onClick={() => setLoginOpen(true)}
+            >
+              Login
+            </Button>
+          )}
+
           <Button
-            variant="secondary"
-            className="rounded-full px-6 py-2 text-sm font-medium"
-            onClick={() => setLoginOpen(true)}
+            variant="primary"
+            className=" mt-2 flex items-center rounded-full px-4 py-2 my-2 text-sm"
+            onClick={() => setDrawerOpen(!drawerOpen)}
           >
-            Login
+            <Search className="mr-2 h-4 w-4" />
+            Search
           </Button>
         </div>
-
-
-
       </header>
- {searchOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-20">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-4 mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Search</h2>
-              <Button variant="ghost" size="icon" onClick={() => setSearchOpen(false)} className="rounded-full">
-                <X className="h-5 w-5" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input placeholder="Search for destinations, properties..." className="pl-10 rounded-full" autoFocus />
-              </div>
-              <Button variant="primary" className="rounded-full">
-                Search
-              </Button>
-            </div>
-            <div className="mt-4">
-              <h3 className="text-sm font-medium mb-2">Popular searches</h3>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" className="rounded-full text-xs">
-                  London
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full text-xs">
-                  Manchester
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full text-xs">
-                  Edinburgh
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full text-xs">
-                  Bath
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-full text-xs">
-                  Liverpool
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetTitle>
+          <SheetContent
+            side="top"
+            className="p-6 h-[60vh] overflow-y-auto rounded-b-xl"
+          >
+            <div className="flex w-full items-center h-full justify-center">
+              <div className="w-full gap-4 flex flex-col items-center">
+                <nav className="rounded-full p-0 gap-4 flex flex-col w-full items-center ">
+                  <div className="relative w-full justify-between border-2  rounded-lg py-2 ">
+                    <div
+                      className="grid items-center text-sm cursor-pointer"
+                      onClick={() => {
+                        setCheckInOpen(!checkInOpen);
+                        setCheckOutOpen(false);
+                        setGuestsOpen(false);
+                      }}
+                    >
+                      <DatePickerWithRange />
+                    </div>
+                  </div>
 
+                  <div className="relative w-full rounded-lg justify-center border-2 pe-6">
+                    <div
+                      className="flex items-center justify-center text-sm cursor-pointer"
+                      onClick={() => {
+                        setGuestsOpen(!guestsOpen);
+                        setCheckInOpen(false);
+                        setCheckOutOpen(false);
+                      }}
+                    >
+                      <div className="mr-2 rounded-full p-2">
+                        <Image
+                          src="/p.svg"
+                          alt="Guests Icon"
+                          width={20}
+                          height={20}
+                          className="h-8"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-medium">Guests</p>
+                        <p className="text-gray-500">{getTotalGuests()}</p>
+                      </div>
+                    </div>
+
+                    <GuestSelector
+                      isOpen={guestsOpen}
+                      onClose={() => setGuestsOpen(false)}
+                      onSelect={setGuests}
+                      initialGuests={guests}
+                    />
+                  </div>
+                  <Button
+                    variant="primary"
+                    className=" mt-2 flex w-full items-center rounded-full px-4 py-2 my-2 text-sm"
+                    onClick={() => setDrawerOpen(!drawerOpen)}
+                  >
+                    <Search className="mr-2 h-4 w-4" />
+                    Search
+                  </Button>
+                </nav>
+              </div>
+            </div>
+          </SheetContent>
+        </SheetTitle>
+      </Sheet>
       {/* Login Modal */}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>

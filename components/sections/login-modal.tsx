@@ -1,12 +1,25 @@
 "use client";
 
-import type React from "react";
-
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
-import { Button } from "../ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 import RegisterModal from "./register-modal";
+import { Button } from "../ui/button";
+import ResetModal from "./resetPassword-modal";
+
+// Define validation schema
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -16,13 +29,32 @@ interface LoginModalProps {
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [rememberMe, setRememberMe] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
+  const router = useRouter();
+
+  // Initialize react-hook-form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
   useEffect(() => {
     if (isOpen) {
       setShowRegister(false);
+      setShowReset(false);
+      setError(null);
+      reset(); // Reset form when modal opens
     }
-  }, [isOpen]);
-  
+  }, [isOpen, reset]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -39,7 +71,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       }
     };
 
-    if (isOpen && !showRegister) {
+    if (isOpen && !showRegister && !showReset) {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("keydown", handleEscape);
       document.body.style.overflow = "hidden";
@@ -50,15 +82,94 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
     };
-  }, [isOpen, onClose, showRegister]);
+  }, [isOpen, onClose, showRegister, showReset]);
 
   const handleRegisterClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowRegister(true);
   };
+  
+  const handleResetClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowReset(true);
+  };
 
   const handleLoginClick = () => {
     setShowRegister(false);
+    setShowReset(false);
+  };
+
+  const handleEmailLogin = async (formData: LoginFormData) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (error) throw error;
+
+      // Get session data
+      const session = await supabase.auth.getSession();
+
+      if (session.data.session) {
+        // Save to localStorage
+        localStorage.setItem("access_token", session.data.session.access_token);
+        localStorage.setItem("email", formData.email);
+
+        // Navigate to dashboard
+        router.push("/Dashboard");
+        onClose();
+      } else {
+        throw new Error("No session data received");
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Google login failed");
+      setLoading(false);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+        options: {
+          redirectTo: `${location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Facebook login failed"
+      );
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -71,6 +182,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         onLoginClick={handleLoginClick}
       />
     );
+  }
+  if (showReset) {
+    return <ResetModal isOpen={true} onClose={onClose} />;
   }
 
   return (
@@ -86,18 +200,18 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <X className="h-5 w-5" />
         </button>
 
-        <div className="flex justify-center  mb-6">
+        <div className="flex justify-center mb-6">
           <Image
             src="/logo.png"
-            alt="LONDONERS"
+            alt="Logo"
             width={200}
             height={50}
             className="h-10 object-contain"
           />
         </div>
 
-        <div className=" mx-auto max-w-md">
-          <h2 className="text-2xl  font-bold text-center mb-4">Login</h2>
+        <div className="mx-auto max-w-md">
+          <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
 
           <p className="text-center mb-6">
             Don't have an account?{" "}
@@ -113,18 +227,26 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           <div className="space-y-4">
             <Button
               variant="outline"
-              className="w-full lg:text-[15px] text-[13px] flex items-center justify-center gap-2 bg-[#1877F2] text-white "
+              className="w-full lg:text-[15px] text-[13px] flex items-center justify-center gap-2 bg-[#1877F2] text-white"
+              onClick={handleFacebookLogin}
+              disabled={loading}
             >
-            <Image src={'./face0.png'} alt="facebook" width={20} height={20}/>
-              Signup with Facebook
+              <Image
+                src="/facebook.svg"
+                alt="Facebook"
+                width={20}
+                height={20}
+              />
+              Login with Facebook
             </Button>
 
             <Button
-           
-              className="w-full flex lg:text-[15px] text-[13px] hover:text-white items-center  justify-center gap-2 bg-[#EAEAEA] text-gray-700   border-gray-300"
+              className="w-full flex lg:text-[15px] text-[13px] hover:text-white items-center justify-center gap-2 bg-[#EAEAEA] text-gray-700 border-gray-300"
+              onClick={handleGoogleLogin}
+              disabled={loading}
             >
-              <Image src={'./goagle0.png'} alt="facebook" width={20} height={20}/>
-              Signup with Google
+              <Image src="/goagle.svg" alt="Google" width={20} height={20} />
+              Login with Google
             </Button>
           </div>
 
@@ -139,20 +261,38 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </div>
           </div>
 
-          <form className="space-y-4">
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit(handleEmailLogin)}>
             <div>
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full  px-4 py-3 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                className={`w-full px-4 py-3 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  errors.email ? "border-red-500" : ""
+                }`}
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
             <div>
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full px-4 py-3 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                className={`w-full px-4 py-3 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  errors.password ? "border-red-500" : ""
+                }`}
+                {...register("password")}
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
@@ -165,7 +305,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 />
                 <span className="text-sm text-gray-700">Remember me</span>
               </label>
-              <a href="#" className="text-sm underline text-gray-700 hover:underline">
+              <a
+                href="#"
+                className="text-sm underline text-gray-700 hover:underline"
+                onClick={handleResetClick}
+              >
                 Forgot password?
               </a>
             </div>
@@ -173,8 +317,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <Button
               variant="primary"
               className="w-full py-3 bg-black hover:bg-black/90"
+              type="submit"
+              disabled={loading}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </div>
