@@ -165,7 +165,7 @@ export default function AllListingsPage() {
                   />
                 </div>
               </div>
-              <div className={`relative lg:hidden p-0 m-0 rounded-xl w-full `}>
+              <div className={`relative md:hidden p-0 m-0 rounded-xl w-full `}>
               <Carousel className="w-full">
   <CarouselContent>
     {listing.images.map((src, index) => (

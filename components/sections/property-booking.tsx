@@ -42,13 +42,13 @@ export function PropertyBooking() {
 
           <div className="grid grid-cols-2 gap-2 border rounded-xl overflow-hidden">
             {/* Check-in Date Picker */}
-            <div className="p-3 border-r border-b">
+            <div className="p-3 border-r hover:bg-gray-500 border-b">
               <div className="text-xs font-medium">CHECK-IN</div>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" className="w-full justify-between p-0 h-auto font-normal">
                     <span>{format(checkInDate, "M/d/yyyy")}</span>
-                    <CalendarIcon className="h-4 w-4 text-gray-500" />
+                    
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -63,13 +63,15 @@ export function PropertyBooking() {
             </div>
 
             {/* Check-out Date Picker */}
-            <div className="p-3 border-b">
-              <div className="text-xs font-medium">CHECK-OUT</div>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between p-0 h-auto font-normal">
+            <div className="p-3 border-b hover:bg-gray-500">
+      
+              <Popover >
+                <PopoverTrigger asChild className=" bg-slate-500" >
+              
+                  <Button  className="w-full bg-transparent hover:bg-transparent text-grey-800 flex flex-col gap-1  py-0  items-start p-0 h-full font-normal">
+                  <div className="text-xs font-medium">CHECK-OUT</div>
                     <span>{format(checkOutDate, "M/d/yyyy")}</span>
-                    <CalendarIcon className="h-4 w-4 text-gray-500" />
+      
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="end">

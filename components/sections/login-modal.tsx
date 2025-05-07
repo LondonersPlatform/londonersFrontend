@@ -224,7 +224,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </a>
           </p>
 
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <Button
               variant="outline"
               className="w-full lg:text-[15px] text-[13px] flex items-center justify-center gap-2 bg-[#1877F2] text-white"
@@ -248,7 +248,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               <Image src="/goagle.svg" alt="Google" width={20} height={20} />
               Login with Google
             </Button>
-          </div>
+          </div> */}
 
           <div className="my-6 relative">
             <div className="absolute inset-0 flex items-center">

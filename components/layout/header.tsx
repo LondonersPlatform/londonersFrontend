@@ -44,7 +44,7 @@ export default function Header() {
           />
         </Link>
         <div className="   flex items-center">
-          <nav className="hidden border rounded-full px-4 p-0 lg:flex items-center  space-x-6">
+          <nav className="hidden border w-full rounded-full px-4 p-0 lg:flex items-center  space-x-6">
             <div className="relative border-e-2 pe-6">
               <div
                 className="flex items-center text-sm cursor-pointer"
@@ -67,19 +67,8 @@ export default function Header() {
                   setCheckOutOpen(false);
                 }}
               >
-                <div className="mr-2 rounded-full  p-2">
-                  <Image
-                    src="/p.svg"
-                    alt="LONDONERS"
-                    width={20}
-                    height={20}
-                    className="h-8"
-                  />
-                </div>
-                <div>
-                  <p className="font-medium">Guests</p>
-                  <p className="text-gray-500">{getTotalGuests()}</p>
-                </div>
+             
+            
               </div>
               <GuestSelector
                 isOpen={guestsOpen}
@@ -114,7 +103,7 @@ export default function Header() {
 
           <Button
             variant="primary"
-            className=" mt-2 flex items-center rounded-full px-4 py-2 my-2 text-sm"
+            className=" mt-2 lg:hidden flex items-center rounded-full px-4 py-2 my-2 text-sm"
             onClick={() => setDrawerOpen(!drawerOpen)}
           >
             <Search className="mr-2 h-4 w-4" />
@@ -122,73 +111,64 @@ export default function Header() {
           </Button>
         </div>
       </header>
-      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <SheetTitle>
-          <SheetContent
-            side="top"
-            className="p-6 h-[60vh] overflow-y-auto rounded-b-xl"
-          >
-            <div className="flex w-full items-center h-full justify-center">
-              <div className="w-full gap-4 flex flex-col items-center">
-                <nav className="rounded-full p-0 gap-4 flex flex-col w-full items-center ">
-                  <div className="relative w-full justify-between border-2  rounded-lg py-2 ">
-                    <div
-                      className="grid items-center text-sm cursor-pointer"
-                      onClick={() => {
-                        setCheckInOpen(!checkInOpen);
-                        setCheckOutOpen(false);
-                        setGuestsOpen(false);
-                      }}
-                    >
-                      <DatePickerWithRange />
-                    </div>
-                  </div>
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen} >
 
-                  <div className="relative w-full rounded-lg justify-center border-2 pe-6">
-                    <div
-                      className="flex items-center justify-center text-sm cursor-pointer"
-                      onClick={() => {
-                        setGuestsOpen(!guestsOpen);
-                        setCheckInOpen(false);
-                        setCheckOutOpen(false);
-                      }}
-                    >
-                      <div className="mr-2 rounded-full p-2">
-                        <Image
-                          src="/p.svg"
-                          alt="Guests Icon"
-                          width={20}
-                          height={20}
-                          className="h-8"
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium">Guests</p>
-                        <p className="text-gray-500">{getTotalGuests()}</p>
-                      </div>
-                    </div>
-
-                    <GuestSelector
-                      isOpen={guestsOpen}
-                      onClose={() => setGuestsOpen(false)}
-                      onSelect={setGuests}
-                      initialGuests={guests}
-                    />
-                  </div>
-                  <Button
-                    variant="primary"
-                    className=" mt-2 flex w-full items-center rounded-full px-4 py-2 my-2 text-sm"
-                    onClick={() => setDrawerOpen(!drawerOpen)}
-                  >
-                    <Search className="mr-2 h-4 w-4" />
-                    Search
-                  </Button>
-                </nav>
-              </div>
+  <SheetTitle>
+  <SheetContent side="top" className="p-6 max:h-[60vh] overflow-y-auto rounded-b-xl">
+    <div className="flex w-full items-start py-12 h-full justify-center">
+      <div className="w-full gap-4 flex flex-col items-center">
+        <nav className="rounded-full p-0 gap-4 flex flex-col w-full items-center ">
+          <div className="relative w-full justify-between border-2  rounded-lg py-2 ">
+            <div
+              className="grid items-center text-sm cursor-pointer"
+              onClick={() => {
+                setCheckInOpen(!checkInOpen);
+                setCheckOutOpen(false);
+                setGuestsOpen(false);
+              }}
+            >
+              <DatePickerWithRange />
             </div>
-          </SheetContent>
-        </SheetTitle>
-      </Sheet>
+          </div>
+
+          <div className="relative w-full py-2 rounded-lg justify-center border-2 ps-3 pe-6">
+            <div
+              className="flex items-center justify-center text-sm cursor-pointer"
+              onClick={() => {
+                setGuestsOpen(!guestsOpen);
+                setCheckInOpen(false);
+                setCheckOutOpen(false);
+              }}
+            >
+           
+        
+            </div>
+
+            <GuestSelector
+              isOpen={guestsOpen}
+              onClose={() => setGuestsOpen(false)}
+              onSelect={setGuests}
+              initialGuests={guests}
+            />
+          </div>
+          <Button
+            variant="primary"
+            className=" mt-2 flex w-full items-center rounded-lg px-4 py-2 my-2 text-sm"
+            onClick={() => setDrawerOpen(!drawerOpen)}
+          >
+            <Search className="mr-2 h-4 w-4" />
+            Search
+          </Button>
+        </nav>
+      </div>
+    </div>
+  </SheetContent>
+
+
+
+  </SheetTitle>
+
+</Sheet>
       {/* Login Modal */}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>

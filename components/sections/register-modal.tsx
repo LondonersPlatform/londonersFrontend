@@ -151,7 +151,7 @@ export default function RegisterModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center h-full justify-center bg-black/50">
       <div
         ref={modalRef}
         className="relative bg-white rounded-xl shadow-xl p-8 w-full max-w-xl mx-4"
@@ -172,7 +172,7 @@ export default function RegisterModal({
             className="h-10 object-contain"
           />
         </div>
-        <div className="mx-auto max-w-lg px-10 h-[82vh]   overflow-auto">
+        <div className="mx-auto max-w-lg px-10 h-auto  overflow-auto">
           <h2 className="text-2xl font-bold text-center mb-4">Register</h2>
 
           <p className="text-center mb-6">
@@ -194,7 +194,7 @@ export default function RegisterModal({
               {errors.root.message}
             </div>
           )}
-
+{/* 
           <div className="space-y-2">
             <Button
               variant="outline"
@@ -215,7 +215,7 @@ export default function RegisterModal({
               <Image src="./goagle0.png" alt="google" width={20} height={20} />
               Signup with Google
             </Button>
-          </div>
+          </div> */}
 
           <div className="my-6 relative">
             <div className="absolute inset-0 flex items-center">

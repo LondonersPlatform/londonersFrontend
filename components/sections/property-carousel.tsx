@@ -121,14 +121,7 @@ export function PropertyCarousel() {
           <CarouselPrevious className="left-2" />
           <CarouselNext className="right-2" />
 
-          <Button
-            variant="secondary"
-            size="sm"
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full"
-          >
-            <Play className="h-4 w-4" />
-            <span>Watch tour video</span>
-          </Button>
+       
         </Carousel>
       </div>
 
