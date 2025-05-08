@@ -65,9 +65,6 @@ export async function getListings(searchParams?: { [key: string]: string | strin
     },
   ];
 
-  // Simulate server processing time
-  await new Promise(resolve => setTimeout(resolve, 100));
-
   return {
     listings,
     total: listings.length
