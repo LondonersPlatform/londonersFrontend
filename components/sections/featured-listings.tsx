@@ -165,7 +165,7 @@ export default function FeaturedListings() {
                     width={300}
                     height={200}
                     loading="eager"
-                    className="transition-transform group-hover:scale-105 w-full h-full object-cover"
+                    className="transition-transform duration-300 group-hover:scale-105 w-full h-full object-cover"
                   />
                   <button
                     className="absolute right-3 top-3 rounded-full bg-white p-1.5 transition-colors"

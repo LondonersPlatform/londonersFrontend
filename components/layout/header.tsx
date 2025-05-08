@@ -66,13 +66,11 @@ export default function Header() {
                   setCheckInOpen(false);
                   setCheckOutOpen(false);
                 }}
-              >
-             
-            
-              </div>
+              ></div>
               <GuestSelector
-                isOpen={guestsOpen}
-                onClose={() => setGuestsOpen(false)}
+                //  ال props دي مش موجودة في ال component ده
+                // isOpen={guestsOpen}
+                // onClose={() => setGuestsOpen(false)}
                 onSelect={setGuests}
                 initialGuests={guests}
               />
@@ -111,64 +109,59 @@ export default function Header() {
           </Button>
         </div>
       </header>
-      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen} >
-
-  <SheetTitle>
-  <SheetContent side="top" className="p-6 max:h-[60vh] overflow-y-auto rounded-b-xl">
-    <div className="flex w-full items-start py-12 h-full justify-center">
-      <div className="w-full gap-4 flex flex-col items-center">
-        <nav className="rounded-full p-0 gap-4 flex flex-col w-full items-center ">
-          <div className="relative w-full justify-between border-2  rounded-lg py-2 ">
-            <div
-              className="grid items-center text-sm cursor-pointer"
-              onClick={() => {
-                setCheckInOpen(!checkInOpen);
-                setCheckOutOpen(false);
-                setGuestsOpen(false);
-              }}
-            >
-              <DatePickerWithRange />
-            </div>
-          </div>
-
-          <div className="relative w-full py-2 rounded-lg justify-center border-2 ps-3 pe-6">
-            <div
-              className="flex items-center justify-center text-sm cursor-pointer"
-              onClick={() => {
-                setGuestsOpen(!guestsOpen);
-                setCheckInOpen(false);
-                setCheckOutOpen(false);
-              }}
-            >
-           
-        
-            </div>
-
-            <GuestSelector
-              isOpen={guestsOpen}
-              onClose={() => setGuestsOpen(false)}
-              onSelect={setGuests}
-              initialGuests={guests}
-            />
-          </div>
-          <Button
-            variant="primary"
-            className=" mt-2 flex w-full items-center rounded-lg px-4 py-2 my-2 text-sm"
-            onClick={() => setDrawerOpen(!drawerOpen)}
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetTitle>
+          <SheetContent
+            side="top"
+            className="p-6 max:h-[60vh] overflow-y-auto rounded-b-xl"
           >
-            <Search className="mr-2 h-4 w-4" />
-            Search
-          </Button>
-        </nav>
-      </div>
-    </div>
-  </SheetContent>
+            <div className="flex w-full items-start py-12 h-full justify-center">
+              <div className="w-full gap-4 flex flex-col items-center">
+                <nav className="rounded-full p-0 gap-4 flex flex-col w-full items-center ">
+                  <div className="relative w-full justify-between border-2  rounded-lg py-2 ">
+                    <div
+                      className="grid items-center text-sm cursor-pointer"
+                      onClick={() => {
+                        setCheckInOpen(!checkInOpen);
+                        setCheckOutOpen(false);
+                        setGuestsOpen(false);
+                      }}
+                    >
+                      <DatePickerWithRange />
+                    </div>
+                  </div>
 
+                  <div className="relative w-full py-2 rounded-lg justify-center border-2 ps-3 pe-6">
+                    <div
+                      className="flex items-center justify-center text-sm cursor-pointer"
+                      onClick={() => {
+                        setGuestsOpen(!guestsOpen);
+                        setCheckInOpen(false);
+                        setCheckOutOpen(false);
+                      }}
+                    ></div>
 
-
-  </SheetTitle>
-
-</Sheet>
+                    <GuestSelector
+                      // isOpen={guestsOpen}
+                      // onClose={() => setGuestsOpen(false)}
+                      onSelect={setGuests}
+                      initialGuests={guests}
+                    />
+                  </div>
+                  <Button
+                    variant="primary"
+                    className=" mt-2 flex w-full items-center rounded-lg px-4 py-2 my-2 text-sm"
+                    onClick={() => setDrawerOpen(!drawerOpen)}
+                  >
+                    <Search className="mr-2 h-4 w-4" />
+                    Search
+                  </Button>
+                </nav>
+              </div>
+            </div>
+          </SheetContent>
+        </SheetTitle>
+      </Sheet>
       {/* Login Modal */}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
