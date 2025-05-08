@@ -9,14 +9,15 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function DatePickerWithRange({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
+  const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 1),
@@ -24,8 +25,8 @@ export function DatePickerWithRange({
 
   return (
     <div className={cn("grid border-none gap-2", className)}>
-      <Popover>
-        <PopoverTrigger asChild>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
           <Button
             id="date"
             className={cn(
@@ -109,8 +110,8 @@ export function DatePickerWithRange({
               <span>Pick a date</span>
             )}
           </Button>
-        </PopoverTrigger>
-        <PopoverContent className=" w-full p-0" align="start">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className=" w-full p-0" align="start">
           <Calendar
             initialFocus
             mode="range"
@@ -119,8 +120,8 @@ export function DatePickerWithRange({
             onSelect={setDate}
             numberOfMonths={2}
           />
-        </PopoverContent>
-      </Popover>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
