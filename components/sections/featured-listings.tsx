@@ -8,7 +8,7 @@ import Bedrooms from "../../public/svg-assets/Bedrooms";
 import BathIcon from "../../public/svg-assets/BathIcon";
 import Beds from "../../public/svg-assets/Beds";
 import GeuestIcon from "../../public/svg-assets/GeuestIcon";
-import LocationIcon  from "../../public/svg-assets/LocationIcon";
+import LocationIcon from "../../public/svg-assets/LocationIcon";
 import {
   Card,
   CardImage,
@@ -139,7 +139,6 @@ export default function FeaturedListings() {
         {" "}
         <h2 className="text-2xl font-bold">Featured listings</h2>
       </div>
-   
 
       <Carousel
         opts={{
@@ -163,8 +162,10 @@ export default function FeaturedListings() {
                   <Image
                     src={item.image || "/placeholder.svg"}
                     alt={item.title}
-                    fill
-                    className=" transition-transform p-2 group-hover:scale-105"
+                    width={300}
+                    height={200}
+                    loading="eager"
+                    className="transition-transform duration-300 group-hover:scale-105 w-full h-full object-cover"
                   />
                   <button
                     className="absolute right-3 top-3 rounded-full bg-white p-1.5 transition-colors"
@@ -192,7 +193,10 @@ export default function FeaturedListings() {
                       <span className="ml-1 text-sm">{item.rating}</span>
                     </div>
                   </div>
-                  <CardDescription className=" flex gap-3"> <LocationIcon/> {item.location}</CardDescription>
+                  <CardDescription className=" flex gap-3">
+                    {" "}
+                    <LocationIcon /> {item.location}
+                  </CardDescription>
                   <div className="mt-4 grid grid-cols-2  gap-2">
                     <span className="inline-flex items-center rounded-full   gap-3 px-2.5 py-0.5 text-xs">
                       <Bedrooms />
@@ -203,12 +207,12 @@ export default function FeaturedListings() {
                       {item.type.bathrooms} Bath
                     </span>
                     <span className="inline-flex items-center rounded-full   gap-3 px-2.5 py-0.5 text-xs">
-               <Beds/>
+                      <Beds />
                       {item.type.rooms} Beds
                     </span>
 
                     <span className="inline-flex items-center rounded-full   gap-3 px-2.5 py-0.5 text-xs">
-               <GeuestIcon/>
+                      <GeuestIcon />
                       {item.type.rooms} 5 Guests
                     </span>
                   </div>
