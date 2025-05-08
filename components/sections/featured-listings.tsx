@@ -158,7 +158,7 @@ export default function FeaturedListings() {
               key={item.id}
               className="pl-4 md:basis-1/2 lg:basis-1/4 "
             >
-              <Card className="border-none shadow-lg">
+              <Card className="shadow-lg  border-none my-12">
                 <CardImage>
                   <Image
                     src={item.image || "/placeholder.svg"}

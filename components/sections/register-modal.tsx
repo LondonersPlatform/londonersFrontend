@@ -172,7 +172,7 @@ export default function RegisterModal({
             className="h-10 object-contain"
           />
         </div>
-        <div className="mx-auto max-w-lg px-10 h-auto  overflow-auto">
+        <div className="mx-auto lg:max-w-lg lg:px-8 px-2 h-auto  overflow-auto">
           <h2 className="text-2xl font-bold text-center mb-4">Register</h2>
 
           <p className="text-center mb-6">

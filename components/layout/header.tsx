@@ -44,7 +44,7 @@ export default function Header() {
           />
         </Link>
         <div className="   flex items-center">
-          <nav className="hidden border w-full rounded-full px-4 p-0 lg:flex items-center  space-x-6">
+          <nav className=" border w-full rounded-full px-4 p-0 lg:flex items-center  space-x-6">
             <div className="relative border-e-2 pe-6">
               <div
                 className="flex items-center text-sm cursor-pointer"
@@ -89,6 +89,14 @@ export default function Header() {
           </nav>
         </div>
         <div className="flex items-center space-x-4">
+        <Button
+            variant="primary"
+            className=" mt-2 lg:hidden flex items-center rounded-full px-4 py-2 my-2 text-sm"
+            onClick={() => setDrawerOpen(!drawerOpen)}
+          >
+            <Search className="mr-2 h-4 w-4" />
+            Search
+          </Button>
           {!isLoading && session ? (
             <ProfileDropdown session={session} isLoading={isLoading} />
           ) : (
@@ -101,14 +109,7 @@ export default function Header() {
             </Button>
           )}
 
-          <Button
-            variant="primary"
-            className=" mt-2 lg:hidden flex items-center rounded-full px-4 py-2 my-2 text-sm"
-            onClick={() => setDrawerOpen(!drawerOpen)}
-          >
-            <Search className="mr-2 h-4 w-4" />
-            Search
-          </Button>
+      
         </div>
       </header>
       <Sheet open={drawerOpen} onOpenChange={setDrawerOpen} >
