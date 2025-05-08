@@ -1,17 +1,12 @@
-"use client";
-
-import { useState } from "react";
 import Image from "next/image";
-import { Heart, Search, SlidersHorizontal, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import FiltersModal from "@/components/sections/filter-modal";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  FilterButton,
+  SortSelect,
+  FavoriteButton,
+  SearchInput
+} from "@/components/listings/listing-client-components";
 import Link from "next/link";
 import Bedrooms from "../../public/svg-assets/Bedrooms";
 import BathIcon from "../../public/svg-assets/BathIcon";
@@ -27,130 +22,32 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-// Mock data for listings
-const listings = [
-  {
-    id: 1,
-    title: "Marlybone book",
-    location: "Phuket, Thailand",
-    area: "Devonshire Place",
-    rating: 4.6,
-    reviews: 200,
-    bedroom: 1,
-    beds: 4,
-    bath: 1,
-    guests: 5,
-    dateRange: "Feb 12 - Mar 18 (35 nights)",
-    pricePerNight: 500,
-    totalPrice: 1200,
-    images: ["/la1.png", "./la2.png"],
-    isFavorite: false,
-  },
-  {
-    id: 2,
-    title: "Marlybone book",
-    location: "Phuket, Thailand",
-    area: "Devonshire Place",
-    rating: 4.6,
-    reviews: 200,
-    bedroom: 1,
-    beds: 4,
-    bath: 1,
-    guests: 5,
-    dateRange: "Feb 12 - Mar 18 (35 nights)",
-    pricePerNight: 500,
-    totalPrice: 1200,
-    images: ["/la1.png", "/la2.png"],
-    isFavorite: true,
-  },
-  {
-    id: 3,
-    title: "Marlybone book",
-    location: "Phuket, Thailand",
-    area: "Devonshire Place",
-    rating: 4.6,
-    reviews: 200,
-    bedroom: 1,
-    beds: 4,
-    bath: 1,
-    guests: 5,
-    dateRange: "Feb 12 - Mar 18 (35 nights)",
-    pricePerNight: 500,
-    totalPrice: 1200,
-    images: ["/la1.png", "/la2.png"],
-    isFavorite: true,
-  },
-];
+import { getListings } from "./actions";
 
-export default function AllListingsPage() {
-  const [showFilters, setShowFilters] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<any>(null);
+// Define the type for search params
+type SearchParams = { [key: string]: string | string[] | undefined };
 
-  const handleApplyFilters = (filters: any) => {
-    setAppliedFilters(filters);
-    setShowFilters(false);
-    console.log("Applied filters:", filters);
-    // Here you would typically filter the listings based on the applied filters
-  };
+// This is now a server component
+export default async function AllListingsPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  // Fetch listings data from server action
+  const { listings, total } = await getListings(searchParams);
 
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Search and filter section */}
       <div className="mb-8">
-        <div className="relative lg:w-1/2 mb-6">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full rounded-full bg-gray-100 py-3 pl-12 pr-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-black"
-          />
-          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-500" />
-        </div>
+        <SearchInput />
 
         <div className="flex flex-col w-full gap-4 md:items-center md:flex-row">
-          <h1 className="text-2xl font-bold flex-grow">20 Rentals</h1>
+          <h1 className="text-2xl font-bold flex-grow">{total} Rentals</h1>
 
           <div className="flex items-center gap-3 justify-end w-full md:w-auto">
-            {/* Mobile view: Icon only */}
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-lg border border-gray-300 md:hidden"
-              onClick={() => setShowFilters(true)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              <span className="sr-only">Filters</span>
-            </Button>
-
-            {/* Desktop view: Icon with text */}
-            <Button
-              variant="outline"
-              className="hidden md:flex items-center space-x-2 rounded-lg border border-gray-300"
-              onClick={() => setShowFilters(true)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              <span>Filters</span>
-            </Button>
-
-            <div className="flex items-center space-x-2">
-              <span className="hidden md:inline text-sm font-medium">
-                Sort by:
-              </span>
-              <Select>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Default order" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Default order</SelectItem>
-                  <SelectItem value="low-to-high">
-                    Price: Low to High
-                  </SelectItem>
-                  <SelectItem value="high-to-low">
-                    Price: High to Low
-                  </SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <FilterButton />
+            <SortSelect />
           </div>
         </div>
       </div>
@@ -214,13 +111,7 @@ export default function AllListingsPage() {
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <h2 className="text-xl font-bold">{listing.title}</h2>
-                    <button className="rounded-full p-1 hover:bg-gray-100">
-                      <Heart
-                        className={`h-6 w-6 ${
-                          listing.isFavorite ? "fill-black text-black" : ""
-                        }`}
-                      />
-                    </button>
+                    <FavoriteButton isFavorite={listing.isFavorite} />
                   </div>
 
                   <div className="mb-4 flex items-center space-x-2">
@@ -317,13 +208,7 @@ export default function AllListingsPage() {
         </Button>
       </div>
 
-      {/* Filters Modal */}
-      {showFilters && (
-        <FiltersModal
-          onClose={() => setShowFilters(false)}
-          onApply={handleApplyFilters}
-        />
-      )}
+      {/* Filters Modal is now handled in the FilterButton component */}
     </div>
   );
 }
