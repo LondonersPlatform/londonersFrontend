@@ -24,7 +24,7 @@ export default function Hero() {
       <video
         ref={videoRef}
         src="/bgg.mov" // Ensure the path is correct for your video file in the public folder
-      
+      autoPlay
         loop
         muted
         className="object-cover w-full h-full transition-all duration-300 brightness-50"

@@ -62,7 +62,7 @@ export default async function AllListingsPage({
           >
             <div className="flex rounded-2xl p-0  my-6 border-gray-300 border-[1px] flex-col md:flex-row">
               {/* Images */}
-              <div className="relative p-0 m-0 rounded-xl items-center  flex w-full md:w-2/5">
+              <div className="relative p-0 m-0 rounded-xl items-center hidden   md:flex w-full md:w-2/5">
                 <div className="relative h-full w-1/2">
                   <Image
                     src={listing.images[1] || "/placeholder.svg"}

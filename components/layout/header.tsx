@@ -44,7 +44,7 @@ export default function Header() {
           />
         </Link>
         <div className="   flex items-center">
-          <nav className=" border w-full rounded-full px-4 p-0 lg:flex items-center  space-x-6">
+          <nav className=" hidden border w-full rounded-full px-4 p-0 lg:flex items-center  space-x-6">
             <div className="relative border-e-2 pe-6">
               <div
                 className="flex items-center text-sm cursor-pointer"
