@@ -75,7 +75,7 @@ export default function AllListingsPage({
               {/* Desktop Images */}
               <div className="relative p-0 m-0 rounded-xl items-center hidden md:flex w-full md:w-2/5">
                 <div className="relative h-full w-1/2">
-                  <Image
+                  <img
                     src={listing.images[1] || "/placeholder.svg"}
                     alt={listing.title}
                     width={300}
@@ -85,7 +85,7 @@ export default function AllListingsPage({
                   />
                 </div>
                 <div className="relative h-full w-1/2">
-                  <Image
+                  <img
                     src={listing.images[0] || "/placeholder.svg"}
                     alt={listing.title}
                     width={300}
@@ -103,7 +103,7 @@ export default function AllListingsPage({
                     {listing.images.map((src: string, index: number) => (
                       <CarouselItem key={index}>
                         <div className="keen-slider__slide relative h-64 w-full">
-                          <Image
+                          <img
                             src={src || "/placeholder.svg"}
                             alt={listing.title}
                             width={400}

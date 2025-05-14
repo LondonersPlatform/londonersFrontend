@@ -13,17 +13,17 @@ export interface ListingParams {
     const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/Retrieve-all-listings`;
     const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   
-    const requestBody = {
-      q: searchParams?.q || '',
-      limit: searchParams?.limit ? Number(searchParams.limit) : 10,
-      't.city': searchParams?.city || '',
-      available: searchParams?.checkIn && searchParams?.checkOut
-        ? {
-            checkIn: searchParams.checkIn,
-            checkOut: searchParams.checkOut,
-          }
-        : undefined,
-    };
+    // const requestBody = {
+    //   q: searchParams?.q || '',
+    //   limit: searchParams?.limit ? Number(searchParams.limit) : 10,
+    //   't.city': searchParams?.city || '',
+    //   available: searchParams?.checkIn && searchParams?.checkOut
+    //     ? {
+    //         checkIn: searchParams.checkIn,
+    //         checkOut: searchParams.checkOut,
+    //       }
+    //     : undefined,
+    // };
   
     const response = await fetch(apiUrl, {
       method: "POST",
@@ -31,7 +31,7 @@ export interface ListingParams {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(requestBody),
+    //   body: JSON.stringify(requestBody),
     });
   
     if (!response.ok) {
