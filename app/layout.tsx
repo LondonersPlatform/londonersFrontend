@@ -7,7 +7,7 @@ import { AuthProvider } from "@/context/auth-context";
 import ClientLayout from "@/components/ClientLayout";
 import { Suspense } from "react";
 import Loading from "./loading";
-
+import QueryProvider from "@/components/QueryProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -27,7 +27,9 @@ export default function RootLayout({
           <AuthProvider>
             {/* Wrap your layout in Suspense to show the loader */}
             <Suspense fallback={<Loading />}>
-              <ClientLayout>{children}</ClientLayout>
+              <ClientLayout>
+               <QueryProvider> {children}</QueryProvider>
+                </ClientLayout>
             </Suspense>
           </AuthProvider>
         </ThemeProvider>

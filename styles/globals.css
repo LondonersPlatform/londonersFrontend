@@ -51,7 +51,10 @@ body {
 
     
 }
-
+.image-wrapper
+{
+  height: 100%;
+}
 @layer base {
   * {
     @apply border-border;
