@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { useAllListing } from '@/context/AllListingContext';
 import {
   FilterButton,
   SortSelect,
@@ -33,7 +34,7 @@ const LIMIT = 10;
 
 export default function AllListingsPage() {
   const searchParamsHook = useSearchParams();
-  const [listings, setListings] = useState<any[]>([]);
+  const { data, setData, available,setCopyData } = useAllListing();
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -52,14 +53,15 @@ export default function AllListingsPage() {
     setError(null);
 
     const searchParams = getSearchParamsObject();
-
     try {
-      const { listings: newListings, total } = await fetchListings(
-        searchParams,
+      const { listings: newListings, total } = await fetchListings({
+        ...searchParams,
         pageToLoad,
-        LIMIT
-      );
-      setListings(prev => (reset ? newListings : [...prev, ...newListings]));
+        LIMIT,
+        available:available
+    });
+      setData(reset ? newListings : [...(data || []), ...newListings]);
+      setCopyData(reset ? newListings : [...(data || []), ...newListings])
       setTotal(total);
       setPage(pageToLoad);
     } catch (err: any) {
@@ -68,16 +70,19 @@ export default function AllListingsPage() {
       setLoading(false);
     }
   };
+  console.log(available)
+console.log(data)
+
 
   useEffect(() => {
     loadListings(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParamsHook.toString()]);
+  }, [searchParamsHook.toString(), available]);
 
   const showMore = () => loadListings(page + 1);
   const showLess = () => loadListings(1, true);
 
-  if (loading && listings.length === 0) return <Loading />;
+  if (loading && !data) return <Loading />;
   if (error) return <div className="p-10 text-center text-red-600">Error: {error}</div>;
 
   return (
@@ -94,7 +99,7 @@ export default function AllListingsPage() {
       </div>
 
       <div className="space-y-6">
-        {listings.map((listing: any) => (
+        {data?.map((listing: any) => (
           <Link
             href={`all-listings/${listing.id}`}
             key={listing.id}
@@ -233,7 +238,7 @@ export default function AllListingsPage() {
       </div>
 
       <div className="mt-10 text-center space-x-4">
-        {listings.length < total && (
+        {data?.length < total && (
           <Button onClick={showMore} disabled={loading}>
             {loading ? 'Loading...' : 'Show More'}
           </Button>

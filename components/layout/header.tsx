@@ -13,6 +13,8 @@ import { useAuth } from "@/context/auth-context";
 import { ProfileDropdown } from "./components/ProfileDropdown";
 import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
+import { useRouter } from "next/navigation";
+import { useAllListing } from "@/context/AllListingContext";
 
 export default function Header() {
   const [checkInOpen, setCheckInOpen] = useState(false);
@@ -20,17 +22,54 @@ export default function Header() {
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [guests, setGuests] = useState({ adults: 1, children: 0, infants: 0 });
-
   const [searchOpen, setSearchOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [total, setTotal] = useState(0);
+  const router = useRouter();
+  const { session, isLoading } = useAuth();
+  const { setAvailableData, available } = useAllListing();
+
   const getTotalGuests = () => {
-    const total = guests.adults + guests.children + guests.infants;
+    const total = +guests.adults + +guests.children + +guests.infants + 1;
+    // console.log(total)
+    setTotal(total);
     return total === 0
       ? "Add guests"
       : `${total} guest${total !== 1 ? "s" : ""}`;
   };
-  const { session, isLoading } = useAuth();
-  console.log(session, "sessionsessionsession");
+
+  const handleGuestSelect = (newGuests: any) => {
+    setGuests(newGuests);
+    getTotalGuests(); // This will update the display
+  };
+
+  const storedata = () => {
+    setSearchOpen(!searchOpen);
+    const searchData: { checkIn?: string; checkOut?: string; minOccupancy?: number } = {};
+    
+    if(checkIn)
+      searchData.checkIn = checkIn;
+    else
+    searchData.checkIn = "2024-06-07"
+    if(checkOut)
+      searchData.checkOut = checkOut;
+    else
+    searchData.checkOut = "2026-06-07";
+    if(total)
+      searchData.minOccupancy = total;
+      
+    setAvailableData(searchData as { checkIn: string; checkOut: string });
+    console.log('Setting search data:', searchData);
+    router.push('/all-listings');
+  }
+
+  const handleDateChange = (checkInDate: string, checkOutDate: string) => {
+    setCheckIn(checkInDate);
+    setCheckOut(checkOutDate);
+  };
+
   return (
     <>
       <header className="container mx-auto flex items-center justify-between py-4 px-4 md:px-6">
@@ -54,7 +93,7 @@ export default function Header() {
                   setGuestsOpen(false);
                 }}
               >
-                <DatePickerWithRange />
+                <DatePickerWithRange onDateChange={handleDateChange} />
               </div>
             </div>
 
@@ -66,12 +105,10 @@ export default function Header() {
                   setCheckInOpen(false);
                   setCheckOutOpen(false);
                 }}
+                
               ></div>
               <GuestSelector
-                //  ال props دي مش موجودة في ال component ده
-                // isOpen={guestsOpen}
-                // onClose={() => setGuestsOpen(false)}
-                onSelect={setGuests}
+                onSelect={handleGuestSelect}
                 initialGuests={guests}
               />
             </div>
@@ -79,7 +116,7 @@ export default function Header() {
             <Button
               variant="primary"
               className="hidden mt-2 md:flex items-center rounded-full px-4 py-2 my-2 text-sm"
-              onClick={() => setSearchOpen(!searchOpen)}
+              onClick={storedata}
             >
               <Search className="mr-2 h-4 w-4" />
               Search
@@ -143,16 +180,14 @@ export default function Header() {
                     ></div>
 
                     <GuestSelector
-                      // isOpen={guestsOpen}
-                      // onClose={() => setGuestsOpen(false)}
-                      onSelect={setGuests}
+                      onSelect={handleGuestSelect}
                       initialGuests={guests}
                     />
                   </div>
                   <Button
                     variant="primary"
                     className=" mt-2 flex w-full items-center rounded-lg px-4 py-2 my-2 text-sm"
-                    onClick={() => setDrawerOpen(!drawerOpen)}
+                  
                   >
                     <Search className="mr-2 h-4 w-4" />
                     Search

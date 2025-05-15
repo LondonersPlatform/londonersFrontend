@@ -14,14 +14,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+interface DatePickerWithRangeProps extends React.HTMLAttributes<HTMLDivElement> {
+  onDateChange?: (checkIn: string, checkOut: string) => void;
+}
+
 export function DatePickerWithRange({
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+  onDateChange,
+}: DatePickerWithRangeProps) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 1),
   });
+
+  const handleDateSelect = (newDate: DateRange | undefined) => {
+    setDate(newDate);
+    if (newDate?.from && newDate?.to) {
+      const checkIn = format(newDate.from, "yyyy-MM-dd");
+      const checkOut = format(newDate.to, "yyyy-MM-dd");
+      onDateChange?.(checkIn, checkOut);
+    }
+  };
 
   return (
     <div className={cn("grid border-none gap-2", className)}>
@@ -117,7 +131,7 @@ export function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={setDate}
+            onSelect={handleDateSelect}
             numberOfMonths={2}
           />
         </DropdownMenuContent>

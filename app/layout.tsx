@@ -4,10 +4,12 @@ import "./date-picker.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/context/auth-context";
+import { AllListingProvider } from "@/context/AllListingContext";
 import ClientLayout from "@/components/ClientLayout";
 import { Suspense } from "react";
 import Loading from "./loading";
 import QueryProvider from "@/components/QueryProvider";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -25,12 +27,15 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <AuthProvider>
-            {/* Wrap your layout in Suspense to show the loader */}
-            <Suspense fallback={<Loading />}>
-              <ClientLayout>
-               <QueryProvider> {children}</QueryProvider>
+            <AllListingProvider>
+              <Suspense fallback={<Loading />}>
+                <ClientLayout>
+                  <QueryProvider>
+                    {children}
+                  </QueryProvider>
                 </ClientLayout>
-            </Suspense>
+              </Suspense>
+            </AllListingProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

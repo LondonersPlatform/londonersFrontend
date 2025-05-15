@@ -1,5 +1,5 @@
 "use client"
-
+import { useAllListing } from "@/context/AllListingContext";
 import { useState } from "react"
 import * as Slider from "@radix-ui/react-slider"
 import { X, ChevronRight, Wifi, Wind, UtensilsCrossed, Baby } from "lucide-react"
@@ -65,6 +65,7 @@ export default function FiltersModal({ onClose, onApply }: FiltersModalProps) {
       }
     })
   }
+  const { data, setData, copyData } = useAllListing();
 
   const handleClearAll = () => {
     setFilters({
@@ -74,12 +75,13 @@ export default function FiltersModal({ onClose, onApply }: FiltersModalProps) {
       priceRange: [100, 10000],
       amenities: [],
     })
+    setData(copyData)
   }
 
   const formatPrice = (value: number) => {
     return value >= 1000 ? `$${value / 1000}K` : `$${value}`
   }
-
+ 
   return (
     <div className="fixed inset-0   shadow-lg border rounded-2xl bg-[#00000066] backdrop-blur-sm z-50 ">
     <div className=" p-6 relative bg-white my-6 rounded-2xl mx-auto  max-w-3xl">

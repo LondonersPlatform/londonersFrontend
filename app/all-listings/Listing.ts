@@ -1,7 +1,10 @@
+export type ListingParams = Record<string, string>;
+
 export async function fetchListings(
   searchParams?: any,
   page = 1,
-  limit = 10
+  limit = 10,
+  available?:any
 ): Promise<any> {
   const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/listing-search`;
   const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

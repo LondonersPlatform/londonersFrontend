@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Heart, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FiltersModal from "@/components/sections/filter-modal";
+import { useAllListing } from "@/context/AllListingContext";
 import {
   Select,
   SelectContent,
@@ -16,14 +17,65 @@ import { useRouter, useSearchParams } from "next/navigation";
 // Filter button component
 export function FilterButton() {
   const [showFilters, setShowFilters] = useState(false);
-  
+  const { data, setData } = useAllListing();
   const handleApplyFilters = (filters: any) => {
+    console.log(filters)
+    const filtered = data.filter((item:any) => {
+      // Price range
+      if (
+        Array.isArray(filters.priceRange) &&
+        typeof filters.priceRange[0] === 'number' &&
+        typeof filters.priceRange[1] === 'number'
+      ) {
+        const [minPrice, maxPrice] = filters.priceRange;
+        if (item.pricePerNight < minPrice || item.pricePerNight > maxPrice) {
+          return false;
+        }
+      }
+  
+      // Bathrooms
+      if (filters.bathrooms !== null && filters.bathrooms !== undefined) {
+        if (item.bath !== filters.bathrooms) {
+          return false;
+        }
+      }
+  
+      // Bedrooms
+      if (filters.bedrooms !== null && filters.bedrooms !== undefined) {
+        if (item.bedroom !== filters.bedrooms) {
+          return false;
+        }
+      }
+  
+      // Beds
+      if (filters.beds !== null && filters.beds !== undefined) {
+        if (item.beds !== filters.beds) {
+          return false;
+        }
+      }
+  
+      // Amenities (must contain all selected amenities)
+      if (
+        Array.isArray(filters.amenities) &&
+        filters.amenities.length > 0
+      ) {
+        const hasAllAmenities = filters.amenities.every((amenity: string) =>
+          item.amenities.includes(amenity)
+        );
+        if (!hasAllAmenities) {
+          return false;
+        }
+      }
+  
+      return true;
+    });
+  
+    setData(filtered);
     setShowFilters(false);
-    console.log("Applied filters:", filters);
-    // Here you would typically filter the listings based on the applied filters
-    // For server components, we'd need to use URL parameters and refresh the page
-    // or use a more complex state management solution
   };
+  
+  
+  
 
   return (
     <>

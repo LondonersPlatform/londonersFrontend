@@ -9,3 +9,12 @@ export default function Listings({ searchParams }: { searchParams?: ListingParam
     queryFn: () => fetchListings(searchParams),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  return {
+    listings: data?.listings || [],
+    total: data?.total || 0,
+    isLoading,
+    isError,
+    error
+  };
+}
