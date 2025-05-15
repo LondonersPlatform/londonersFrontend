@@ -1,57 +1,87 @@
 'use client';
 
-import Image from "next/image";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 import {
   FilterButton,
   SortSelect,
   FavoriteButton,
   SearchInput,
-} from "@/components/listings/listing-client-components";
-import Link from "next/link";
-import Bedrooms from "../../public/svg-assets/Bedrooms";
-import BathIcon from "../../public/svg-assets/BathIcon";
-import Loading from "../loading";
-import Beds from "../../public/svg-assets/Beds";
-import GeuestIcon from "../../public/svg-assets/GeuestIcon";
-import LocationIcon from "../../public/svg-assets/LocationIcon";
-import DistarrowIcon from "../../public/svg-assets/DistarrowIcon";
+} from '@/components/listings/listing-client-components';
+
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { useQuery } from "@tanstack/react-query";
-import { fetchListings, ListingParams } from "../all-listings/Listing";
+} from '@/components/ui/carousel';
 
-// Props from server
-export default function AllListingsPage({
-  searchParams,
-}: {
-  searchParams: ListingParams;
-}) {
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ['listings'],
-    queryFn: () => fetchListings(searchParams),
-    staleTime: 5 * 60 * 1000,
-  });
+import Bedrooms from '../../public/svg-assets/Bedrooms';
+import BathIcon from '../../public/svg-assets/BathIcon';
+import Beds from '../../public/svg-assets/Beds';
+import GeuestIcon from '../../public/svg-assets/GeuestIcon';
+import LocationIcon from '../../public/svg-assets/LocationIcon';
+import DistarrowIcon from '../../public/svg-assets/DistarrowIcon';
+import Loading from '../loading';
+import { fetchListings } from './Listing'; // your API function
 
-  if (isLoading) return <Loading/>;
-  if (isError) return <div className="p-10 text-center text-red-600">Error: {(error as Error).message}</div>;
+const LIMIT = 10;
 
-  const { listings, total } = data || { listings: [], total: 0 };
+export default function AllListingsPage() {
+  const searchParamsHook = useSearchParams();
+  const [listings, setListings] = useState<any[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const getSearchParamsObject = () => {
+    const params: Record<string, string> = {};
+    searchParamsHook.forEach((value, key) => {
+      params[key] = value;
+    });
+    return params;
+  };
+
+  const loadListings = async (pageToLoad: number, reset = false) => {
+    setLoading(true);
+    setError(null);
+
+    const searchParams = getSearchParamsObject();
+
+    try {
+      const { listings: newListings, total } = await fetchListings(
+        searchParams,
+        pageToLoad,
+        LIMIT
+      );
+      setListings(prev => (reset ? newListings : [...prev, ...newListings]));
+      setTotal(total);
+      setPage(pageToLoad);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadListings(1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParamsHook.toString()]);
+
+  const showMore = () => loadListings(page + 1);
+  const showLess = () => loadListings(1, true);
+
+  if (loading && listings.length === 0) return <Loading />;
+  if (error) return <div className="p-10 text-center text-red-600">Error: {error}</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Search and filter section */}
       <div className="mb-8">
         <SearchInput />
         <div className="flex flex-col w-full gap-4 md:items-center md:flex-row">
@@ -63,9 +93,8 @@ export default function AllListingsPage({
         </div>
       </div>
 
-      {/* Listings */}
       <div className="space-y-6">
-        {listings.map((listing: any, index: number) => (
+        {listings.map((listing: any) => (
           <Link
             href={`all-listings/${listing.id}`}
             key={listing.id}
@@ -76,7 +105,7 @@ export default function AllListingsPage({
               <div className="relative p-0 m-0 rounded-xl items-center hidden md:flex w-full md:w-2/5">
                 <div className="relative h-full w-1/2">
                   <img
-                    src={listing.images[1] || "/placeholder.svg"}
+                    src={listing.images[1] || '/placeholder.svg'}
                     alt={listing.title}
                     width={300}
                     height={200}
@@ -86,25 +115,25 @@ export default function AllListingsPage({
                 </div>
                 <div className="relative h-full w-1/2">
                   <img
-                    src={listing.images[0] || "/placeholder.svg"}
+                    src={listing.images[0] || '/placeholder.svg'}
                     alt={listing.title}
                     width={300}
-                    loading="eager"
                     height={200}
+                    loading="eager"
                     className="w-full h-full object-cover"
                   />
                 </div>
               </div>
 
               {/* Mobile Carousel */}
-              <div className={`relative md:hidden p-0 m-0 rounded-xl w-full`}>
+              <div className="relative md:hidden p-0 m-0 rounded-xl w-full">
                 <Carousel className="w-full">
                   <CarouselContent>
                     {listing.images.map((src: string, index: number) => (
                       <CarouselItem key={index}>
                         <div className="keen-slider__slide relative h-64 w-full">
                           <img
-                            src={src || "/placeholder.svg"}
+                            src={src || '/placeholder.svg'}
                             alt={listing.title}
                             width={400}
                             height={256}
@@ -146,8 +175,8 @@ export default function AllListingsPage({
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.floor(listing.rating)
-                              ? "text-yellow-400"
-                              : "text-gray-300"
+                              ? 'text-yellow-400'
+                              : 'text-gray-300'
                           }`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
@@ -184,7 +213,7 @@ export default function AllListingsPage({
 
                 <div>
                   <div className="my-4 text-sm">{listing.dateRange}</div>
-                  <div className="flex items-end gap-5 ">
+                  <div className="flex items-end gap-5">
                     <div>
                       <span className="text-xl font-bold">${listing.pricePerNight}</span>
                       <span className="text-sm text-gray-500">/night</span>
@@ -203,15 +232,17 @@ export default function AllListingsPage({
         ))}
       </div>
 
-      {/* Show more button */}
-      <div className="mt-8 flex justify-center">
-        <Button
-          variant="primary"
-          className="flex items-center space-x-2 rounded-full bg-black px-6 py-3 text-white"
-        >
-          <span>Show more</span>
-          <ArrowRight className="h-4 w-4" />
-        </Button>
+      <div className="mt-10 text-center space-x-4">
+        {listings.length < total && (
+          <Button onClick={showMore} disabled={loading}>
+            {loading ? 'Loading...' : 'Show More'}
+          </Button>
+        )}
+        {page > 1 && (
+          <Button variant="outline" onClick={showLess}>
+            Show Less
+          </Button>
+        )}
       </div>
     </div>
   );
