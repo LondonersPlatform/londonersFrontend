@@ -14,68 +14,78 @@ import {
 } from "@/components/ui/select";
 import { useRouter, useSearchParams } from "next/navigation";
 
+interface ListingItem {
+  pricePerNight: number;
+  bath: number;
+  bedroom: number;
+  beds: number;
+  amenities: string[];
+}
+
+interface FilterOptions {
+  priceRange?: [number, number] | null;
+  bathrooms?: number | null;
+  bedrooms?: number | null;
+  beds?: number | null;
+  amenities?: string[];
+}
+
 // Filter button component
 export function FilterButton() {
   const [showFilters, setShowFilters] = useState(false);
   const { data, setData } = useAllListing();
-  const handleApplyFilters = (filters: any) => {
+
+  const handleApplyFilters = (filters: FilterOptions) => {
     console.log(filters)
-    const filtered = data.filter((item:any) => {
-      // Price range
-      if (
-        Array.isArray(filters.priceRange) &&
-        typeof filters.priceRange[0] === 'number' &&
-        typeof filters.priceRange[1] === 'number'
-      ) {
+    const filtered = data.filter((item: ListingItem) => {
+      // Price range filter
+      if (filters.priceRange?.length === 2) {
         const [minPrice, maxPrice] = filters.priceRange;
         if (item.pricePerNight < minPrice || item.pricePerNight > maxPrice) {
           return false;
         }
       }
-  
-      // Bathrooms
-      if (filters.bathrooms !== null && filters.bathrooms !== undefined) {
+
+      // Bathrooms filter
+      if(filters.bathrooms){
+      if (typeof filters.bathrooms === 'number') {
         if (item.bath !== filters.bathrooms) {
           return false;
         }
       }
-  
-      // Bedrooms
-      if (filters.bedrooms !== null && filters.bedrooms !== undefined) {
+    }
+      if (typeof filters.bedrooms === 'number') {
         if (item.bedroom !== filters.bedrooms) {
           return false;
         }
       }
-  
-      // Beds
-      if (filters.beds !== null && filters.beds !== undefined) {
+
+      // // Beds filter
+      if (typeof filters.beds === 'number') {
         if (item.beds !== filters.beds) {
           return false;
         }
       }
-  
-      // Amenities (must contain all selected amenities)
-      if (
-        Array.isArray(filters.amenities) &&
-        filters.amenities.length > 0
-      ) {
-        const hasAllAmenities = filters.amenities.every((amenity: string) =>
-          item.amenities.includes(amenity)
+
+      // Amenities filter - check if item has all selected amenities
+      if (Array.isArray(filters.amenities) && filters.amenities.length > 0) {
+        const loweredCaseData=item.amenities.map(el=>el.toLocaleLowerCase())
+        const itemAmenities = new Set(loweredCaseData);
+        const hasAllAmenities = filters.amenities.every(amenity => 
+          itemAmenities.has(amenity.toLocaleLowerCase())
         );
         if (!hasAllAmenities) {
           return false;
         }
       }
-  
+
       return true;
     });
-  
+console.log(filtered)
+console.log(data)
     setData(filtered);
     setShowFilters(false);
   };
-  
-  
-  
 
   return (
     <>

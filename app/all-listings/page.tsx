@@ -70,8 +70,8 @@ export default function AllListingsPage() {
       setLoading(false);
     }
   };
-  console.log(available)
-console.log(data)
+//   console.log(available)
+// console.log(data)
 
 
   useEffect(() => {
