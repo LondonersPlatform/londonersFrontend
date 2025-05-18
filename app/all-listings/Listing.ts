@@ -1,16 +1,9 @@
-export async function fetchListings(
-  searchParams?: any,
-  page = 1,
-  limit = 10
-): Promise<any> {
+export async function fetchListings(searchParams?: any): Promise<any> {
   const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/listing-search`;
   const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   const requestBody = {
     ...searchParams,
-    skip: (page - 1) * limit,
-    limit: limit,
-    
   };
 
   const response = await fetch(apiUrl, {
@@ -20,12 +13,15 @@ export async function fetchListings(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(requestBody),
+    next: { revalidate: 60 },
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || "Failed to retrieve listings");
   }
+
+  
 
   const data = await response.json();
   return {

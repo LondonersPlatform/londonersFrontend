@@ -59,12 +59,16 @@ export function FilterButton() {
   );
 }
 
-// Sort component
-export function SortSelect() {
+type SortSelectProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+
+export function SortSelect({ value, onChange }: SortSelectProps) {
   return (
     <div className="flex items-center space-x-2">
       <span className="hidden md:inline text-sm font-medium">Sort by:</span>
-      <Select>
+      <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="w-[200px]">
           <SelectValue placeholder="Default order" />
         </SelectTrigger>
@@ -72,13 +76,11 @@ export function SortSelect() {
           <SelectItem value="default">Default order</SelectItem>
           <SelectItem value="low-to-high">Price: Low to High</SelectItem>
           <SelectItem value="high-to-low">Price: High to Low</SelectItem>
-          <SelectItem value="rating">Rating</SelectItem>
         </SelectContent>
       </Select>
     </div>
   );
 }
-
 // Favorite button component
 export function FavoriteButton({ isFavorite }: { isFavorite: boolean }) {
   const [favorite, setFavorite] = useState(isFavorite);

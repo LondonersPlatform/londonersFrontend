@@ -15,13 +15,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -30,31 +23,16 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
+import Gallery from "../ui/Gallery";
 
-export function PropertyCarousel() {
+export function PropertyCarousel({imagesDummy}:any) {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
   const propertyUrl = "https://example.com/property/marlybone-book";
+// Using the same Unsplash imagesDummy from the original component
 
-  // Travel destinations for the carousel
-  const travelDestinations = [
-    "Bali Beach Resort",
-    "Swiss Alps Chalet",
-    "Santorini Villa",
-    "Kyoto Garden Retreat",
-    "Maldives Overwater Bungalow",
-  ];
-
-  // Travel destinations for thumbnails
-  const thumbnailDestinations = [
-    "Beach View",
-    "Mountain View",
-    "Pool Area",
-    "Restaurant",
-    "Bedroom Suite",
-  ];
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(propertyUrl);
@@ -103,45 +81,11 @@ export function PropertyCarousel() {
       </div>
 
       <div className="relative">
-        <Carousel className="w-full">
-          <CarouselContent>
-            {travelDestinations.map((destination, index) => (
-              <CarouselItem key={index}>
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg">
-                  <Image
-                    src={`/${index + 1}dt.png`}
-                    alt={`${destination} image`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-2" />
-          <CarouselNext className="right-2" />
-
-       
-        </Carousel>
+   
+     <Gallery imagesDummy={imagesDummy}/>
       </div>
 
-      <div className="overflow-x-auto pb-2">
-        <div className="flex gap-2">
-          {thumbnailDestinations.map((thumbnail, index) => (
-            <div
-              key={index}
-              className="relative min-w-[120px] h-[80px] rounded-lg overflow-hidden border"
-            >
-              <Image
-                src={`/${index + 1}dt.png`}
-                alt={`${thumbnail}`}
-                fill
-                className="object-cover"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+
 
       {/* Share Modal */}
       <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>

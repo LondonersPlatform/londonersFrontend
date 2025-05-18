@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   FilterButton,
@@ -28,18 +27,22 @@ import LocationIcon from '../../public/svg-assets/LocationIcon';
 import DistarrowIcon from '../../public/svg-assets/DistarrowIcon';
 import Loading from '../loading';
 import { fetchListings } from './Listing'; // your API function
+import { ListingSkeletonCard } from '@/components/ui/ListingSkeletonCard';
 
-const LIMIT = 10;
+const LIMIT = 5;
 
 export default function AllListingsPage() {
   const searchParamsHook = useSearchParams();
-  const [listings, setListings] = useState<any[]>([]);
+  const [allListings, setAllListings] = useState<any[]>([]);
+  const [visibleListings, setVisibleListings] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState('default');
 
-  const getSearchParamsObject = () => {
+
+ const getSearchParamsObject = () => {
     const params: Record<string, string> = {};
     searchParamsHook.forEach((value, key) => {
       params[key] = value;
@@ -47,21 +50,28 @@ export default function AllListingsPage() {
     return params;
   };
 
-  const loadListings = async (pageToLoad: number, reset = false) => {
+  const sortListings = (listings: any[], sort: string) => {
+    if (sort === 'low-to-high') {
+      return [...listings].sort((a, b) => a.pricePerNight - b.pricePerNight);
+    } else if (sort === 'high-to-low') {
+      return [...listings].sort((a, b) => b.pricePerNight - a.pricePerNight);
+    }
+    return listings; // default
+  };
+
+  const loadAllListings = async () => {
     setLoading(true);
     setError(null);
-
-    const searchParams = getSearchParamsObject();
-
     try {
-      const { listings: newListings, total } = await fetchListings(
-        searchParams,
-        pageToLoad,
-        LIMIT
-      );
-      setListings(prev => (reset ? newListings : [...prev, ...newListings]));
+      const searchParams = getSearchParamsObject();
+      const { listings: fetchedListings, total } = await fetchListings(searchParams);
+
+
+      const sortedListings = sortListings(fetchedListings, sortOrder);
+      setAllListings(sortedListings);
       setTotal(total);
-      setPage(pageToLoad);
+      setPage(1);
+      setVisibleListings(sortedListings.slice(0, LIMIT));
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -70,14 +80,37 @@ export default function AllListingsPage() {
   };
 
   useEffect(() => {
-    loadListings(1, true);
+    loadAllListings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParamsHook.toString()]);
+  }, [searchParamsHook.toString(), sortOrder]);
 
-  const showMore = () => loadListings(page + 1);
-  const showLess = () => loadListings(1, true);
+  const showMore = () => {
+    const nextPage = page + 1;
+    const end = nextPage * LIMIT;
+    setPage(nextPage);
+    setVisibleListings(allListings.slice(0, end));
+  };
 
-  if (loading && listings.length === 0) return <Loading />;
+  const showLess = () => {
+    setPage(1);
+    setVisibleListings(allListings.slice(0, LIMIT));
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortOrder(value);
+  };
+
+
+  if (loading && visibleListings.length === 0) {
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-6">
+      {[...Array(3)].map((_, index) => (
+        <ListingSkeletonCard key={index} />
+      ))}
+    </div>
+  );
+}
+  ;
   if (error) return <div className="p-10 text-center text-red-600">Error: {error}</div>;
 
   return (
@@ -88,13 +121,13 @@ export default function AllListingsPage() {
           <h1 className="text-2xl font-bold flex-grow">{total} Rentals</h1>
           <div className="flex items-center gap-3 justify-end w-full md:w-auto">
             <FilterButton />
-            <SortSelect />
+              <SortSelect value={sortOrder} onChange={handleSortChange} />
           </div>
         </div>
       </div>
 
       <div className="space-y-6">
-        {listings.map((listing: any) => (
+        {visibleListings.map((listing: any) => (
           <Link
             href={`all-listings/${listing.id}`}
             key={listing.id}
@@ -102,7 +135,7 @@ export default function AllListingsPage() {
           >
             <div className="flex rounded-2xl p-0 my-6 border-gray-300 border-[1px] flex-col md:flex-row">
               {/* Desktop Images */}
-              <div className="relative p-0 m-0 rounded-xl items-center hidden md:flex w-full md:w-2/5">
+              <div className="relative gap-3 p-0 m-0 rounded-xl items-center hidden md:flex w-full md:w-2/5">
                 <div className="relative h-full w-1/2">
                   <img
                     src={listing.images[1] || '/placeholder.svg'}
@@ -110,7 +143,7 @@ export default function AllListingsPage() {
                     width={300}
                     height={200}
                     loading="eager"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full rounded-s-xl object-cover"
                   />
                 </div>
                 <div className="relative h-full w-1/2">
@@ -233,13 +266,13 @@ export default function AllListingsPage() {
       </div>
 
       <div className="mt-10 text-center space-x-4">
-        {listings.length < total && (
-          <Button onClick={showMore} disabled={loading}>
+        {visibleListings.length < allListings.length && (
+          <Button onClick={showMore} disabled={loading} className=' rounded-full'>
             {loading ? 'Loading...' : 'Show More'}
           </Button>
         )}
         {page > 1 && (
-          <Button variant="outline" onClick={showLess}>
+          <Button variant="secondary" onClick={showLess} className=' rounded-full'>
             Show Less
           </Button>
         )}
