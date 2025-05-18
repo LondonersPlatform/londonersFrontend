@@ -13,6 +13,7 @@ import { useAuth } from "@/context/auth-context";
 import { ProfileDropdown } from "./components/ProfileDropdown";
 import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [checkInOpen, setCheckInOpen] = useState(false);
@@ -23,6 +24,9 @@ export default function Header() {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedDateRange, setSelectedDateRange] = useState<any | undefined>();
+const router = useRouter();
+
   const getTotalGuests = () => {
     const total = guests.adults + guests.children + guests.infants;
     return total === 0
@@ -54,7 +58,7 @@ export default function Header() {
                   setGuestsOpen(false);
                 }}
               >
-                <DatePickerWithRange />
+                <DatePickerWithRange onDateChange={setSelectedDateRange} />
               </div>
             </div>
 
@@ -75,19 +79,37 @@ export default function Header() {
                 initialGuests={guests}
               />
             </div>
+<Button
+  variant="primary"
+  className="hidden mt-2 md:flex items-center rounded-full px-4 py-2 my-2 text-sm"
+  onClick={() => {
+    const checkIn = selectedDateRange?.from
+      ? selectedDateRange.from.toISOString().split("T")[0]
+      : "";
+    const checkOut = selectedDateRange?.to
+      ? selectedDateRange.to.toISOString().split("T")[0]
+      : "";
 
-            <Button
-              variant="primary"
-              className="hidden mt-2 md:flex items-center rounded-full px-4 py-2 my-2 text-sm"
-              onClick={() => setSearchOpen(!searchOpen)}
-            >
-              <Search className="mr-2 h-4 w-4" />
-              Search
-            </Button>
+    const minOccupancy = guests.adults + guests.children + guests.infants;
+
+    const query = new URLSearchParams({
+      checkIn,
+      checkOut,
+      minOccupancy: minOccupancy.toString(),
+      ignoreFlexibleBlocks: "false",
+    });
+
+    router.push(`/all-listings?${query.toString()}`);
+  }}
+>
+  <Search className="mr-2 h-4 w-4" />
+  Search
+</Button>
+
           </nav>
         </div>
         <div className="flex items-center space-x-4">
-        <Button
+          <Button
             variant="primary"
             className=" mt-2 lg:hidden flex items-center rounded-full px-4 py-2 my-2 text-sm"
             onClick={() => setDrawerOpen(!drawerOpen)}
@@ -106,8 +128,6 @@ export default function Header() {
               Login
             </Button>
           )}
-
-      
         </div>
       </header>
       <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
@@ -128,7 +148,9 @@ export default function Header() {
                         setGuestsOpen(false);
                       }}
                     >
-                      <DatePickerWithRange />
+                      <DatePickerWithRange
+                        onDateChange={setSelectedDateRange}
+                      />
                     </div>
                   </div>
 

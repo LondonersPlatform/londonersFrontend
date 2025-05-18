@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Heart, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FiltersModal from "@/components/sections/filter-modal";
@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // Filter button component
 export function FilterButton() {
@@ -58,12 +59,16 @@ export function FilterButton() {
   );
 }
 
-// Sort component
-export function SortSelect() {
+type SortSelectProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+
+export function SortSelect({ value, onChange }: SortSelectProps) {
   return (
     <div className="flex items-center space-x-2">
       <span className="hidden md:inline text-sm font-medium">Sort by:</span>
-      <Select>
+      <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="w-[200px]">
           <SelectValue placeholder="Default order" />
         </SelectTrigger>
@@ -71,13 +76,11 @@ export function SortSelect() {
           <SelectItem value="default">Default order</SelectItem>
           <SelectItem value="low-to-high">Price: Low to High</SelectItem>
           <SelectItem value="high-to-low">Price: High to Low</SelectItem>
-          <SelectItem value="rating">Rating</SelectItem>
         </SelectContent>
       </Select>
     </div>
   );
 }
-
 // Favorite button component
 export function FavoriteButton({ isFavorite }: { isFavorite: boolean }) {
   const [favorite, setFavorite] = useState(isFavorite);
@@ -99,28 +102,50 @@ export function FavoriteButton({ isFavorite }: { isFavorite: boolean }) {
 
 // Search input component
 export function SearchInput() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+  const [searchValue, setSearchValue] = useState(searchParams.get('q') || '');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams);
+      if (searchValue.trim()) {
+        params.set('q', searchValue.trim());
+      } else {
+        params.delete('q');
+      }
+      
+      router.push(`/all-listings?${params.toString()}`);
+    });
+  };
+
   return (
-    <div className="relative lg:w-1/2 mb-6">
+    <form onSubmit={handleSearch} className="relative lg:w-1/2 mb-6">
       <input
         type="text"
         placeholder="Search"
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
         className="w-full rounded-full bg-gray-100 py-3 pl-12 pr-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-black"
+        disabled={isPending}
       />
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-500"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.3-4.3" />
-      </svg>
-    </div>
+      <button type="submit" className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5 text-gray-500"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+      </button>
+    </form>
   );
 }
