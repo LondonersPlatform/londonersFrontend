@@ -9,12 +9,55 @@ import {
   Wind,
   UtensilsCrossed,
   Baby,
+  Accessibility,
+  Clover,
+  Table2,
+  SprayCan,
+  Coffee,
+  Bike,
+  Table,
+  WashingMachine,
+  BatteryCharging,
+  Flame,
+  Fish,
+  PersonStanding,
+  Users,
+  Cat,
+  Wine,
+  Sailboat,
+  Umbrella,
+  TowerControl,
+  CookingPot,
+  FerrisWheel,
+  Tv,
+  Speaker,
+  AlertCircle,
+  ShoppingCart,
+  SoapDispenserDroplet,
+  Mountain,
+  Home,
+  ParkingCircle,
+  Sofa,
+  Landmark,
+  Microwave,
+  Laptop,
+  Utensils,
+  Trees,
+  Play,
+  ThermometerSun,
+  Flower2,
+  Snowflake,
+  Bath,
+  Bed,
+  BabyIcon,
+  ChevronLeft,
 } from "lucide-react";
 
 interface FiltersModalProps {
   onClose: () => void;
   onApply: (filters: FilterState) => void;
   filterListings: any;
+  setShowFilters: (show: boolean) => void;
 }
 
 interface FilterState {
@@ -27,6 +70,7 @@ interface FilterState {
 
 export default function FiltersModal({
   onClose,
+  setShowFilters,
   filterListings,
   onApply,
 }: FiltersModalProps) {
@@ -34,18 +78,15 @@ export default function FiltersModal({
     bedrooms: null,
     beds: 1,
     bathrooms: 1,
-    priceRange: [100, 10000],
+    priceRange: [0, 10000],
     amenities: [],
   });
 
-  // Inside your component
   useEffect(() => {
-    // This will run every time filters change
     onApply(filters);
   }, [filters, onApply]);
-  // Generate some random histogram data
+
   const histogramData = Array.from({ length: 50 }, (_, i) => {
-    // Create a pattern similar to the image with 3 peaks
     if ((i > 10 && i < 15) || (i > 25 && i < 30) || (i > 40 && i < 45)) {
       return Math.floor(Math.random() * 30) + 40; // Higher values for peaks
     } else {
@@ -66,36 +107,247 @@ export default function FiltersModal({
   });
 
   const amenitiesList = [
-    { id: "wifi", label: "Wifi", icon: <Wifi className="w-4 h-4 mr-2" /> },
     {
-      id: "aircon",
-      label: "Air conditioners",
-      icon: <Wind className="w-4 h-4 mr-2" />,
+      id: "accessible-toilet",
+      label: "Accessible-height toilet",
+      icon: <Accessibility className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "air-conditioning",
+      label: "Air conditioning",
+      icon: <Snowflake className="w-4 h-4 mr-2" />,
+    },
+
+    {
+      id: "babysitter",
+      label: "Babysitter recommendations",
+      icon: <Baby className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "bathtub",
+      label: "Bathtub",
+      icon: <Bath className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "bed-linens",
+      label: "Bed linens",
+      icon: <Bed className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "body-soap",
+      label: "Body soap",
+      icon: <BabyIcon className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "cable-tv",
+      label: "Cable TV",
+      icon: <Tv className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "co-detector",
+      label: "Carbon monoxide detector",
+      icon: <AlertCircle className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "casinos",
+      label: "Casinos",
+      icon: <Clover className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "changing-table",
+      label: "Changing table",
+      icon: <Table2 className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "cleaning-disinfection",
+      label: "Cleaning Disinfection",
+      icon: <SprayCan className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "coffee",
+      label: "Coffee",
+      icon: <Coffee className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "coffee-maker",
+      label: "Coffee maker",
+      icon: <Coffee className="w-4 h-4 mr-2" />,
+    },
+    { id: "crib", label: "Crib", icon: <Baby className="w-4 h-4 mr-2" /> },
+    {
+      id: "cycling",
+      label: "Cycling",
+      icon: <Bike className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "dining-table",
+      label: "Dining table",
+      icon: <Table className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "dishwasher",
+      label: "Dishwasher",
+      icon: <WashingMachine className="w-4 h-4 mr-2" />,
+    },
+    // { id: "dryer", label: "Dryer", icon: <Dry className="w-4 h-4 mr-2" /> },
+    {
+      id: "ev-charger",
+      label: "EV charger",
+      icon: <BatteryCharging className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "fire-extinguisher",
+      label: "Fire extinguisher",
+      icon: <Flame className="w-4 h-4 mr-2" />,
+    },
+
+    {
+      id: "fishing",
+      label: "Fishing",
+      icon: <Fish className="w-4 h-4 mr-2" />,
+    },
+    // { id: "freezer", label: "Freezer", icon: <machine className="w-4 h-4 mr-2" /> },
+    {
+      id: "garden-view",
+      label: "Garden View",
+      icon: <Trees className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "garden",
+      label: "Garden or backyard",
+      icon: <Flower2 className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "golf",
+      label: "Golf - Optional",
+      icon: <Play className="w-4 h-4 mr-2" />,
+    },
+
+    {
+      id: "heating",
+      label: "Heating",
+      icon: <ThermometerSun className="w-4 h-4 mr-2" />,
+    },
+
+    {
+      id: "internet",
+      label: "Internet",
+      icon: <Wifi className="w-4 h-4 mr-2" />,
     },
     {
       id: "kitchen",
       label: "Kitchen",
-      icon: <UtensilsCrossed className="w-4 h-4 mr-2" />,
+      icon: <Utensils className="w-4 h-4 mr-2" />,
     },
     {
-      id: "babysitter",
-      label: "Babysitter",
+      id: "laptop-friendly",
+      label: "Laptop friendly workspace",
+      icon: <Laptop className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "microwave",
+      label: "Microwave",
+      icon: <Microwave className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "museums",
+      label: "Museums",
+      icon: <Landmark className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "outdoor-seating",
+      label: "Outdoor seating",
+      icon: <Sofa className="w-4 h-4 mr-2" />,
+    },
+    // { id: "oven", label: "Oven", icon: <Oven className="w-4 h-4 mr-2" /> },
+    {
+      id: "parking",
+      label: "Paid parking off premises",
+      icon: <ParkingCircle className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "patio",
+      label: "Patio or balcony",
+      icon: <Home className="w-4 h-4 mr-2" />,
+    },
+    // { id: "refrigerator", label: "Refrigerator", icon: <Fridge className="w-4 h-4 mr-2" /> },
+    {
+      id: "rock-climbing",
+      label: "Rock Climbing",
+      icon: <Mountain className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "shampoo",
+      label: "Shampoo",
+      icon: <SoapDispenserDroplet className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "shopping",
+      label: "Shopping",
+      icon: <ShoppingCart className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "smoke-detector",
+      label: "Smoke detector",
+      icon: <AlertCircle className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "stereo",
+      label: "Stereo system",
+      icon: <Speaker className="w-4 h-4 mr-2" />,
+    },
+    // { id: "stove", label: "Stove", icon: <Stove className="w-4 h-4 mr-2" /> },
+    { id: "tv", label: "TV", icon: <Tv className="w-4 h-4 mr-2" /> },
+    {
+      id: "theme-parks",
+      label: "Theme Parks",
+      icon: <FerrisWheel className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "toaster",
+      label: "Toaster",
+      icon: <CookingPot className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "towels",
+      label: "Towels provided",
+      icon: <TowerControl className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "washer",
+      label: "Washer",
+      icon: <WashingMachine className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "water-parks",
+      label: "Water Parks",
+      icon: <Umbrella className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "water-sports",
+      label: "Water Sports",
+      icon: <Sailboat className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "wine-glasses",
+      label: "Wine glasses",
+      icon: <Wine className="w-4 h-4 mr-2" />,
+    },
+    { id: "zoo", label: "Zoo", icon: <Cat className="w-4 h-4 mr-2" /> },
+    {
+      id: "family-friendly",
+      label: "Family/kid friendly",
+      icon: <Users className="w-4 h-4 mr-2" />,
+    },
+    {
+      id: "infant-friendly",
+      label: "Suitable for infants (under 2 years)",
       icon: <Baby className="w-4 h-4 mr-2" />,
     },
     {
-      id: "aircon2",
-      label: "Air conditioners",
-      icon: <Wind className="w-4 h-4 mr-2" />,
-    },
-    {
-      id: "kitchen2",
-      label: "Kitchen",
-      icon: <UtensilsCrossed className="w-4 h-4 mr-2" />,
-    },
-    {
-      id: "babysitter2",
-      label: "Babysitter",
-      icon: <Baby className="w-4 h-4 mr-2" />,
+      id: "child-friendly",
+      label: "Suitable for children (2-12 years)",
+      icon: <PersonStanding className="w-4 h-4 mr-2" />,
     },
   ];
 
@@ -114,7 +366,7 @@ export default function FiltersModal({
       bedrooms: null,
       beds: 1,
       bathrooms: 1,
-      priceRange: [100, 10000],
+      priceRange: [0, 10000],
       amenities: [],
     });
   };
@@ -122,6 +374,9 @@ export default function FiltersModal({
   const formatPrice = (value: number) => {
     return value >= 1000 ? `$${value / 1000}K` : `$${value}`;
   };
+  const [showAll, setShowAll] = useState(false);
+
+  const visibleAmenities = showAll ? amenitiesList : amenitiesList.slice(0, 10);
 
   return (
     <div className="fixed inset-0   shadow-lg border rounded-2xl bg-[#00000066] backdrop-blur-sm z-50 ">
@@ -142,17 +397,22 @@ export default function FiltersModal({
                 <div className="font-medium">Bedrooms</div>
                 <div className="flex items-center">
                   <button
-                    className={`rounded-full px-6 py-2 mr-3 ${
-                      filters.bedrooms === null
-                        ? "border-2 border-black"
-                        : "border"
+                    className={`rounded-full w-8 h-8 flex items-center justify-center border ${
+                      (filters.bedrooms || 0) <= 1
+                        ? "border-gray-200 text-gray-400 cursor-not-allowed"
+                        : "border-gray-300 hover:border-gray-400"
                     }`}
+                    disabled={(filters.bedrooms || 0) <= 1}
                     onClick={() =>
-                      setFilters((prev) => ({ ...prev, bedrooms: null }))
+                      setFilters((prev) => ({
+                        ...prev,
+                        bedrooms: (prev.bedrooms || 0) - 1,
+                      }))
                     }
                   >
-                    Any
+                    <span className="text-lg">-</span>
                   </button>
+                  <span className=" px-4">{filters.bedrooms}</span>
                   <button
                     className="rounded-full w-8 h-8 flex items-center justify-center border border-gray-300 hover:border-gray-400"
                     onClick={() =>
@@ -178,7 +438,7 @@ export default function FiltersModal({
                         beds: Math.max(0, prev.beds - 1),
                       }))
                     }
-                    disabled={filters.beds <= 0}
+                    disabled={filters.beds <= 1}
                   >
                     <span className="text-lg">-</span>
                   </button>
@@ -302,26 +562,41 @@ export default function FiltersModal({
           <div className="my-8">
             <h2 className="text-xl font-semibold mb-6">Amenities</h2>
 
-            <div className="flex flex-wrap gap-2">
-              {amenitiesList.map((amenity) => (
-                <button
-                  key={amenity.id}
-                  className={`flex items-center px-4 py-2 rounded-full border ${
-                    filters.amenities.includes(amenity.id)
-                      ? "bg-black text-white"
-                      : "bg-white text-black"
-                  }`}
-                  onClick={() => toggleAmenity(amenity.id)}
-                >
-                  {amenity.icon}
-                  {amenity.label}
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="flex flex-wrap gap-2">
+                {visibleAmenities.map((amenity) => (
+                  <button
+                    key={amenity.id}
+                    className={`flex items-center px-4 py-2 rounded-full border ${
+                      filters.amenities.includes(amenity.label)
+                        ? "bg-black text-white"
+                        : "bg-white text-black"
+                    }`}
+                    onClick={() => toggleAmenity(amenity.label)}
+                  >
+                    {amenity.icon}
+                    {amenity.label}
+                  </button>
+                ))}
+              </div>
 
-            <button className="flex items-center mt-4 font-semibold">
-              Show more <ChevronRight className="w-4 h-4 ml-1" />
-            </button>
+              {amenitiesList.length > 10 && (
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="flex items-center mt-4 font-semibold"
+                >
+                  {showAll ? (
+                    <>
+                      Show less <ChevronLeft className="w-4 h-4 ml-1" />
+                    </>
+                  ) : (
+                    <>
+                      Show more <ChevronRight className="w-4 h-4 ml-1" />
+                    </>
+                  )}
+                </button>
+              )}
+            </>
 
             <div className="mt-6 border-b border-gray-200"></div>
           </div>
@@ -336,7 +611,10 @@ export default function FiltersModal({
             </button>
 
             <button
-              onClick={() => onApply(filters)}
+              onClick={() => {
+                onApply(filters);
+                setShowFilters(false);
+              }}
               className="bg-black text-white rounded-lg px-6 py-3"
             >
               Show {filterListings.length} places

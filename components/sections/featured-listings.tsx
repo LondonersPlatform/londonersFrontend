@@ -118,7 +118,11 @@ export default function FeaturedListings() {
                       />
                       <button
                         className="absolute right-3 top-3 rounded-full bg-white p-1.5 transition-colors"
-                        onClick={() => toggleFavorite(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // prevent bubbling
+                          e.preventDefault(); // prevent link navigation
+                          toggleFavorite(item.id);
+                        }}
                       >
                         <Heart
                           className={`h-4 w-4 ${
