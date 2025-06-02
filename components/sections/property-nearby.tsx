@@ -22,7 +22,9 @@ interface PropertyNearbyProps {
   properties?: NearbyProperty[];
 }
 
-const dummyNearby: NearbyProperty[] = [
+const dummyNearby: NearbyProperty[] = 
+
+[
   {
     id: 1,
     imageUrl: "/dt2.png",

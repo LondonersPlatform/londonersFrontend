@@ -12,40 +12,35 @@ import {
   Facebook,
   Linkedin,
   Mail,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import Gallery from "../ui/Gallery";
+import { useSearchParams } from "next/navigation";
+import Bedrooms from "@/public/svg-assets/Bedrooms";
+import Beds from "@/public/svg-assets/Beds";
+import BathIcon from "@/public/svg-assets/BathIcon";
+import GeuestIcon from "@/public/svg-assets/GeuestIcon";
+import ShareModalListing from "../listings/ShareModalListing";
 
-export function PropertyCarousel({imagesDummy}:any) {
+export function PropertyCarousel({ imagesDummy }: any) {
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+
   const [isFavorite, setIsFavorite] = useState(false);
+  const searchParams = useSearchParams(); // for query params
+  const area = searchParams.get("area");
+  const title = searchParams.get("title");
+  const rating = searchParams.get("rating");
+  const bedroom = searchParams.get("bedroom");
+  const bath = searchParams.get("bath");
+  const beds = searchParams.get("beds");
+  const guests = searchParams.get("guests");
 
   const propertyUrl = "https://example.com/property/marlybone-book";
-// Using the same Unsplash imagesDummy from the original component
-
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(propertyUrl);
-    setCopied(true);
-    toast({
-      title: "Link copied",
-      description: "Property link has been copied to clipboard",
-    });
-
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  };
+  // Using the same Unsplash imagesDummy from the original component
 
   const handleToggleFavorite = () => {
     setIsFavorite(!isFavorite);
@@ -58,22 +53,53 @@ export function PropertyCarousel({imagesDummy}:any) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Marlybone Travel Lodge</h1>
+        <div className=" flex flex-col gap-6">
+          <h1 className="text-2xl flex items-center gap-3 font-bold">
+            {title}
+            <span className=" flex items-center  text-meduim gap-2">
+              <Star fill="#F3DC0D" color="#F3DC0D" />
+
+              {rating}
+            </span>
+          </h1>
+          <div className="mb-4 flex flex-wrap gap-4">
+            <h2 className="text-[#0000008C]">{area}</h2>
+
+            <div className="flex items-center gap-2">
+              <Bedrooms />
+              <span className="text-sm">{bedroom} Bedroom</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Beds />
+              <span className="text-sm">{beds} Beds</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <BathIcon />
+              <span className="text-sm">{bath} Bath</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <GeuestIcon />
+              <span className="text-sm">{guests} Guests</span>
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center space-x-2">
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
+            className=" rounded-full"
             onClick={() => setShareModalOpen(true)}
           >
-            <Share2 className="h-5 w-5" />
+            <Share2 className="h-5 w-5 " />
           </Button>
           <Button
-            variant="ghost"
+            variant="outline"
+            className=" rounded-full"
             size="icon"
             onClick={handleToggleFavorite}
-            className={isFavorite ? "text-rose-500" : ""}
           >
             <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
           </Button>
@@ -81,59 +107,20 @@ export function PropertyCarousel({imagesDummy}:any) {
       </div>
 
       <div className="relative">
-   
-     <Gallery imagesDummy={imagesDummy}/>
+        <Gallery imagesDummy={imagesDummy} />
       </div>
 
-
-
-      {/* Share Modal */}
-      <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Share this property</DialogTitle>
-            <DialogDescription>
-              Share this travel destination with your friends and family
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex items-center space-x-2 mt-4">
-            <Input value={propertyUrl} readOnly className="flex-1" />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCopyLink}
-              className="shrink-0"
-            >
-              {copied ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-          <div className="mt-6">
-            <h4 className="text-sm font-medium mb-3">Share on social media</h4>
-            <div className="flex justify-center gap-4">
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Share on Twitter</span>
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Facebook className="h-5 w-5" />
-                <span className="sr-only">Share on Facebook</span>
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Linkedin className="h-5 w-5" />
-                <span className="sr-only">Share on LinkedIn</span>
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Mail className="h-5 w-5" />
-                <span className="sr-only">Share via Email</span>
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ShareModalListing
+        shareModalOpen={shareModalOpen}
+        setShareModalOpen={setShareModalOpen}
+        imagesDummy={imagesDummy}
+        title={title}
+        area={area}
+        beds={area}
+        bedroom={bedroom}
+        bath={bath}
+        rating={rating}
+      />
     </div>
   );
 }

@@ -35,7 +35,7 @@ export function PropertyAmenities({amenityData}:any) {
         const IconComponent = iconComponents[amenity.icon];
           return (
             <div key={index} className="flex items-center gap-3">
-              <IconComponent className="h-5 w-5" />
+              {/* <IconComponent className="h-5 w-5" /> */}
               <span>{amenity.name}</span>
             </div>
           );

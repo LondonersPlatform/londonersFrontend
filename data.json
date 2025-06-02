@@ -1,5 +1,6 @@
 [
   {
+    "MaxNumofGuests":"7",
      "Cleaningfee": "60",
       "Servicefee": "70",
       "reviews": "4.9",
@@ -274,7 +275,162 @@
         }
       ]
     }
-  }
+  },
+  {
+  "dummyNearby": [
+    {
+      "id": 1,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Book",
+      "rating": 4.9,
+      "reviewCount": 42,
+      "details": {
+        "beds": 2,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 2,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Loft",
+      "rating": 4.8,
+      "reviewCount": 36,
+      "details": {
+        "beds": 1,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 3,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone View",
+      "rating": 4.7,
+      "reviewCount": 28,
+      "details": {
+        "beds": 3,
+        "baths": 2,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 4,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Haven",
+      "rating": 4.9,
+      "reviewCount": 51,
+      "details": {
+        "beds": 2,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 5,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Retreat",
+      "rating": 4.6,
+      "reviewCount": 33,
+      "details": {
+        "beds": 1,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 6,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Nook",
+      "rating": 4.8,
+      "reviewCount": 47,
+      "details": {
+        "beds": 2,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 7,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Spot",
+      "rating": 4.7,
+      "reviewCount": 39,
+      "details": {
+        "beds": 1,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 8,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Place",
+      "rating": 4.9,
+      "reviewCount": 58,
+      "details": {
+        "beds": 3,
+        "baths": 2,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 9,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Space",
+      "rating": 4.8,
+      "reviewCount": 42,
+      "details": {
+        "beds": 2,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 10,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Pad",
+      "rating": 4.7,
+      "reviewCount": 31,
+      "details": {
+        "beds": 1,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 11,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Flat",
+      "rating": 4.9,
+      "reviewCount": 49,
+      "details": {
+        "beds": 2,
+        "baths": 1,
+        "kitchens": 1
+      }
+    },
+    {
+      "id": 12,
+      "imageUrl": "/dt2.png",
+      "title": "Marylebone Suite",
+      "rating": 4.8,
+      "reviewCount": 44,
+      "details": {
+        "beds": 3,
+        "baths": 2,
+        "kitchens": 1
+      }
+    }
+  ]
+}
+
+
+
+
+
+
+
 ]
 
 

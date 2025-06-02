@@ -14,7 +14,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 
 // Filter button component
-export function FilterButton() {
+export function FilterButton({onApply,filterListings}:any) {
   const [showFilters, setShowFilters] = useState(false);
   
   const handleApplyFilters = (filters: any) => {
@@ -43,6 +43,7 @@ export function FilterButton() {
         variant="outline"
         className="hidden md:flex items-center space-x-2 rounded-lg border border-gray-300"
         onClick={() => setShowFilters(true)}
+       
       >
         <SlidersHorizontal className="h-4 w-4" />
         <span>Filters</span>
@@ -52,7 +53,9 @@ export function FilterButton() {
       {showFilters && (
         <FiltersModal
           onClose={() => setShowFilters(false)}
-          onApply={handleApplyFilters}
+          onApply={onApply}
+          
+          filterListings={filterListings}
         />
       )}
     </>

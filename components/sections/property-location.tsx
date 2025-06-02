@@ -2,7 +2,15 @@ export function PropertyLocation({ location }: any) {
   return (
     <div className="space-y-6 mb-8">
       <h2 className="text-xl font-semibold">{location.title}</h2>
+    <div className="space-y-4">
+        <p className="text-gray-700">{location.description}</p>
 
+        <ul className="space-y-2 text-gray-700">
+          {location?.walkingDistances?.map((distance: any, index: number) => (
+            <li key={index}>{distance}</li>
+          ))}
+        </ul>
+      </div>
       <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg">
         <iframe
           src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d9938.465474012487!2d${
@@ -21,15 +29,7 @@ export function PropertyLocation({ location }: any) {
         ></iframe>
       </div>
 
-      <div className="space-y-4">
-        <p className="text-gray-700">{location.description}</p>
-
-        <ul className="space-y-2 text-gray-700">
-          {location.walkingDistances.map((distance: any, index: number) => (
-            <li key={index}>{distance}</li>
-          ))}
-        </ul>
-      </div>
+  
     </div>
   );
 }

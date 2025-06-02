@@ -1,11 +1,9 @@
 import { Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { ReviewModalDemo } from "./ReviewModalDemo";
 
-export default function PropertyReviews({propertyReviews}:any) {
-  
-
-
+export default function PropertyReviews({ propertyReviews }: any) {
   // Helper function to render stars
   const renderStars = (rating: number, totalStars = 5) => {
     return Array.from({ length: totalStars }).map((_, i) => (
@@ -52,7 +50,7 @@ export default function PropertyReviews({propertyReviews}:any) {
       </div>
 
       {/* Category ratings */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         {propertyReviews.ratingSummary.categories.map((item, index) => (
           <div key={index} className="border rounded-lg p-3">
             <div className="text-sm">{item.label}</div>
@@ -65,9 +63,9 @@ export default function PropertyReviews({propertyReviews}:any) {
       </div>
 
       {/* Reviews */}
-      <div className="space-y-8 border-t pt-8">
+      <div className="space-y-8 border-t  pt-8">
         {propertyReviews.reviews.map((review) => (
-          <div key={review.id} className="space-y-3">
+          <div key={review.id} className="space-y-2">
             <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarImage src={review.user.avatar} alt={review.user.name} />
@@ -85,17 +83,12 @@ export default function PropertyReviews({propertyReviews}:any) {
               </div>
             </div>
             <p className="text-gray-700">{review.content}</p>
-            <button className="text-sm font-medium">Show more</button>
           </div>
         ))}
-      </div>
+     
 
-      <Button
-        variant="outline"
-        className="rounded-full flex items-center gap-2"
-      >
-        Show all reviews <span className="ml-1">→</span>
-      </Button>
+         <ReviewModalDemo />
+      </div>
     </div>
   );
 }
