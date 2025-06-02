@@ -1,48 +1,42 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   FilterButton,
   SortSelect,
   FavoriteButton,
   SearchInput,
-} from '@/components/listings/listing-client-components';
-
+} from "@/components/listings/listing-client-components";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
+} from "@/components/ui/carousel";
+import { useQuery } from "@tanstack/react-query";
 
-import Bedrooms from '../../public/svg-assets/Bedrooms';
-import BathIcon from '../../public/svg-assets/BathIcon';
-import Beds from '../../public/svg-assets/Beds';
-import GeuestIcon from '../../public/svg-assets/GeuestIcon';
-import LocationIcon from '../../public/svg-assets/LocationIcon';
-import DistarrowIcon from '../../public/svg-assets/DistarrowIcon';
-import Loading from '../loading';
-import { fetchListings } from './Listing'; // your API function
-import { ListingSkeletonCard } from '@/components/ui/ListingSkeletonCard';
+import Bedrooms from "../../public/svg-assets/Bedrooms";
+import BathIcon from "../../public/svg-assets/BathIcon";
+import Beds from "../../public/svg-assets/Beds";
+import GeuestIcon from "../../public/svg-assets/GeuestIcon";
+import LocationIcon from "../../public/svg-assets/LocationIcon";
+import DistarrowIcon from "../../public/svg-assets/DistarrowIcon";
+import Loading from "../loading";
+import { fetchListings } from "./Listing";
+import { ListingSkeletonCard } from "@/components/ui/ListingSkeletonCard";
+import { useState } from "react";
 
 const LIMIT = 5;
 
 export default function AllListingsPage() {
   const searchParamsHook = useSearchParams();
-  const [allListings, setAllListings] = useState<any[]>([]);
-  const [visibleListings, setVisibleListings] = useState<any[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState('default');
+  const [sortOrder, setSortOrder] = useState("default");
 
-
- const getSearchParamsObject = () => {
+  const getSearchParamsObject = () => {
     const params: Record<string, string> = {};
     searchParamsHook.forEach((value, key) => {
       params[key] = value;
@@ -51,77 +45,461 @@ export default function AllListingsPage() {
   };
 
   const sortListings = (listings: any[], sort: string) => {
-    if (sort === 'low-to-high') {
+    if (sort === "low-to-high") {
       return [...listings].sort((a, b) => a.pricePerNight - b.pricePerNight);
-    } else if (sort === 'high-to-low') {
+    } else if (sort === "high-to-low") {
       return [...listings].sort((a, b) => b.pricePerNight - a.pricePerNight);
     }
     return listings; // default
   };
 
-  const loadAllListings = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const searchParams = getSearchParamsObject();
-      const { listings: fetchedListings, total } = await fetchListings(searchParams);
+  const {
+    data: listingsData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["listings", searchParamsHook.toString()],
+    queryFn: () => fetchListings(getSearchParamsObject()),
+  });
 
+  const filterListings = (listings: any[], filters: any) => {
+    if (!listings) return [];
 
-      const sortedListings = sortListings(fetchedListings, sortOrder);
-      setAllListings(sortedListings);
-      setTotal(total);
-      setPage(1);
-      setVisibleListings(sortedListings.slice(0, LIMIT));
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    return listings.filter((listing) => {
+      // Filter by bedrooms
+      if (filters.bedrooms !== null && listing.bedroom !== filters.bedrooms) {
+        return false;
+      }
+
+      // Filter by beds
+      if (listing.beds < filters.beds) {
+        return false;
+      }
+
+      // Filter by bathrooms
+      if (listing.bath < filters.bathrooms) {
+        return false;
+      }
+
+      // Filter by price range
+      if (
+        listing.pricePerNight < filters.priceRange[0] ||
+        listing.pricePerNight > filters.priceRange[1]
+      ) {
+        return false;
+      }
+
+      // Filter by amenities (all selected amenities must be present)
+      if (filters.amenities.length > 0) {
+        const hasAllAmenities = filters.amenities.every((amenity: string) =>
+          listing.amenities.includes(amenity)
+        );
+        if (!hasAllAmenities) {
+          return false;
+        }
+      }
+
+      return true;
+    });
   };
+  const listed = {
+    status: "success",
+    message: "Listings retrieved successfully",
+    data: [
+      {
+        id: "679b27aefabe790013d94352",
+        title: "Be More Elizabeth!",
+        location: "Greater London, United Kingdom",
+        area: "Devonshire Place",
+        rating: 0,
+        reviews: 0,
+        bedroom: 2,
+        beds: 2,
+        bath: 2,
+        guests: 2,
+        dateRange: "Available Now",
+        pricePerNight: 900,
+        totalPrice: 1500,
+        images: [
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b27aefabe790013d94352/333b855e-2ee4-4a-_HoTP",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b27aefabe790013d94352/94fd6c0e-5e65-4a-wmfOx",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b27aefabe790013d94352/360c1810-f5a1-45-NW6aa",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b27aefabe790013d94352/3473aaae-d7b2-46-pPzu4",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b27aefabe790013d94352/629c6f0b-6ec5-48-ROnQA",
+        ],
+        isFavorite: false,
+        amenities: [
+          "Accessible-height toilet",
+          "Air conditioning",
+          "BBQ grill",
+          "Babysitter recommendations",
+          "Bathtub",
+          "Bed linens",
+          "Body soap",
+          "Cable TV",
+          "Carbon monoxide detector",
+          "Casinos",
+          "Changing table",
+          "Cleaning Disinfection",
+          "Cleaning before checkout",
+          "Cleaning products",
+          "Clothing storage",
+          "Coffee",
+          "Coffee maker",
+          "Conditioner",
+          "Cookware",
+          "Crib",
+          "Cycling",
+          "Dining table",
+          "Dishes and silverware",
+          "Dishwasher",
+          "Dryer",
+          "Dryer in common space",
+          "EV charger",
+          "Enhanced cleaning practices",
+          "Essentials",
+          "Extra pillows and blankets",
+          "Family/kid friendly",
+          "Fire extinguisher",
+          "First aid kit",
+          "Fishing",
+          "Freezer",
+          "Garden View",
+          "Garden or backyard",
+          "Golf - Optional",
+          "Grab-rails for shower and toilet",
+          "Hair dryer",
+          "Hangers",
+          "Heating",
+          "High chair",
+          "High touch surfaces disinfected",
+          "Horseback Riding",
+          "Hot water",
+          "Indoor fireplace",
+          "Internet",
+          "Iron",
+          "Kettle",
+          "Kitchen",
+          "Laptop friendly workspace",
+          "Long term stays allowed",
+          "Luggage dropoff allowed",
+          "Microwave",
+          "Mountain Climbing",
+          "Museums",
+          "Outdoor seating (furniture)",
+          "Oven",
+          "Pack ’n Play/travel crib",
+          "Paid parking off premises",
+          "Path to entrance lit at night",
+          "Patio or balcony",
+          "Private entrance",
+          "Refrigerator",
+          "Rock Climbing",
+          "Roll-in shower with shower bench or chair",
+          "Room-darkening shades",
+          "Shampoo",
+          "Shopping",
+          "Shower chair",
+          "Shower gel",
+          "Single level home",
+          "Smoke detector",
+          "Stereo system",
+          "Stove",
+          "TV",
+          "Theme Parks",
+          "Toaster",
+          "Towels provided",
+          "Washer",
+          "Washer in common space",
+          "Water Parks",
+          "Water Sports",
+          "Window guards",
+          "Wine glasses",
+          "Wireless Internet",
+          "Zoo",
+          "Pack ’n play/travel crib",
+          "Suitable for children (2-12 years)",
+          "Suitable for infants (under 2 years)",
+        ],
+      },
+      {
+        id: "679b235b2e9626001105b891",
+        title: "Devonshire's Elegance",
+        location: "Greater London, United Kingdom",
+        area: "Devonshire Place",
+        rating: 0,
+        reviews: 0,
+        bedroom: 1,
+        beds: 1,
+        bath: 1,
+        guests: 2,
+        dateRange: "Available Now",
+        pricePerNight: 0,
+        totalPrice: 0,
+        images: [
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b235b2e9626001105b891/fcbda6e1-e70e-4f-LwQSG",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b235b2e9626001105b891/77b6f8c0-93a2-4d-zH_tT",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b235b2e9626001105b891/25fb603c-b40c-48-Lqlzg",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b235b2e9626001105b891/c48b7af2-75b4-41-ln9Ym",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b235b2e9626001105b891/1f56f37e-54b2-4c-i-Q91",
+        ],
+        isFavorite: false,
+        amenities: [
+          "Air conditioning",
+          "Babysitter recommendations",
+          "Bathtub",
+          "Bed linens",
+          "Body soap",
+          "Cable TV",
+          "Carbon monoxide detector",
+          "Casinos",
+          "Changing table",
+          "Cleaning Disinfection",
+          "Cleaning before checkout",
+          "Cleaning products",
+          "Clothing storage",
+          "Coffee",
+          "Coffee maker",
+          "Conditioner",
+          "Cookware",
+          "Crib",
+          "Cycling",
+          "Dining table",
+          "Dishes and silverware",
+          "Dishwasher",
+          "Dryer",
+          "Dryer in common space",
+          "EV charger",
+          "Enhanced cleaning practices",
+          "Essentials",
+          "Extra pillows and blankets",
+          "Family/kid friendly",
+          "Fire extinguisher",
+          "First aid kit",
+          "Fishing",
+          "Freezer",
+          "Golf - Optional",
+          "Hair dryer",
+          "Hangers",
+          "Heating",
+          "High chair",
+          "High touch surfaces disinfected",
+          "Horseback Riding",
+          "Hot water",
+          "Internet",
+          "Iron",
+          "Kettle",
+          "Kitchen",
+          "Laptop friendly workspace",
+          "Laundromat nearby",
+          "Long term stays allowed",
+          "Luggage dropoff allowed",
+          "Microwave",
+          "Mountain Climbing",
+          "Museums",
+          "Oven",
+          "Pack ’n Play/travel crib",
+          "Paid parking off premises",
+          "Path to entrance lit at night",
+          "Private entrance",
+          "Refrigerator",
+          "Rock Climbing",
+          "Room-darkening shades",
+          "Shampoo",
+          "Shopping",
+          "Shower gel",
+          "Smoke detector",
+          "Stove",
+          "TV",
+          "Theme Parks",
+          "Toaster",
+          "Towels provided",
+          "Town",
+          "Washer",
+          "Washer in common space",
+          "Water Parks",
+          "Water Sports",
+          "Window guards",
+          "Wine glasses",
+          "Wireless Internet",
+          "Zoo",
+          "Pack ’n play/travel crib",
+          "Suitable for children (2-12 years)",
+          "Suitable for infants (under 2 years)",
+        ],
+      },
+      {
+        id: "679b2773da32a800107fc7c0",
+        title: "Diana's Hidden Gem",
+        location: "Greater London, United Kingdom",
+        area: "Devonshire Place",
+        rating: 0,
+        reviews: 0,
+        bedroom: 1,
+        beds: 1,
+        bath: 1,
+        guests: 2,
+        dateRange: "Available Now",
+        pricePerNight: 0,
+        totalPrice: 0,
+        images: [
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b2773da32a800107fc7c0/ad334f44-e605-4d-embnf",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b2773da32a800107fc7c0/d142ed5f-7191-4b-BO14f",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b2773da32a800107fc7c0/4f1fec58-e843-4a-ieyYc",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b2773da32a800107fc7c0/4e06c441-d9f3-41-zdA5l",
+          "https://assets.guesty.com/image/upload/t_default_thumb/listing_images_s3/production/property-photos/37f485d1553bd4c4c04324da08b531d337d996d802c28bc6/679b2773da32a800107fc7c0/84916016-d00d-4c-PnjSF",
+        ],
+        isFavorite: false,
+        amenities: [
+          "Air conditioning",
+          "Babysitter recommendations",
+          "Bed linens",
+          "Boat slip",
+          "Body soap",
+          "Cable TV",
+          "Carbon monoxide detector",
+          "Changing table",
+          "Cleaning Disinfection",
+          "Cleaning before checkout",
+          "Cleaning products",
+          "Clothing storage",
+          "Coffee",
+          "Coffee maker",
+          "Conditioner",
+          "Cookware",
+          "Crib",
+          "Cycling",
+          "Dining table",
+          "Dishes and silverware",
+          "Dishwasher",
+          "Downtown",
+          "Dryer",
+          "Dryer in common space",
+          "EV charger",
+          "Enhanced cleaning practices",
+          "Essentials",
+          "Extra pillows and blankets",
+          "Family/kid friendly",
+          "Fire extinguisher",
+          "First aid kit",
+          "Freezer",
+          "Garden or backyard",
+          "Hair dryer",
+          "Hangers",
+          "Heating",
+          "High chair",
+          "High touch surfaces disinfected",
+          "Horseback Riding",
+          "Hot water",
+          "Internet",
+          "Iron",
+          "Kettle",
+          "Kitchen",
+          "Laptop friendly workspace",
+          "Laundromat nearby",
+          "Long term stays allowed",
+          "Luggage dropoff allowed",
+          "Microwave",
+          "Mini fridge",
+          "Museums",
+          "Outdoor seating (furniture)",
+          "Oven",
+          "Pack ’n Play/travel crib",
+          "Paid parking off premises",
+          "Patio or balcony",
+          "Private entrance",
+          "Refrigerator",
+          "Room-darkening shades",
+          "Shampoo",
+          "Shopping",
+          "Shower gel",
+          "Smoke detector",
+          "Stove",
+          "TV",
+          "Toaster",
+          "Towels provided",
+          "Washer",
+          "Washer in common space",
+          "Window guards",
+          "Wine glasses",
+          "Wireless Internet",
+          "Zoo",
+          "Pack ’n play/travel crib",
+          "Suitable for children (2-12 years)",
+          "Suitable for infants (under 2 years)",
+        ],
+      },
+    ],
+    totalCount: 18,
+    page: 1,
+    limit: 25,
+  };
+  // Remove the hardcoded 'listed' data and use listingsData from the query
+  const [filters, setFilters] = useState<any>({
+    bedrooms: null,
+    beds: 1,
+    bathrooms: 1,
+    priceRange: [0, 10000],
+    amenities: [],
+  });
 
-  useEffect(() => {
-    loadAllListings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParamsHook.toString(), sortOrder]);
+  // Filter the actual listings data
+  const filteredListings = listed?.data
+    ? filterListings(listed.data, filters)
+    : [];
+
+  const sortedListings = filteredListings
+    ? sortListings(filteredListings, sortOrder)
+    : [];
+
+  const visibleListings = sortedListings.slice(0, page * LIMIT);
+  const total = listed?.total || 0;
 
   const showMore = () => {
-    const nextPage = page + 1;
-    const end = nextPage * LIMIT;
-    setPage(nextPage);
-    setVisibleListings(allListings.slice(0, end));
+    setPage((prev) => prev + 1);
   };
 
   const showLess = () => {
     setPage(1);
-    setVisibleListings(allListings.slice(0, LIMIT));
   };
 
   const handleSortChange = (value: string) => {
     setSortOrder(value);
   };
 
+  if (isLoading && !listingsData) {
+    return (
+      <div className="container mx-auto px-4 py-8 space-y-6">
+        {[...Array(3)].map((_, index) => (
+          <ListingSkeletonCard key={index} />
+        ))}
+      </div>
+    );
+  }
 
-  if (loading && visibleListings.length === 0) {
-  return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      {[...Array(3)].map((_, index) => (
-        <ListingSkeletonCard key={index} />
-      ))}
-    </div>
-  );
-}
-  ;
-  if (error) return <div className="p-10 text-center text-red-600">Error: {error}</div>;
+  if (isError) {
+    return (
+      <div className="p-10 text-center text-red-600">
+        Error: {error.message}
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <SearchInput />
         <div className="flex flex-col w-full gap-4 md:items-center md:flex-row">
-          <h1 className="text-2xl font-bold flex-grow">{total} Rentals</h1>
+          <h1 className="text-2xl font-bold flex-grow">{filteredListings.length} Rentals</h1>
           <div className="flex items-center gap-3 justify-end w-full md:w-auto">
-            <FilterButton />
-              <SortSelect value={sortOrder} onChange={handleSortChange} />
+            <FilterButton
+              onApply={(newFilters:any) => {
+                setFilters(newFilters);
+              }}
+              filterListings={filteredListings}
+            />
+            <SortSelect value={sortOrder} onChange={handleSortChange} />
           </div>
         </div>
       </div>
@@ -129,7 +507,13 @@ export default function AllListingsPage() {
       <div className="space-y-6">
         {visibleListings.map((listing: any) => (
           <Link
-            href={`all-listings/${listing.id}`}
+            href={`all-listings/${listing.id}?area=${encodeURIComponent(
+              listing.area
+            )}&rating=${listing.rating}&bedroom=${listing.bedroom}&bath=${
+              listing.bath
+            }&beds=${listing.beds}&guests=${listing.guests}&title=${
+              listing.title
+            }`}
             key={listing.id}
             className="rounded-xl transition-shadow hover:shadow-sm"
           >
@@ -138,7 +522,7 @@ export default function AllListingsPage() {
               <div className="relative gap-3 p-0 m-0 rounded-xl items-center hidden md:flex w-full md:w-2/5">
                 <div className="relative h-full w-1/2">
                   <img
-                    src={listing.images[1] || '/placeholder.svg'}
+                    src={listing.images[1] || "/placeholder.svg"}
                     alt={listing.title}
                     width={300}
                     height={200}
@@ -148,7 +532,7 @@ export default function AllListingsPage() {
                 </div>
                 <div className="relative h-full w-1/2">
                   <img
-                    src={listing.images[0] || '/placeholder.svg'}
+                    src={listing.images[0] || "/placeholder.svg"}
                     alt={listing.title}
                     width={300}
                     height={200}
@@ -166,7 +550,7 @@ export default function AllListingsPage() {
                       <CarouselItem key={index}>
                         <div className="keen-slider__slide relative h-64 w-full">
                           <img
-                            src={src || '/placeholder.svg'}
+                            src={src || "/placeholder.svg"}
                             alt={listing.title}
                             width={400}
                             height={256}
@@ -198,7 +582,9 @@ export default function AllListingsPage() {
                     <span className="text-gray-400">
                       <DistarrowIcon />
                     </span>
-                    <span className="text-sm text-gray-600">{listing.area}</span>
+                    <span className="text-sm text-gray-600">
+                      {listing.area}
+                    </span>
                   </div>
 
                   <div className="mb-4 flex items-center">
@@ -208,8 +594,8 @@ export default function AllListingsPage() {
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.floor(listing.rating)
-                              ? 'text-yellow-400'
-                              : 'text-gray-300'
+                              ? "text-yellow-400"
+                              : "text-gray-300"
                           }`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
@@ -217,7 +603,9 @@ export default function AllListingsPage() {
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                       ))}
-                      <span className="ml-2 text-sm font-medium">{listing.rating}</span>
+                      <span className="ml-2 text-sm font-medium">
+                        {listing.rating}
+                      </span>
                       <span className="ml-1 text-sm text-gray-500">
                         ({listing.reviews} Reviews)
                       </span>
@@ -248,11 +636,15 @@ export default function AllListingsPage() {
                   <div className="my-4 text-sm">{listing.dateRange}</div>
                   <div className="flex items-end gap-5">
                     <div>
-                      <span className="text-xl font-bold">${listing.pricePerNight}</span>
+                      <span className="text-xl font-bold">
+                        ${listing.pricePerNight}
+                      </span>
                       <span className="text-sm text-gray-500">/night</span>
                     </div>
                     <div className="text-right flex items-center gap-2">
-                      <span className="text-xl font-bold">${listing.totalPrice}</span>
+                      <span className="text-xl font-bold">
+                        ${listing.totalPrice}
+                      </span>
                       <div className="text-sm text-gray-500">
                         Total (including fees and taxes)
                       </div>
@@ -266,13 +658,21 @@ export default function AllListingsPage() {
       </div>
 
       <div className="mt-10 text-center space-x-4">
-        {visibleListings.length < allListings.length && (
-          <Button onClick={showMore} disabled={loading} className=' rounded-full'>
-            {loading ? 'Loading...' : 'Show More'}
+        {visibleListings.length < sortedListings.length && (
+          <Button
+            onClick={showMore}
+            disabled={isLoading}
+            className="rounded-full"
+          >
+            {isLoading ? "Loading..." : "Show More"}
           </Button>
         )}
         {page > 1 && (
-          <Button variant="secondary" onClick={showLess} className=' rounded-full'>
+          <Button
+            variant="secondary"
+            onClick={showLess}
+            className="rounded-full"
+          >
             Show Less
           </Button>
         )}

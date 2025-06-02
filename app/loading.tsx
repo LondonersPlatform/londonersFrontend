@@ -32,7 +32,7 @@ export default function Loading({ isLoading = true, onLoadingComplete, timeout =
   if (!visible) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-95">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-100">
       <div className="relative flex flex-col items-center">
         <div className="animate-pulse">
           <Image src="/imglogo.png" alt="LONDONERS.com" width={300} height={80} priority />
