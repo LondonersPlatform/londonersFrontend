@@ -54,7 +54,7 @@ export function FilterButton({onApply,filterListings}:any) {
         <FiltersModal
           onClose={() => setShowFilters(false)}
           onApply={onApply}
-          
+          setShowFilters={setShowFilters}
           filterListings={filterListings}
         />
       )}
