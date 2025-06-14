@@ -16,7 +16,7 @@ export default function Footer() {
               className="object-contain"
             />
           </div>
-       
+
           <div className="lg:absolute right-4  md:relative">
             <Image
               src="/f0.png"
@@ -38,26 +38,17 @@ export default function Footer() {
             Blog
           </Link>
         </div>
-        <div className="flex justify-center py-4 space-x-4">
-            <Link
-              href="#"
-              className="rounded-full bg-blue-900 p-2 text-white hover:bg-blue-800"
-            >
-              <Facebook className="h-5 w-5" />
-            </Link>
-            <Link
-              href="#"
-              className="rounded-full bg-pink-700 p-2 text-white hover:bg-pink-600"
-            >
-              <Instagram className="h-5 w-5" />
-            </Link>
-            <Link
-              href="#"
-              className="rounded-full bg-red-700 p-2 text-white hover:bg-red-600"
-            >
-              <Youtube className="h-5 w-5" />
-            </Link>
-          </div>
+        <div className="flex justify-center items-center py-4 space-x-4">
+          <Link href="https://www.facebook.com/londonerscom">
+            <img src={"./facebookIcon.svg"} className=" w-[36px]" />
+          </Link>
+          <Link href="https://www.instagram.com/londonerscom">
+            <img src={"./instagramIcon.svg"} className=" w-[36px]" />
+          </Link>
+          <Link href="https://youtube.com/@londoners.com.?si=V4eyp_SVmU6ATFFb ">
+            <img src={"./youtubeIcon.svg"} className=" w-[36px]" />
+          </Link>
+        </div>
         <div className="mt-8 text-center text-sm text-gray-500">
           Londoners - 2023 All rights reserved
         </div>
