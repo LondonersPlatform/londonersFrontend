@@ -1,4 +1,4 @@
-// app/layout.tsx (or app/layout.js in Next.js 13)
+
 import "./globals.css";
 import "./date-picker.css";
 import { Inter } from "next/font/google";
@@ -8,11 +8,13 @@ import ClientLayout from "@/components/ClientLayout";
 import { Suspense } from "react";
 import Loading from "./loading";
 import QueryProvider from "@/components/QueryProvider";
+import { LoginModalProvider } from "@/context/login-modal-context";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Londoners - Premium London Accommodations",
-  description: "Find your perfect stay in London with Londoners premium accommodations",
+  description:
+    "Find your perfect stay in London with Londoners premium accommodations",
 };
 
 export default function RootLayout({
@@ -23,15 +25,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <AuthProvider>
-            {/* Wrap your layout in Suspense to show the loader */}
-            <Suspense fallback={<Loading />}>
-              <ClientLayout>
-               <QueryProvider> {children}</QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+        >
+          <LoginModalProvider>
+            <AuthProvider>
+              {/* Wrap your layout in Suspense to show the loader */}
+              <Suspense fallback={<Loading />}>
+                <ClientLayout>
+                  <QueryProvider> {children}</QueryProvider>
                 </ClientLayout>
-            </Suspense>
-          </AuthProvider>
+              </Suspense>
+            </AuthProvider>
+          </LoginModalProvider>
         </ThemeProvider>
       </body>
     </html>

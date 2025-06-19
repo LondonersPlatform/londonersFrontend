@@ -18,8 +18,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createQuote } from "@/app/all-listings/Listing";
+import {
+  createQuote,
+  getCalendarByListingId,
+} from "@/app/all-listings/Listing";
 import WIcon from "@/public/svg-assets/WIcon";
+import { useRouter } from "next/navigation";
+import { useLoginModal } from "@/context/login-modal-context";
 
 interface QuoteResponse {
   total: number;
@@ -44,11 +49,46 @@ export function PropertyBooking({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { setRedirectPath, setLoginOpen } = useLoginModal();
+  const [loadingDates, setLoadingDates] = useState(true);
+  const [availableDates, setAvailableDates] = useState<Date[]>([]);
+  // Replace this with actual ID passed to the component or via props
+
+  useEffect(() => {
+    const fetchDates = async () => {
+      try {
+        const dates = await getCalendarByListingId(listingId);
+        setAvailableDates(dates);
+      } catch (error) {
+        console.error("Error loading calendar dates:", error);
+      } finally {
+        setLoadingDates(false);
+      }
+    };
+
+    fetchDates();
+  }, [listingId]);
   // Calculate the number of nights between check-in and check-out
   const nights = Math.ceil(
     (checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)
   );
 
+  const session = JSON.parse(localStorage.getItem("session") || "{}");
+  console.log(localStorage.getItem("session"), "session in property booking");
+  const openLoginModal = () => {
+    const query = new URLSearchParams({
+      quoteId: quoteData?.guesty_quote._id,
+      PricePerNight: PricePerNight,
+      serviceFee: serviceFee,
+      Cleaningfee: Cleaningfee,
+      whatsup: whatsup,
+      MaxNumofGuests: MaxNumofGuests,
+      listingId: listingId,
+    });
+
+    setRedirectPath(`/Payment?${query.toString()}`);
+    setLoginOpen(true);
+  };
   // Fetch quote data whenever dates or guest count changes
   useEffect(() => {
     const fetchQuote = async () => {
@@ -77,6 +117,23 @@ export function PropertyBooking({
     fetchQuote();
   }, [checkInDate, checkOutDate, guestCount, listingId]);
 
+  const router = useRouter();
+
+  const handleClick = () => {
+    setLoading(true);
+
+    const query = new URLSearchParams({
+      quoteId: quoteData?.guesty_quote._id,
+      PricePerNight: PricePerNight,
+      serviceFee: serviceFee,
+      Cleaningfee: Cleaningfee,
+      whatsup: whatsup,
+      MaxNumofGuests: MaxNumofGuests,
+      listingId: listingId,
+    });
+
+    router.push(`/Payment?${query.toString()}`);
+  };
   // Calculate costs based on API response or fallback to props
   const nightlyRate = PricePerNight;
   const subtotal = nightlyRate * nights;
@@ -125,7 +182,7 @@ export function PropertyBooking({
                 <PopoverTrigger asChild>
                   <Button className="w-full bg-transparent hover:bg-transparent text-grey-800 flex flex-col gap-1 py-0 items-start p-0 h-full font-normal">
                     <div className="text-xs font-medium">CHECK-IN</div>
-                    <span>{format(checkInDate, "M/d/yyyy")}</span>
+                    <span>{format(checkInDate, "d/M/yyyy")}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -134,6 +191,13 @@ export function PropertyBooking({
                     selected={checkInDate}
                     onSelect={handleCheckInChange}
                     initialFocus
+                    disabled={(date) => {
+                      return (
+                        !availableDates.some(
+                          (d) => d.toDateString() === date.toDateString()
+                        ) || date < new Date()
+                      );
+                    }}
                   />
                 </PopoverContent>
               </Popover>
@@ -145,7 +209,7 @@ export function PropertyBooking({
                 <PopoverTrigger asChild className=" ">
                   <Button className="w-full bg-transparent hover:bg-transparent text-grey-800 flex flex-col gap-1 py-0 items-start p-0 h-full font-normal">
                     <div className="text-xs font-medium">CHECK-OUT</div>
-                    <span>{format(checkOutDate, "M/d/yyyy")}</span>
+                    <span>{format(checkOutDate, "d/M/yyyy")}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="end">
@@ -154,7 +218,13 @@ export function PropertyBooking({
                     selected={checkOutDate}
                     onSelect={(date) => date && setCheckOutDate(date)}
                     initialFocus
-                    disabled={(date) => date <= checkInDate}
+                    disabled={(date) => {
+                      return (
+                        !availableDates.some(
+                          (d) => d.toDateString() === date.toDateString()
+                        ) || date <= checkInDate
+                      );
+                    }}
                   />
                 </PopoverContent>
               </Popover>
@@ -203,7 +273,15 @@ export function PropertyBooking({
             </div>
           </div>
 
-          <Button className="w-full" disabled={loading}>
+          <Button
+            className="w-full"
+            disabled={loading}
+            onClick={
+              !localStorage.getItem("access_token")
+                ? openLoginModal
+                : handleClick
+            }
+          >
             {loading ? "Loading..." : "Book Now"}
           </Button>
           <p className="text-center text-sm text-gray-500">
@@ -237,7 +315,7 @@ export function PropertyBooking({
           rel="noopener noreferrer"
         >
           <Button className="bg-[#59D750] w-full hover:bg-[#67e15e] p-5 text-center flex items-center justify-center gap-2">
-         <WIcon/>
+            <WIcon />
             Chat on WhatsApp
           </Button>
         </a>

@@ -40,13 +40,13 @@ export default function Footer() {
         </div>
         <div className="flex justify-center items-center py-4 space-x-4">
           <Link href="https://www.facebook.com/londonerscom">
-            <img src={"./facebookIcon.svg"} className=" w-[36px]" />
+            <img src={"/facebookIcon.svg"} className=" w-[36px]" />
           </Link>
           <Link href="https://www.instagram.com/londonerscom">
-            <img src={"./instagramIcon.svg"} className=" w-[36px]" />
+            <img src={"/instagramIcon.svg"} className=" w-[36px]" />
           </Link>
           <Link href="https://youtube.com/@londoners.com.?si=V4eyp_SVmU6ATFFb ">
-            <img src={"./youtubeIcon.svg"} className=" w-[36px]" />
+            <img src={"/youtubeIcon.svg"} className=" w-[36px]" />
           </Link>
         </div>
         <div className="mt-8 text-center text-sm text-gray-500">

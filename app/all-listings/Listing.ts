@@ -1,4 +1,54 @@
 
+export async function signUpUser(userDetails: any): Promise<any> {
+  const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/auth-signUp`;
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userDetails),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to sign up user");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error("Error signing up user:", error.message);
+    throw error;
+  }
+}
+export async function getGuestyId(email: string): Promise<any> {
+  const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-guesty-id`;
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData?.message || `Failed to get Guesty ID (status ${response.status})`
+    );
+  }
+
+  return response.json();
+}
+
+
 export async function fetchListings(searchParams?: any): Promise<any> {
   const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/listing-search`;
   const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -30,6 +80,9 @@ export async function fetchListings(searchParams?: any): Promise<any> {
     total: data.totalCount || 0,
   };
 }
+
+
+
 
 export async function fetchListingById(id: string): Promise<any> {
   const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/Retrieve-listing-byID`;
@@ -70,14 +123,26 @@ export async function createQuote(payload: any): Promise<any> {
   
   });
 
-  if (!response.ok) {
-    try {
-      const errorData = await response.json();
-      throw new Error(errorData?.error || `Request failed with status ${response.status}`);
-    } catch {
-      throw new Error(`Request failed with status ${response.status}`);
+if (!response.ok) {
+  let errorMessage = "An unknown error occurred.";
+  try {
+    const errorData = await response.json();
+    console.error("Error creating quote:", errorData);
+    
+    // Try to extract a useful error message
+    if (errorData.details) {
+      const details = JSON.parse(errorData.details);
+      errorMessage = details?.error?.message || errorData.details;
+    } else if (errorData.error) {
+      errorMessage = errorData.error;
     }
+  } catch (e) {
+    console.error("Error parsing error response:", e);
   }
+
+  throw new Error(errorMessage);
+}
+
 
   return response.json();
 }
@@ -109,5 +174,108 @@ export async function fetchPhotoTourImages(
   }
 
   // If your Edge Function wraps the response in a `data` field, adjust this line
+  return response.json();
+}
+
+export async function createSetupIntent(payload: {
+  customer_id: string;
+  usage?: "off_session" | "on_session";
+  payment_method_types?: string[];
+}): Promise<any> {
+  const apiUrl = `https://oaumvyuwtzuyhkwzzxtb.supabase.co/functions/v1/create-setup-intent`;
+
+  // ⚠️ Use a valid Supabase JWT, not a service role on client side
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""; // or securely inject a token if using SSR
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      customer_id: payload.customer_id,
+      usage: payload.usage || "off_session",
+      payment_method_types: payload.payment_method_types || ["card"],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData?.message || `Failed to create setup intent (status ${response.status})`,
+    );
+  }
+
+  return response.json();
+}
+
+
+
+export async function getCalendarByListingId(listingId: string): Promise<Date[]> {
+  const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-calender`;
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ listingId }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData?.message || `Failed to fetch calendar (status ${response.status})`
+    );
+  }
+
+  const data = await response.json();
+
+  // Filter available dates and convert to Date objects
+  return data
+    .filter((entry: any) => entry.status === "available")
+    .map((entry: any) => new Date(entry.date));
+}
+
+
+
+export async function createReservation(payload: {
+  quoteId: any;
+  guestId: string;
+  ratePlanId?: string;
+  reservedUntil?: number;
+  ignoreCalendar?: boolean;
+  ignoreTerms?: boolean;
+  ignoreBlocks?: boolean;
+  confirmationCode?: string;
+  origin?: string;
+  originId?: string;
+}): Promise<any> {
+  const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-reservation`;
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      quoteId: payload.quoteId,
+      guestId: payload.guestId,
+ 
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData?.message || `Failed to create reservation (status ${response.status})`
+    );
+  }
+
   return response.json();
 }
