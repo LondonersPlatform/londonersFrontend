@@ -45,15 +45,14 @@ const PaymentSuccess = () => (
 
 const PaymentFailed = ({ error }: { error: string }) => (
   <>
-    <PaymentStatus status="failed" amount={"180$"} transactionType="visa" />
-    <div className="p-4 mb-4 bg-red-100 text-red-700 rounded-md">
-      Payment failed: {error}
-    </div>
+    <PaymentStatus status={error} amount={"180$"} transactionType="visa" />
+    <div className="p-4 mb-4 bg-red-100 text-red-700 rounded-md">{error}</div>
   </>
 );
 
 export default function Payment() {
   const searchParams = useSearchParams();
+  const ratePlanIdParms = searchParams.get("ratePlanIdParms");
   const quoteIdParms = searchParams.get("quoteId");
   const GuestyId = localStorage.getItem("GuestyId") || "";
   useEffect(() => {
@@ -62,6 +61,7 @@ export default function Payment() {
         const res = await createReservation({
           quoteId: quoteIdParms, // replace with your actual quoteId
           guestId: GuestyId, // assuming session exists from useAuth()
+          ratePlanId: ratePlanIdParms ?? undefined,
         });
         console.log("Reservation Response:", res);
       } catch (error) {
@@ -77,7 +77,7 @@ export default function Payment() {
     new Date(2025, 1, 12)
   );
   const [stripeError, setStripeError] = useState<string | null>(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(
     new Date(2025, 1, 20)
   );
@@ -182,173 +182,191 @@ export default function Payment() {
 
   const { session, isLoading } = useAuth();
   console.log(session?.user.id, "sessionsessionsession");
+  {
+    /* Show payment status messages */
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-[1300px] mx-auto space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Card className="col-span-2">
-          <CardContent>
-            {/* Show payment status messages */}
-            {paymentSuccess && <PaymentSuccess />}
-            {stripeError && <PaymentFailed error={stripeError} />}
+    <>
+      {paymentSuccess && <PaymentSuccess />}
+      {stripeError && <PaymentFailed error={stripeError} />}
+      {!stripeError &&
+        (!paymentSuccess && (
+          <form
+            onSubmit={handleSubmit}
+            className="max-w-[1300px] mx-auto space-y-8"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <Card className="col-span-2">
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="fullName">
+                        Full Name<span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="fullName"
+                        onChange={handleInputChange}
+                        value={formValues.fullName}
+                        required
+                      />
+                    </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="fullName">
-                  Full Name<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="fullName"
-                  onChange={handleInputChange}
-                  value={formValues.fullName}
-                  required
+                    <div className="space-y-2 md:col-span-2">
+                      <Label>
+                        Card Number<span className="text-red-500">*</span>
+                      </Label>
+                      <div className="p-3 border rounded-md bg-white shadow-sm">
+                        <CardNumberElement
+                          options={{
+                            style: {
+                              base: {
+                                fontSize: "16px",
+                                color: "#32325d",
+                                "::placeholder": { color: "#aab7c4" },
+                              },
+                              invalid: { color: "#fa755a" },
+                            },
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>
+                        Expiry Date<span className="text-red-500">*</span>
+                      </Label>
+                      <div className="p-3 border rounded-md bg-white shadow-sm">
+                        <CardExpiryElement
+                          options={{
+                            style: {
+                              base: {
+                                fontSize: "16px",
+                                color: "#32325d",
+                                "::placeholder": { color: "#aab7c4" },
+                              },
+                              invalid: { color: "#fa755a" },
+                            },
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>
+                        CVV<span className="text-red-500">*</span>
+                      </Label>
+                      <div className="p-3 border rounded-md bg-white shadow-sm">
+                        <CardCvcElement
+                          options={{
+                            style: {
+                              base: {
+                                fontSize: "16px",
+                                color: "#32325d",
+                                "::placeholder": {
+                                  color: "#aab7c4",
+                                  // Won’t affect actual placeholder text
+                                },
+                              },
+                              invalid: {
+                                color: "#fa755a",
+                              },
+                            },
+                          }}
+                        />
+                      </div>
+                      <p className="text-sm text-muted-foreground">e.g. 123</p>{" "}
+                      {/* Custom hint below */}
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="billingAddress">
+                        Billing Address<span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="billingAddress"
+                        onChange={handleInputChange}
+                        value={formValues.billingAddress}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="billingZipCode">
+                        Zip Code<span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="billingZipCode"
+                        onChange={handleInputChange}
+                        value={formValues.billingZipCode}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="billingCity">
+                        City<span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="billingCity"
+                        onChange={handleInputChange}
+                        value={formValues.billingCity}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="billingCountry">
+                        Country<span className="text-red-500">*</span>
+                      </Label>
+                      <Select
+                        onValueChange={(value) =>
+                          setFormValues((prev) => ({
+                            ...prev,
+                            billingCountry: value,
+                          }))
+                        }
+                        value={formValues.billingCountry}
+                      >
+                        <SelectTrigger id="billingCountry">
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {["us", "gb", "ca", "au"].map((c) => (
+                            <SelectItem key={c} value={c}>
+                              {c.toUpperCase()}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2 my-6 flex items-end">
+                    <Button
+                      type="submit"
+                      className="w-full bg-black text-white"
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              <div>
+                <BookingSidebar
+                  checkInDate={checkInDate}
+                  setCheckInDate={setCheckInDate}
+                  checkOutDate={checkOutDate}
+                  setCheckOutDate={setCheckOutDate}
+                  guests={guests}
+                  setGuests={setGuests}
+                  dailyCleaningCount={dailyCleaningCount}
+                  setDailyCleaningCount={setDailyCleaningCount}
+                  babysittingCount={babysittingCount}
+                  setBabysittingCount={setBabysittingCount}
                 />
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label>
-                  Card Number<span className="text-red-500">*</span>
-                </Label>
-                <div className="p-3 border rounded-md bg-white shadow-sm">
-                  <CardNumberElement
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: "16px",
-                          color: "#32325d",
-                          "::placeholder": { color: "#aab7c4" },
-                        },
-                        invalid: { color: "#fa755a" },
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>
-                  Expiry Date<span className="text-red-500">*</span>
-                </Label>
-                <div className="p-3 border rounded-md bg-white shadow-sm">
-                  <CardExpiryElement
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: "16px",
-                          color: "#32325d",
-                          "::placeholder": { color: "#aab7c4" },
-                        },
-                        invalid: { color: "#fa755a" },
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>
-                  CVC<span className="text-red-500">*</span>
-                </Label>
-                <div className="p-3 border rounded-md bg-white shadow-sm">
-                  <CardCvcElement
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: "16px",
-                          color: "#32325d",
-                          "::placeholder": { color: "#aab7c4" },
-                        },
-                        invalid: { color: "#fa755a" },
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="billingAddress">
-                  Billing Address<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="billingAddress"
-                  onChange={handleInputChange}
-                  value={formValues.billingAddress}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="billingZipCode">
-                  Zip Code<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="billingZipCode"
-                  onChange={handleInputChange}
-                  value={formValues.billingZipCode}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="billingCity">
-                  City<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="billingCity"
-                  onChange={handleInputChange}
-                  value={formValues.billingCity}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="billingCountry">
-                  Country<span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  onValueChange={(value) =>
-                    setFormValues((prev) => ({
-                      ...prev,
-                      billingCountry: value,
-                    }))
-                  }
-                  value={formValues.billingCountry}
-                >
-                  <SelectTrigger id="billingCountry">
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["us", "gb", "ca", "au"].map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c.toUpperCase()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </div>
-            <div className="md:col-span-2 my-6 flex items-end">
-              <Button type="submit" className="w-full bg-black text-white">
-                Submit
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-    <div>
-          <BookingSidebar
-          checkInDate={checkInDate}
-          setCheckInDate={setCheckInDate}
-          checkOutDate={checkOutDate}
-          setCheckOutDate={setCheckOutDate}
-          guests={guests}
-          setGuests={setGuests}
-          dailyCleaningCount={dailyCleaningCount}
-          setDailyCleaningCount={setDailyCleaningCount}
-          babysittingCount={babysittingCount}
-          setBabysittingCount={setBabysittingCount}
-        />
-    </div>
-      </div>
-    </form>
+          </form>
+        ))}
+    </>
   );
 }

@@ -25,7 +25,11 @@ export default function ClientLayout({
 
   const pathname = usePathname();
   const hideHeader =
-    pathname?.includes("/Dashboard") || pathname?.includes("/Favourite") || pathname?.includes("/Profile");
+    pathname?.includes("/Dashboard") ||
+    pathname?.includes("/Favourite") ||
+    pathname?.includes("/Profile") ||
+    pathname?.includes("/update-password");
+  const isAuthPath = pathname?.includes("/update-password");
   if (isLoading) {
     return (
       <div className="text-center py-20">
@@ -38,9 +42,9 @@ export default function ClientLayout({
     <>
       {!session ? (
         <>
-          <Header />
+          {!isAuthPath && <Header />}
           {children}
-          <Footer />
+          {!isAuthPath && <Footer />}
         </>
       ) : (
         <>

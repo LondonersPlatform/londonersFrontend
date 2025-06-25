@@ -25,9 +25,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { fetchListings } from "@/app/all-listings/Listing";
+import { addFavorite, checkFavorite, deleteFavorite, fetchListings } from "@/app/all-listings/Listing";
 import SkeletonCard from "../ui/SkeletonCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLoginModal } from "@/context/login-modal-context";
 
 interface Listing {
   id: string;
@@ -53,16 +54,85 @@ export default function FeaturedListings() {
 
   const listings = data?.listings || [];
   const total = data?.total || 0;
+ const { setRedirectPath, setLoginOpen } = useLoginModal();
+ 
 
-  const toggleFavorite = (id: string) => {
+  const handleFavoriteClick = async (
+  e: React.MouseEvent,
+  listingId: string
+) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const accessToken = localStorage.getItem("access_token");
+  const guestyId = localStorage.getItem("GuestyId");
+
+  if (!accessToken || !guestyId) {
+    setRedirectPath("/all-listings");
+    setLoginOpen(true);
+    return;
+  }
+
+  const isFavorited = favorites.includes(listingId);
+  const newFavoriteState = !isFavorited;
+  setFavorites((prev) =>
+    newFavoriteState ? [...prev, listingId] : prev.filter((id) => id !== listingId)
+  );
+
+  try {
+    if (newFavoriteState) {
+      await addFavorite({
+        guestyUserId: guestyId,
+        listingId,
+      });
+    } else {
+      await deleteFavorite({
+        guesty_user_id: guestyId,
+        listingId,
+      });
+    }
+  } catch (error: any) {
+    console.error("Failed to update favorite:", error.message);
+    // rollback UI change
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      isFavorited ? [...prev, listingId] : prev.filter((id) => id !== listingId)
     );
+  }
+};
+
+useEffect(() => {
+  const fetchFavoritesStatus = async () => {
+    const token = localStorage.getItem("access_token");
+    const guestyId = localStorage.getItem("GuestyId");
+    if (!token || !guestyId) return;
+
+    const favoriteIds: string[] = [];
+
+    await Promise.all(
+      listings.map(async (listing: Listing) => {
+        try {
+          const res = await checkFavorite(guestyId, listing.id);
+          if (res.isFavorite) {
+            favoriteIds.push(listing.id);
+          }
+        } catch (err) {
+          console.error(`Failed to check favorite for ${listing.id}`, err);
+        }
+      })
+    );
+
+    setFavorites(favoriteIds);
   };
+
+  if (listings.length > 0) {
+    fetchFavoritesStatus();
+  }
+}, [listings]);
+
 
   if (isError) {
     return (
-      <section className="container mx-auto py-16 px-4 md:px-6">
+      <section className="w-[85%] mx-auto py-16 px-4 md:px-6">
         <div className="text-center text-red-500">
           Failed to load featured listings
         </div>
@@ -71,7 +141,7 @@ export default function FeaturedListings() {
   }
 
   return (
-    <section className="container mx-auto py-16 px-4 md:px-6">
+    <section className="w-[85%] mx-auto py-16 px-4 md:px-6">
       <div className="text-center w-full">
         <h2 className="text-2xl font-bold">Featured listings</h2>
       </div>
@@ -118,16 +188,12 @@ export default function FeaturedListings() {
                       />
                       <button
                         className="absolute right-3 top-3 rounded-full bg-white p-1.5 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation(); // prevent bubbling
-                          e.preventDefault(); // prevent link navigation
-                          toggleFavorite(item.id);
-                        }}
+                   onClick={(e) => handleFavoriteClick(e, item.id)}
                       >
                         <Heart
                           className={`h-4 w-4 ${
                             favorites.includes(item.id)
-                              ? "fill-black text-black"
+                              ? "fill-red-600 text-red-700"
                               : ""
                           }`}
                         />

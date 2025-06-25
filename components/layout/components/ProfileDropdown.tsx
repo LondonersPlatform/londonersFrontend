@@ -9,11 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { BookDashed, LogOut, User } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { getGuestyId } from "@/app/all-listings/Listing";
+import DashboardIcon from "@/public/svg-assets/DashboardIcon";
 
 interface ProfileDropdownProps {
   isLoading: boolean;
@@ -45,19 +46,17 @@ export function ProfileDropdown({}: ProfileDropdownProps) {
       router.refresh(); // Refresh the page to update UI state
       localStorage.removeItem("session");
       localStorage.removeItem("GuestyId");
+      localStorage.removeItem("access_token");
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
-const email =localStorage.getItem("email") || session?.user?.email || "dee";
+  const email = localStorage.getItem("email") || session?.user?.email || "dee";
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="h-10 border-2 w-10 cursor-pointer">
-          <AvatarImage
-            src={session?.avatarUrl}
-            alt={email}
-          />
+          <AvatarImage src={session?.avatarUrl} alt={email} />
           <AvatarFallback className="bg-primary text-primary-foreground">
             {session?.user?.email || email
               ? email.slice(0, 2).toUpperCase()
@@ -81,7 +80,12 @@ const email =localStorage.getItem("email") || session?.user?.email || "dee";
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/profile")}>
+
+        <DropdownMenuItem onClick={() => router.push("/Dashboard")}>
+          <DashboardIcon className="mr-2 h-4 w-4" />
+          <span>Dashboard</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/Profile")}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>

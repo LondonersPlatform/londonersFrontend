@@ -19,12 +19,14 @@ import { useParams, useSearchParams } from "next/navigation";
 import Loading from "@/app/loading";
 
 export default function Home() {
-  const { id } = useParams(); // 👈 Get ID from route
+  const { id } = useParams();
 
-  const listingId = id;
+  // Ensure id is a string
+  const listingId = Array.isArray(id) ? id[0] : id;
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["listing", listingId],
-    queryFn: () => fetchListingById(id),
+    enabled: !!listingId,
+    queryFn: () => fetchListingById(listingId as string),
   });
 
   const overviewRef = useRef(null);
@@ -45,10 +47,10 @@ export default function Home() {
     return <div className="p-8 text-red-500">Error: {error.message}</div>;
 
   return (
-    <div className="min-h-screen lg:mx-32 overflow-x-hidden flex flex-col">
+    <div className="min-h-screen    overflow-x-hidden flex flex-col">
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-6">
-          <PropertyCarousel imagesDummy={data[0].imagesDummy} />
+        <div className="w-[83%] mx-auto py-6">
+          <PropertyCarousel imagesDummy={data[0].imagesDummy} listingId={listingId}  />
 
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="w-full lg:w-2/3">
@@ -84,10 +86,11 @@ export default function Home() {
                       dummyPropertyData={data[1].dummyPropertyData}
                     stars={data[5]?.propertyReviews.ratingSummary?.stars}
                     />
-                    <PropertyAmenities amenityData={data[2].amenityData} />
-                    <PropertyTransportation
+                     <PropertyTransportation
                       transportData={data[3].transportData}
                     />
+                    <PropertyAmenities amenityData={data[2].amenityData} />
+                   
                     <PropertyRooms roomData={data[4].roomData} />
                   </div>
 
@@ -112,9 +115,11 @@ export default function Home() {
 
             <div className="w-full mt-12 lg:w-1/3">
               <div className="sticky top-24">
+         
                 <PropertyBooking
                 whatsup={data[0].whatsup}
                 listingId={listingId}
+                rate={data[8].rates[0].internalRatePlanId}
                 PricePerNight={data[0].PricePerNight}
                   Cleaningfee={data[0].Cleaningfee}
                   serviceFee={data[0].Servicefee ?data[0].Servicefee  :0  }

@@ -1,50 +1,96 @@
-import { Wifi, Tv, AirVent, Utensils, ParkingMeterIcon as Parking, Snowflake, Coffee, Dumbbell, Waves, ShowerHead, Home, FireExtinguisher, Sprout } from "lucide-react"
-import { Button } from "@/components/ui/button"
-// Create a mapping object
-const iconComponents:any = {
-  Wifi: Wifi,
-  Tv: Tv,
-  AirVent: AirVent,
-  Utensils: Utensils,
-  Parking: Parking,
-  Snowflake: Snowflake,
-  Coffee: Coffee,
-  Dumbbell: Dumbbell,
-  Waves: Waves,
-  ShowerHead: ShowerHead,
-  Home: Home,
-  FireExtinguisher: FireExtinguisher,
-  Sprout: Sprout
+import {
+  Wifi,
+  Tv,
+  AirVent,
+  Utensils,
+  ParkingMeterIcon as Parking,
+  Snowflake,
+  Coffee,
+  Dumbbell,
+  Waves,
+  ShowerHead,
+  Home,
+  FireExtinguisher,
+  Sprout,
+  HelpCircle,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"; // Assuming you use Radix or shadcn/ui
+import { useState } from "react";
+
+const iconMap: Record<string, React.ElementType> = {
+  Wifi,
+  Tv,
+  AirVent,
+  Utensils,
+  Parking,
+  Snowflake,
+  Coffee,
+  Dumbbell,
+  Waves,
+  ShowerHead,
+  Home,
+  FireExtinguisher,
+  Sprout,
 };
 
-// Utility function to get random amenities
-const getRandomAmenities = (amenityData:any) => {
-  const shuffled = [...amenityData].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, Math.floor(Math.random() * 5) + 3); // 3-7 amenities
+const getIconByAmenity = (amenity: any): React.ElementType => {
+  if (amenity.name && iconMap[amenity.name]) return iconMap[amenity.name];
+
+  const name = amenity.name.toLowerCase();
+  if (name.includes("tv")) return Tv;
+  if (name.includes("wifi")) return Wifi;
+  if (name.includes("air")) return AirVent;
+  if (name.includes("coffee")) return Coffee;
+  if (name.includes("gym") || name.includes("fitness")) return Dumbbell;
+  if (name.includes("parking")) return Parking;
+  if (name.includes("shower")) return ShowerHead;
+  if (name.includes("food") || name.includes("restaurant")) return Utensils;
+
+  return HelpCircle;
 };
 
-export function PropertyAmenities({amenityData}:any) {
-  const randomAmenities = getRandomAmenities(amenityData);
-  
+export function PropertyAmenities({ amenityData }: any) {
+  const [open, setOpen] = useState(false);
+  const visibleAmenities = amenityData.slice(0, 7);
+  const hasMore = amenityData.length > 7;
+
+  const renderAmenity = (amenity: any, index: number) => {
+    const Icon = getIconByAmenity(amenity);
+    return (
+      <div key={index} className="flex items-center gap-3">
+        <span className="bg-[#F5F5F5] px-4 py-1 flex items-start gap-2 rounded-2xl">
+          <Icon className="w-5 h-5 text-primary" />
+          {amenity.name}
+        </span>
+      </div>
+    );
+  };
+
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">What this place offers</h2>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-        {randomAmenities.map((amenity, index) => {
-        const IconComponent = iconComponents[amenity.icon];
-          return (
-            <div key={index} className="flex items-center gap-3">
-              {/* <IconComponent className="h-5 w-5" /> */}
-              <span>{amenity.name}</span>
-            </div>
-          );
-        })}
+      <div className="flex flex-wrap gap-4 mb-4">
+        {visibleAmenities.map(renderAmenity)}
       </div>
 
-      <Button variant="outline" className="rounded-full">
-        Show more
-      </Button>
+      {hasMore && (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="rounded-full">
+              Show more
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl py-6">
+            <DialogHeader>
+              <DialogTitle className=" py-6">All Amenities</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-6 max-h-[400px] overflow-y-auto">
+              {amenityData.map(renderAmenity)}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

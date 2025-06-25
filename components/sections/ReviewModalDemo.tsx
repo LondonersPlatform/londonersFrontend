@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { CategoryRatingType, Review, ReviewModal } from "../ui/ReviewModal";
 import { StarRating } from "../ui/StarRating";
+import Arrowright from "@/public/svg-assets/arrowright";
 
 // Sample data
 const demoReviews: Review[] = [
@@ -84,13 +85,13 @@ export function ReviewModalDemo() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex flex-col items-start gap-4">
+    <div className="flex border-b-2 flex-col items-start gap-4">
       <Button
         variant="outline"
-        className="rounded-full  w-auto"
+        className="rounded-full flex items-center gap-1  border-[#000000] mb-6 w-auto"
         onClick={() => setOpen(true)}
       >
-        Show more
+        Show all reviews <Arrowright />
       </Button>
 
       <ReviewModal

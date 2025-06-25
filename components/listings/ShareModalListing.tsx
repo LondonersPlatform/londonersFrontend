@@ -38,6 +38,7 @@ function ShareModalListing({
   bedroom,
   beds,
   bath,
+  urlPathId,
   guests,
 }: any) {
   const [placeUrl, setplaceUrl] = useState("");
@@ -47,8 +48,9 @@ function ShareModalListing({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const url = window.location.href;
+      const url = (urlPathId ? `${urlPathId}`: window.location.href);
       setplaceUrl(url);
+      console.log(url,"url====>")
       setIframeCode(
         `<iframe src="${url}" width="600" height="400" frameborder="0" style="border:0" allowfullscreen></iframe>`
       );
@@ -123,7 +125,7 @@ function ShareModalListing({
         <DialogContent className="sm:max-w-3xl  lg:px-12 overflow-y-auto lg:rounded-2xl py-12">
           <DialogHeader>
             <DialogTitle className=" text-2xl">Share this place</DialogTitle>
-         
+      
           </DialogHeader>
 
           {!showEmbedCode ? (

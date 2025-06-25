@@ -1,25 +1,26 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Badge, Calendar, Heart, Mail, User } from "lucide-react";
+import { Badge, Calendar, Heart, LogOut, Mail, User } from "lucide-react";
 import clsx from "clsx"; // Optional utility for conditional classes
+import { useAuth } from "@/context/auth-context";
 
 export const SidebarContent = () => {
   const router = useRouter();
   const pathname = usePathname();
-
+ // {
+    //   href: "/inbox",
+    //   icon: <Mail size={20} />,
+    //   label: "Inbox",
+    //   badge: 3,
+    // },
   const links = [
     {
       href: "/Dashboard",
       icon: <Calendar size={20} />,
       label: "Reservations",
     },
-    {
-      href: "/inbox",
-      icon: <Mail size={20} />,
-      label: "Inbox",
-      badge: 3,
-    },
+   
     {
       href: "/Favourite",
       icon: <Heart size={20} />,
@@ -31,11 +32,29 @@ export const SidebarContent = () => {
       label: "Profile",
     },
   ];
-
+  const { signOut } = useAuth();
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.refresh(); // Refresh the page to update UI state
+      router.push("/");
+      localStorage.removeItem("session");
+      localStorage.removeItem("GuestyId");
+      localStorage.removeItem("access_token");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+  const handleClick = () => {
+    router.push("/");
+  };
   return (
     <>
-      <div className="p-6">
-        <div className="text-xl font-bold tracking-wider">LONDONERS</div>
+      <div
+        className="p-6 flex w-full justify-center cursor-pointer"
+        onClick={() => router.push("/")}
+      >
+        <img src={"/logoside.svg"} />
       </div>
 
       <nav className="flex-1 px-4">
@@ -46,6 +65,7 @@ export const SidebarContent = () => {
             return (
               <div
                 key={href}
+                onClick={() => router.push(`${href}`)}
                 className={clsx(
                   "flex items-center gap-3 px-3 py-2 rounded cursor-pointer transition-colors",
                   {
@@ -53,7 +73,6 @@ export const SidebarContent = () => {
                     "text-[#8c8c8c] hover:text-white": !isActive,
                   }
                 )}
-                onClick={() => router.push(href)}
               >
                 {icon}
                 <span>{label}</span>
@@ -65,6 +84,14 @@ export const SidebarContent = () => {
               </div>
             );
           })}
+
+          <div
+            className="flex items-center gap-3 px-3 py-2 rounded cursor-pointer text-[#8c8c8c] hover:text-white transition-colors"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </div>
         </div>
       </nav>
     </>

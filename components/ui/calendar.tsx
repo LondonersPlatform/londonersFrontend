@@ -16,11 +16,18 @@ function Calendar({
   ...props
 }: CalendarProps) {
   return (
-    <DayPicker
+    <>
+<div className=" flex flex-col  gap-1 px-4 py-3">
+
+      <h1 className=" font-semibold ">Select check in date</h1>
+    <p className=" text-[#8C8C8C] text-xs">Add your dates for exact pricing </p>
+</div>
+      <DayPicker
        disabled={{ before: new Date() }}
       showOutsideDays={showOutsideDays}
       className={cn("p-3  z-[100]", className)}
       classNames={{
+        
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
@@ -30,8 +37,8 @@ function Calendar({
           buttonVariants.outline,  
           "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
         ),
-        nav_button_previous: "absolute rounded-2xl left-1",
-        nav_button_next: "absolute rounded-2xl right-1",
+        nav_button_previous: "absolute   border-[0px] rounded-2xl left-1  hover:border-[0px] hover:bg-transparent ",
+        nav_button_next: "absolute rounded-2xl  border-[0px] right-1 hover:border-[0px] hover:border-[0px] hover:bg-transparent",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
         head_cell:
@@ -46,20 +53,24 @@ function Calendar({
         day_selected:
           "bg-primary rounded-full text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         day_today: "bg-accent rounded-full border text-accent-foreground",
+       
         day_outside:
           "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
         day_disabled: "text-muted-foreground opacity-50",
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
+        day_inRange: "bg-gray-200 text-black",
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+        IconLeft: ({ ...props }) => <ChevronLeft className="h-4  w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
       }}
       {...props}
     />
+    </>
+  
   )
 }
 Calendar.displayName = "Calendar"

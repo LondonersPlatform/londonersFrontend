@@ -56,7 +56,7 @@ export function PropertyOverview({ dummyPropertyData ,stars }: any) {
     </div>
 
       {/* Amenities */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-b py-6">
+      <div className="grid grid-rows-1 md:grid-rows-3 gap-6 border-t border-b py-6">
         {dummyPropertyData.amenities.map((amenity: any, index: number) => {
           const IconComponent = iconMap[amenity.icon] || Wifi; // Default to Wifi if unknown
           return (

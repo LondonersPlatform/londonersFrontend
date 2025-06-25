@@ -69,7 +69,7 @@ export default function ResetModal({ isOpen, onClose }: ResetModalProps) {
       setSuccess(false)
       
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
+        redirectTo: `${window.location.origin}/update-password`,
       })
 
       if (error) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import { SidebarContent } from "@/components/layout/Sidebar"
+import { useRouter } from "next/navigation"
 
 const reservations = [
   {
@@ -153,11 +154,17 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("All")
   const [searchQuery, setSearchQuery] = useState("")
   const [sidebarOpen, setSidebarOpen] = useState(false)
-
+ const router = useRouter();
+ useEffect(() => {
+    const isAuth = localStorage.getItem("access_token") || localStorage.getItem("session");
+    if (!isAuth) {
+      router.push("/"); // ✅ Redirect if not authenticated
+    }
+  }, []);
   const tabs = ["All", "Previous reservations", "Current reservations", "Upcoming reservations"]
 
   return (
-    <div className="flex h-screen bg-[#f5f5f5]">
+    <div className="flex h-screen   bg-[#f5f5f5]">
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex w-64 bg-[#000000] text-white flex-col">
         <SidebarContent />
@@ -173,9 +180,9 @@ export default function Dashboard() {
       </Sheet>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 bg-white   flex flex-col min-w-0">
         {/* Header */}
-        <div className="bg-white p-4 lg:p-6 border-b border-[#ededed]">
+        <div className="bg-white p-4 lg:p-6  border-[#ededed]">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" className="lg:hidden p-2" onClick={() => setSidebarOpen(true)}>
               <Menu size={20} />
@@ -189,8 +196,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Tabs and Search */}
-        <div className="bg-white px-4 lg:px-6 py-4 border-b border-[#ededed]">
+
+
+         {/* Tabs and Search */}
+        <div className="bg-white px-4 lg:px-6  mt-6 border rounded-lg  lg:mx-12 mx-4  py-4 border-b border-[#ededed]">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Tabs - Scrollable on mobile */}
             <div className="flex space-x-6 lg:space-x-8 overflow-x-auto pb-2 lg:pb-0">
@@ -198,9 +207,9 @@ export default function Dashboard() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`pb-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                  className={` text-sm font-medium  transition-colors  ${
                     activeTab === tab
-                      ? "text-[#59d750] border-[#59d750]"
+                      ? "text-[#59D750]  bg-[#59D75014]  rounded-lg p-3"
                       : "text-[#8c8c8c] border-transparent hover:text-[#000000]"
                   }`}
                 >
@@ -226,7 +235,7 @@ export default function Dashboard() {
         </div>
 
         {/* Table Container */}
-        <div className="flex-1 bg-white overflow-hidden">
+        <div className="flex-1 bg-white overflow-hidden lg:mx-12 mx-4">
           <div className="overflow-x-auto h-full">
             <table className="w-full min-w-[800px]">
               <thead className="bg-[#f5f5f5] border-b border-[#ededed] sticky top-0">
@@ -313,6 +322,7 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
+
       </div>
     </div>
   )

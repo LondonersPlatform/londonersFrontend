@@ -88,9 +88,9 @@ export default function RegisterModal({
         email: data.email,
         fullname: data.name,
       });
-      console.log("Response from signUpUser:", response);
+   
       const session = response.session;
-      console.log("Session data====>:", session);
+
       const { error: sessionError } = await supabase.auth.setSession(session);
     
       if (session) {

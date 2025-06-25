@@ -1,6 +1,6 @@
 export function PropertyLocation({ location }: any) {
   return (
-    <div className="space-y-6 mb-8">
+    <div className="space-y-6 mt-8 mb-8">
       <h2 className="text-xl font-semibold">{location.title}</h2>
     <div className="space-y-4">
         <p className="text-gray-700">{location.description}</p>

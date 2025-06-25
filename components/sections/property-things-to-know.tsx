@@ -1,4 +1,7 @@
 import { Button } from "@/components/ui/button";
+import HouseRulesModal from "../listings/house-rules-modal";
+import CancellationPolicyModal from "../listings/cancellation-policy-modal";
+import SafetyPropertyModal from "../listings/safety-property-modal";
 
 
 
@@ -26,16 +29,17 @@ export function PropertyThingsToKnow({
                 ))}
               </ul>
             )}
-
+    {index == 0 && <HouseRulesModal />}
+            {index == 1 && <CancellationPolicyModal />}
+            {index == 2 && <SafetyPropertyModal />}
+ 
          
           </div>
         ))}   
          
          
       </div>
-         <Button variant="outline" className="text-sm mt-6 rounded-3xl ">
-            Show more
-          </Button>
+        
     </div>
   );
 }

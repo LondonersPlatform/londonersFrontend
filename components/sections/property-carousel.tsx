@@ -25,8 +25,11 @@ import Beds from "@/public/svg-assets/Beds";
 import BathIcon from "@/public/svg-assets/BathIcon";
 import GeuestIcon from "@/public/svg-assets/GeuestIcon";
 import ShareModalListing from "../listings/ShareModalListing";
+import { addFavorite, deleteFavorite } from "@/app/all-listings/Listing";
+import { useLoginModal } from "@/context/login-modal-context";
 
-export function PropertyCarousel({ imagesDummy }: any) {
+export function PropertyCarousel({ imagesDummy ,listingId }: any) {
+  const { setRedirectPath, setLoginOpen } = useLoginModal();
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const [isFavorite, setIsFavorite] = useState(false);
@@ -39,18 +42,50 @@ export function PropertyCarousel({ imagesDummy }: any) {
   const beds = searchParams.get("beds");
   const guests = searchParams.get("guests");
 
+
+
   const propertyUrl = "https://example.com/property/marlybone-book";
   // Using the same Unsplash imagesDummy from the original component
 
-  const handleToggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-    toast({
-      title: isFavorite ? "Removed from favorites" : "Added to favorites",
-      description: isFavorite
-        ? "This property has been removed from your favorites"
-        : "This property has been added to your favorites",
-    });
-  };
+const handleFavoriteClick = async (
+  e: React.MouseEvent,
+  listingId: string
+) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const accessToken = localStorage.getItem("access_token");
+  const guestyId = localStorage.getItem("GuestyId");
+
+  if (!accessToken || !guestyId) {
+    setRedirectPath("/all-listings");
+    setLoginOpen(true);
+    return;
+  }
+
+  const newFavoriteState = !isFavorite;
+  setIsFavorite(newFavoriteState);
+
+  try {
+    if (newFavoriteState) {
+      await addFavorite({
+        guestyUserId: guestyId,
+        listingId,
+      });
+    } else {
+      await deleteFavorite({
+        guesty_user_id: guestyId,
+        listingId,
+      });
+    }
+  } catch (error: any) {
+    console.error("Failed to update favorite:", error.message);
+    setIsFavorite(!newFavoriteState); // rollback
+  }
+};
+
+
+
 
   return (
     <div className="space-y-4 ">
@@ -99,9 +134,10 @@ export function PropertyCarousel({ imagesDummy }: any) {
             variant="outline"
             className=" rounded-full"
             size="icon"
-            onClick={handleToggleFavorite}
+        onClick={(e) => handleFavoriteClick(e, listingId as string)}
+
           >
-            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+            <Heart className={`h-5 w-5 ${isFavorite ? "fill-red-600 text-red-700" : ""}`} />
           </Button>
         </div>
       </div>
@@ -111,6 +147,7 @@ export function PropertyCarousel({ imagesDummy }: any) {
       </div>
 
       <ShareModalListing
+      
         shareModalOpen={shareModalOpen}
         setShareModalOpen={setShareModalOpen}
         imagesDummy={imagesDummy}

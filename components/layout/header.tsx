@@ -56,7 +56,7 @@ export default function Header() {
     pathname?.includes("/Dashboard") || pathname?.includes("/favourite");
   return (
     <>
-      <header className="container mx-auto flex items-center justify-between py-4 px-4 md:px-6">
+      <header className=" mx-auto w-[85%]  flex items-center justify-between py-4 px-4 md:px-6">
         {!isLoading || (!session && hideLogo) ? (
           <Link href="/" className="mr-8">
             <Image
@@ -104,9 +104,7 @@ export default function Header() {
                 }}
               ></div>
               <GuestSelector
-                //  ال props دي مش موجودة في ال component ده
-                // isOpen={guestsOpen}
-                // onClose={() => setGuestsOpen(false)}
+
                 onSelect={setGuests}
                 initialGuests={guests}
               />

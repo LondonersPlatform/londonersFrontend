@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
 interface PaymentStatusProps {
-  status: "success" | "failed"
+  status: string
   transactionId: string
   date: string
   time: string
@@ -60,10 +60,7 @@ export default function PaymentStatus({
         {/* Transaction Details Card */}
         <Card className="border border-gray-200">
           <CardContent className="p-6 space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Transaction ID</span>
-              <span className="text-gray-900 font-medium">{transactionId}</span>
-            </div>
+        
 
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">Date</span>
@@ -87,7 +84,7 @@ export default function PaymentStatus({
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${isSuccess ? "bg-green-500" : "bg-red-500"}`} />
                 <span className={`text-sm font-medium ${isSuccess ? "text-green-600" : "text-red-600"}`}>
-                  {isSuccess ? "Success" : "Failed"}
+                  {isSuccess ? status : status}
                 </span>
               </div>
             </div>

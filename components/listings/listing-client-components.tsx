@@ -1,29 +1,26 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
-import { Heart, SlidersHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import FiltersModal from "@/components/sections/filter-modal";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useRouter, useSearchParams } from "next/navigation";
+import type React from "react"
+
+import { useState } from "react"
+import { Heart, SlidersHorizontal, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import FiltersModal from "@/components/sections/filter-modal"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useLoginModal } from "@/context/login-modal-context"
+import { addFavorite, deleteFavorite } from "@/app/all-listings/Listing"
 
 // Filter button component
-export function FilterButton({onApply,filterListings}:any) {
-  const [showFilters, setShowFilters] = useState(false);
-  
-  const handleApplyFilters = (filters: any) => {
-    setShowFilters(false);
-    console.log("Applied filters:", filters);
-    // Here you would typically filter the listings based on the applied filters
-    // For server components, we'd need to use URL parameters and refresh the page
-    // or use a more complex state management solution
-  };
+export function FilterButton({ onApply, filterListings, onFilterClick }: any) {
+  const [showFilters, setShowFilters] = useState(false)
+
+  const handleFilterClick = () => {
+    // Clear search when filter button is clicked
+    if (onFilterClick) {
+      onFilterClick()
+    }
+    setShowFilters(true)
+  }
 
   return (
     <>
@@ -32,7 +29,7 @@ export function FilterButton({onApply,filterListings}:any) {
         variant="outline"
         size="icon"
         className="rounded-lg border border-gray-300 md:hidden"
-        onClick={() => setShowFilters(true)}
+        onClick={handleFilterClick}
       >
         <SlidersHorizontal className="h-4 w-4" />
         <span className="sr-only">Filters</span>
@@ -42,8 +39,7 @@ export function FilterButton({onApply,filterListings}:any) {
       <Button
         variant="outline"
         className="hidden md:flex items-center space-x-2 rounded-lg border border-gray-300"
-        onClick={() => setShowFilters(true)}
-       
+        onClick={handleFilterClick}
       >
         <SlidersHorizontal className="h-4 w-4" />
         <span>Filters</span>
@@ -59,13 +55,13 @@ export function FilterButton({onApply,filterListings}:any) {
         />
       )}
     </>
-  );
+  )
 }
 
 type SortSelectProps = {
-  value: string;
-  onChange: (value: string) => void;
-};
+  value: string
+  onChange: (value: string) => void
+}
 
 export function SortSelect({ value, onChange }: SortSelectProps) {
   return (
@@ -82,58 +78,97 @@ export function SortSelect({ value, onChange }: SortSelectProps) {
         </SelectContent>
       </Select>
     </div>
-  );
+  )
 }
+
 // Favorite button component
-export function FavoriteButton({ isFavorite }: { isFavorite: boolean }) {
-  const [favorite, setFavorite] = useState(isFavorite);
+export function FavoriteButton({
+  isFavorite,
+  listingId,
+}: {
+  isFavorite: boolean
+  listingId?: string
+}) {
+  const [favorite, setFavorite] = useState(isFavorite)
+  const { setRedirectPath, setLoginOpen } = useLoginModal()
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault()
+
+    const accessToken = localStorage.getItem("access_token")
+    const guestyId = localStorage.getItem("GuestyId")
+
+    if (!accessToken || !guestyId) {
+      setRedirectPath("/all-listings")
+      setLoginOpen(true)
+      return
+    }
+
+    const newFavoriteState = !favorite
+    setFavorite(newFavoriteState) // Update UI immediately
+
+    try {
+      if (newFavoriteState && listingId) {
+        // Add to favorites
+        await addFavorite({
+          guestyUserId: guestyId,
+          listingId,
+        })
+      } else if (!newFavoriteState && listingId) {
+        // Remove from favorites
+        await deleteFavorite({
+          guesty_user_id: guestyId,
+          listingId,
+        })
+      }
+    } catch (error: any) {
+      console.error("Failed to update favorite:", error.message)
+      setFavorite(favorite) // Rollback on failure
+    }
+  }
 
   return (
-    <button 
-      className="rounded-full p-1 hover:bg-gray-100"
-      onClick={(e) => {
-        e.preventDefault(); // Prevent link navigation
-        setFavorite(!favorite);
-      }}
-    >
-      <Heart
-        className={`h-6 w-6 ${favorite ? "fill-black text-black" : ""}`}
-      />
+    <button className="rounded-full p-1 hover:bg-gray-100" onClick={handleFavoriteClick}>
+      <Heart className={`h-6 w-6 ${favorite ? "fill-red-600 text-red-700" : ""}`} />
     </button>
-  );
+  )
 }
 
-// Search input component
-export function SearchInput() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-  const [searchValue, setSearchValue] = useState(searchParams.get('q') || '');
+// Search input component - Client-side search
+export function SearchInput({
+  onSearchChange,
+  searchValue,
+}: {
+  onSearchChange: (query: string) => void
+  searchValue: string
+}) {
+  const [inputValue, setInputValue] = useState(searchValue)
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    startTransition(() => {
-      const params = new URLSearchParams(searchParams);
-      if (searchValue.trim()) {
-        params.set('q', searchValue.trim());
-      } else {
-        params.delete('q');
-      }
-      
-      router.push(`/all-listings?${params.toString()}`);
-    });
-  };
+    e.preventDefault()
+    onSearchChange(inputValue)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setInputValue(value)
+    // Real-time search as user types
+    onSearchChange(value)
+  }
+
+  const handleClear = () => {
+    setInputValue("")
+    onSearchChange("")
+  }
 
   return (
     <form onSubmit={handleSearch} className="relative lg:w-1/2 mb-6">
       <input
         type="text"
-        placeholder="Search"
-        value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
-        className="w-full rounded-full bg-gray-100 py-3 pl-12 pr-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-black"
-        disabled={isPending}
+        placeholder="Search by name, location, price, or rating..."
+        value={inputValue}
+        onChange={handleInputChange}
+        className="w-full rounded-full bg-gray-100 py-3 pl-12 pr-12 text-gray-700 focus:outline-none focus:ring-2 focus:ring-black"
       />
       <button type="submit" className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform">
         <svg
@@ -149,6 +184,15 @@ export function SearchInput() {
           <path d="m21 21-4.3-4.3" />
         </svg>
       </button>
+      {inputValue && (
+        <button
+          type="button"
+          onClick={handleClear}
+          className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-500 hover:text-gray-700"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
     </form>
-  );
+  )
 }

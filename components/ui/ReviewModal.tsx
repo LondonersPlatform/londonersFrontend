@@ -117,7 +117,7 @@ export function ReviewModal({
             placeholder="Search review"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 rounded-full w-full"
+            className="pl-10 my-3 outline-none rounded-full w-full"
           />
         </div>
             <ReviewList reviews={filteredReviews} />
