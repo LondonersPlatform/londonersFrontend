@@ -559,6 +559,7 @@ export default function Component() {
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
+                        showheader={false}
                           mode="single"
                           selected={dateOfBirth}
                           onSelect={handleDateChange}

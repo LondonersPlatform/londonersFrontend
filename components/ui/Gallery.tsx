@@ -160,14 +160,14 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
             />
 
             {/* Show More */}
-            {index === (imagesDummy.length)-1  && (
+            {index === (imagesDummy.length)-1    && (
               <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 flex items-end justify-end rounded-md">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/PhotoTour?listingId=${listingId}`);
                   }}
-                  className="text-black flex items-center gap-2 py-2 bg-slate-50 text-sm px-4 rounded"
+                  className="text-black flex items-center border-1 border-black max-w-[260px] gap-2 py-2 bg-slate-50 text-sm px-4 rounded"
                 >
                   <Image src="/show1.svg" width={18} height={18} alt="icon" />
                   Show all photos

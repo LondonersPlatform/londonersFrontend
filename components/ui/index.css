@@ -1,0 +1,167 @@
+
+        /* Simple approach - style the existing numbers directly */
+        .simple-pill-calendar .rdp-day {
+          width: 40px !important;
+          height: 40px !important;
+          border-radius: 0 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          position: relative !important;
+          background: transparent !important;
+          border: none !important;
+          font-size: 14px !important;
+          font-weight: 400 !important;
+        }
+
+        /* Start date: rounded left + gray background */
+        .simple-pill-calendar .range-start-date {
+          background-color: #ededed !important;
+          border-radius: 20px 0 0 20px !important;
+          width: 40px !important;
+          height: 40px !important;
+        }
+
+        /* End date: rounded right + gray background */
+        .simple-pill-calendar .range-end-date {
+          background-color: #ededed !important;
+          border-radius: 0 20px 20px 0 !important;
+          width: 40px !important;
+          height: 40px !important;
+        }
+
+        /* Middle dates: square gray background */
+        .simple-pill-calendar .range-middle-date {
+          background-color: #ededed !important;
+          color: #000000 !important;
+          border-radius: 0 !important;
+          width: 40px !important;
+          height: 40px !important;
+        }
+
+        /* Start date: black circle styling directly on the button */
+        .simple-pill-calendar .range-start-marker {
+          background-color: #000000 !important;
+          color: #ffffff !important;
+          border-radius: 50% !important;
+          width: 36px !important;
+          height: 36px !important;
+          font-weight: 500 !important;
+          z-index: 10 !important;
+          position: relative !important;
+          margin: 2px !important;
+        }
+
+        /* End date: black circle styling directly on the button */
+        .simple-pill-calendar .range-end-marker {
+          background-color: #000000 !important;
+          color: #ffffff !important;
+          border-radius: 50% !important;
+          width: 36px !important;
+          height: 36px !important;
+          font-weight: 500 !important;
+          z-index: 10 !important;
+          position: relative !important;
+          margin: 2px !important;
+        }
+
+        /* Seamless table spacing */
+        .simple-pill-calendar .rdp-table {
+          border-spacing: 0 !important;
+        }
+
+        .simple-pill-calendar .rdp-cell {
+          padding: 0 !important;
+        }
+
+        /* Remove default shadcn styling */
+        .simple-pill-calendar .rdp-day_selected,
+        .simple-pill-calendar .rdp-day_range_start,
+        .simple-pill-calendar .rdp-day_range_end,
+        .simple-pill-calendar .rdp-day_range_middle {
+          background: transparent !important;
+        }
+
+        /* Hover effects */
+        .simple-pill-calendar .range-start-marker:hover,
+        .simple-pill-calendar .range-end-marker:hover {
+          background-color: #333333 !important;
+          color: #ffffff !important;
+        }
+
+        .simple-pill-calendar .range-middle-date:hover {
+          background-color: #ddd !important;
+        }
+
+        /* Focus styles */
+        .simple-pill-calendar .rdp-day:focus-visible {
+          outline: 2px solid #000000 !important;
+          outline-offset: 2px !important;
+        }
+      .simple-pill-calendar .day-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 0;
+}
+
+.simple-pill-calendar .day-wrapper.bg-gray-100 {
+  background-color: #EDEDED;
+}
+.simple-pill-calendar .day-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  transition: all 0.2s ease;
+}
+
+.simple-pill-calendar .day-wrapper.bg-gray-100 {
+  background-color: #EDEDED;
+}
+
+.simple-pill-calendar .day-wrapper.bg-black {
+  background-color: #000;
+  color: #fff;
+}
+
+.simple-pill-calendar .day-wrapper.rounded-l-full {
+  border-top-left-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+}
+
+.simple-pill-calendar .day-wrapper.rounded-r-full {
+  border-top-right-radius: 9999px;
+  border-bottom-right-radius: 9999px;
+}
+
+.day-content-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.range-middle {
+  background-color: theme('colors.gray.100');
+}
+
+.range-start {
+  background-color: theme('colors.black');
+  color: theme('colors.white');
+  border-top-left-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+}
+
+.range-end {
+  background-color: theme('colors.black');
+  color: theme('colors.white');
+  border-top-right-radius: 9999px;
+  border-bottom-right-radius: 9999px;
+}

@@ -139,7 +139,7 @@ export default function Favourite() {
 
         {favorites.length === 0 ? (
           <div className="flex flex-col h-full bg-slate-100 mx-6 rounded-xl items-center justify-center  text-center space-y-4">
-            <Heart size={56} />
+            <Heart size={56}  />
             <h2 className="text-2xl font-semibold text-[#000000]">
               No Favorites Yet
             </h2>
