@@ -5,13 +5,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { format } from "date-fns";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
   availableDates?: Date[];
-  showheader?:boolean
+  showheader?: boolean;
 };
-
 
 function Calendar({
   className,
@@ -21,17 +19,14 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  // Prepare a Set of available date strings (YYYY-MM-DD)
-  const availableDateSet = new Set(
-    availableDates.map((d) => d.toISOString().split("T")[0])
-  );
-
-  // Disable any date not in availableDates
   const disableUnavailableDates = (date: Date) => {
+    if (availableDates.length === 0) return false;
     
-const dateString = format(date, "yyyy-MM-dd");
-
-    return !availableDateSet.has(dateString);
+    // Compare dates without time components
+    const dateTime = new Date(date).setHours(0, 0, 0, 0);
+    return !availableDates.some(availDate => 
+      new Date(availDate).setHours(0, 0, 0, 0) === dateTime
+    );
   };
 
   return (
@@ -44,8 +39,7 @@ const dateString = format(date, "yyyy-MM-dd");
       )}
 
       <DayPicker
-     disabled={availableDates.length > 0 ? disableUnavailableDates : undefined}
-
+        disabled={disableUnavailableDates}
         showOutsideDays={showOutsideDays}
         className={cn("p-3 z-[100]", className)}
         classNames={{
@@ -94,6 +88,7 @@ const dateString = format(date, "yyyy-MM-dd");
     </>
   );
 }
+
 Calendar.displayName = "Calendar";
 
 export { Calendar };

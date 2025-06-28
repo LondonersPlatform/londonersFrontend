@@ -221,7 +221,7 @@ const paramsObjectSearch = {
 
   if (isLoading && !listingsData) {
     return (
-      <div className="w-[85%] mx-auto px-4 py-8 space-y-6">
+      <div className="md:w-[85%] w-[90%] mx-auto px-4 py-8 space-y-6">
         {[...Array(3)].map((_, index) => (
           <ListingSkeletonCard key={index} />
         ))}
@@ -238,7 +238,7 @@ const paramsObjectSearch = {
   }
 
   return (
-    <div className="w-[85%] mx-auto px-4 py-8">
+    <div className="md:w-[85%] w-[90%] w-[90%] mx-auto px-4 py-8">
       <div className="mb-8">
         <SearchInput
           onSearchChange={handleSearchChange}

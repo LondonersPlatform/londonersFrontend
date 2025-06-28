@@ -132,7 +132,7 @@ useEffect(() => {
 
   if (isError) {
     return (
-      <section className="w-[85%] mx-auto py-16 px-4 md:px-6">
+      <section className="md:w-[85%] w-[90%] mx-auto py-16 px-4 md:px-6">
         <div className="text-center text-red-500">
           Failed to load featured listings
         </div>
@@ -141,7 +141,7 @@ useEffect(() => {
   }
 
   return (
-    <section className="w-[85%] mx-auto py-16 px-4 md:px-6">
+    <section className="md:w-[85%] w-[90%] mx-auto py-16 px-4 md:px-6">
       <div className="text-center w-full">
         <h2 className="text-2xl font-bold">Featured listings</h2>
       </div>
@@ -202,7 +202,7 @@ useEffect(() => {
 
                     <CardContent>
                       <div className="mb-2 flex items-center justify-between">
-                        <CardTitle>{item.title}</CardTitle>
+                        <CardTitle className="text-lg font-bold">{item.title}</CardTitle>
                         <div className="flex items-center">
                           <svg
                             className="h-4 w-4 fill-yellow-400 text-yellow-400"

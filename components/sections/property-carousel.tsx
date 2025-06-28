@@ -90,16 +90,18 @@ const handleFavoriteClick = async (
   return (
     <div className="space-y-4 ">
       <div className="flex items-center justify-between">
-        <div className=" flex flex-col gap-6">
-          <h1 className="text-2xl flex items-center gap-3 font-bold">
-            {title}
+        <div className=" w-full  flex flex-col gap-3">
+          <h1 className="text-2xl  lg:justify-start justify-between  w-full flex items-center gap-2 font-bold">
+
+            <span className="">{title}</span>
             <span className=" flex items-center  text-meduim gap-2">
               <Star fill="#F3DC0D" color="#F3DC0D" />
 
               {rating}
             </span>
           </h1>
-          <div className="mb-4 flex flex-wrap gap-4">
+         <div className=" flex items-start">
+ <div className="mb-4 flex-grow flex flex-wrap gap-4">
             <h2 className="text-[#0000008C]">{area}</h2>
 
             <div className="flex items-center gap-2">
@@ -119,9 +121,8 @@ const handleFavoriteClick = async (
               <span className="text-sm">{guests} Guests</span>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="icon"
@@ -140,6 +141,11 @@ const handleFavoriteClick = async (
             <Heart className={`h-5 w-5 ${isFavorite ? "fill-red-600 text-red-700" : ""}`} />
           </Button>
         </div>
+
+         </div>
+        </div>
+
+      
       </div>
 
       <div className="relative">

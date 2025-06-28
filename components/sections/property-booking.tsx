@@ -34,6 +34,8 @@ export function PropertyBooking({
   PricePerNight,
   serviceFee,
   rate,
+minNights,
+
   Cleaningfee,
   whatsup,
   MaxNumofGuests,
@@ -42,7 +44,7 @@ export function PropertyBooking({
   const today = new Date();
   const tomorrow = new Date();
   tomorrow.setDate(today.getDate() + 1);
-
+  console.log("minNights",minNights)
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: today,
     to: tomorrow,
@@ -57,7 +59,6 @@ export function PropertyBooking({
   const [availableDates, setAvailableDates] = useState<any>([]);
     const [isOpenDate, setIsOpen] = useState(false);
          
-
   useEffect(() => {
     const fetchDates = async () => {
       try {
@@ -201,6 +202,7 @@ export function PropertyBooking({
             {/* Date Range Picker */}
             <div className="p-3 border-b hover:bg-gray-50">
               <DatePickerWithRangeSmall
+              minNights={minNights}
               isOpen={isOpenDate}
               onOpenChange={setIsOpen}
                 onDateChange={setDateRange}

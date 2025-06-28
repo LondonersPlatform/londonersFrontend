@@ -18,11 +18,12 @@ export function DatePickerWithRangeSmall({
   className,
   availableDates = [],
   isOpen,
+  minNights,
   onDateChange,
 }: React.HTMLAttributes<HTMLDivElement> & {
   availableDates?: { date: string; status: string }[];
   isOpen?:boolean
-  
+  minNights?:any,
   onDateChange?: (date: DateRange | undefined) => void;
 }) {
   const [open, setOpen] = React.useState( isOpen ||false);
@@ -89,6 +90,7 @@ React.useEffect(() => {
     setOpen(true);
   };
 
+  
   return (
     <div className={cn("grid border-none text-sm gap-2", className)}>
 
@@ -145,8 +147,15 @@ React.useEffect(() => {
   selected={undefined}
   onSelect={handleDateSelect}
   numberOfMonths={2}
+ activeSelection={activeSelection}
+  selectedDateRange={date} // 👈 pass this
+  minNights={minNights}    // 👈 pass this
   availableDates={availableDates}
+
+  
   modifiers={{
+
+    
     rangeStart: (day) => (date?.from ? isSameDay(day, date.from) : false),
     rangeEnd: (day) => (date?.to ? isSameDay(day, date.to) : false),
     rangeMiddle: (day) => {
@@ -166,6 +175,8 @@ React.useEffect(() => {
     rangeEnd: "range-end-date",
     rangeMiddle: "range-middle-date",
   }}
+
+  
   className="simple-pill-calendar"
 components={{
   DayContent: ({ date, modifiers = {} }) => {

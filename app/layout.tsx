@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import Loading from "./loading";
 import QueryProvider from "@/components/QueryProvider";
 import { LoginModalProvider } from "@/context/login-modal-context";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {

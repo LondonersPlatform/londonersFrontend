@@ -59,9 +59,9 @@ export default function GuestSelector({
             />
           </div>
          <div className=" flex flex-col items-center">
-         <span>Guests</span>
+         <span className=" font-bold text-sm">Guests</span>
         
-         <span className="text-xs text-[#8C8C8C]"> {totalGuests + "  "+"Guests"}</span>
+         <span className=" text-sm text-[#8C8C8C]"> {totalGuests + "  "+"Guests"}</span>
 
          </div>
         </button>

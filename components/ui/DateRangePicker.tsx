@@ -53,60 +53,81 @@ export function DatePickerWithRange({
   }
 
   return (
-    <div className={cn("grid border-none gap-2", className)}>
+    <div className={cn("grid  border-none", className)}>
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
-          <Button
-            id="date"
-            className={cn(
-              "w-auto border-none bg-transparent hover:bg-transparent text-black justify-start text-left font-normal",
-              !date && "text-muted-foreground"
-            )}
-          >
-            {date?.from ? (
-              date.to ? (
-                <>
-                  <div className="flex border-e-2 pe-5 gap-2 mr-2">
-                    <Image src="/c.svg" alt="Check-in" width={20} height={20} className="h-8" />
-                    <h5>
-                      <span className="font-medium">Check in</span>
-                      <br />
-                      <span className="text-gray-500">{format(date.from, "LLL dd, y")}</span>
-                    </h5>
-                  </div>
-                  <div className="flex gap-2">
-                    <Image src="/c.svg" alt="Check-out" width={20} height={20} className="h-8" />
-                    <h5>
-                      <span className="font-medium">Check Out</span>
-                      <br />
-                      <span className="text-gray-500">{format(date.to, "LLL dd, y")}</span>
-                    </h5>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex gap-2 mr-2">
-                    <Image src="/c.svg" alt="Check-in" width={20} height={20} className="h-8" />
-                    <h5>
-                      <span className="font-medium">Check in</span>
-                      <br />
-                      <span className="text-gray-500">{format(date.from, "LLL dd, y")}</span>
-                    </h5>
-                  </div>
-                  <div className="flex gap-2">
-                    <Image src="/c.svg" alt="Check-out" width={20} height={20} className="h-8" />
-                    <h5>
-                      <span className="font-medium">Check Out</span>
-                      <br />
-                      <span className="text-gray-500">Pick a date</span>
-                    </h5>
-                  </div>
-                </>
-              )
-            ) : (
-              <span>Pick a date</span>
-            )}
-          </Button>
+      <main
+  id="date"
+  className={cn(
+    "w-auto border-none p-0 flex items-center   bg-transparent   hover:bg-transparent text-black justify-start text-left font-normal",
+    !date && "text-muted-foreground"
+  )}
+>
+  {date?.from ? (
+    date.to ? (
+      <>
+        <div
+          className={cn(
+            "flex border-e-2 h-full  items-center px-6 gap-2 rounded-s-full    mr-2  ",
+            clickStep === "from" && open && "bg-[#EDEDED]"
+          )}
+        >
+          <Image src="/c.svg" alt="Check-in" width={20} height={20} className="h-8" />
+          <h5>
+            <span className="font-bold text-sm">Check in</span>
+            <br />
+            <span className="text-gray-500">{format(date.from, "LLL dd, y")}</span>
+          </h5>
+        </div>
+        <div
+          className={cn(
+            "flex gap-2  p-2 pe-6",
+            clickStep === "to" && open && "bg-[#EDEDED]"
+          )}
+        >
+          <Image src="/c.svg" alt="Check-out" width={20} height={20} className="h-8" />
+          <h5>
+            <span className="font-bold text-sm">Check Out</span>
+            <br />
+            <span className="text-gray-500">{format(date.to, "LLL dd, y")}</span>
+          </h5>
+        </div>
+      </>
+    ) : (
+      <>
+        <div
+          className={cn(
+            "flex gap-2 mr-2  rounded-lg p-2 px-6",
+            clickStep === "from" && open && "bg-[#EDEDED]"
+          )}
+        >
+          <Image src="/c.svg" alt="Check-in" width={20} height={20} className="h-8" />
+          <h5>
+            <span className="font-bold text-sm">Check in</span>
+            <br />
+            <span className="text-gray-500">{format(date.from, "LLL dd, y")}</span>
+          </h5>
+        </div>
+        <div
+          className={cn(
+            "flex gap-2  p-2 pe-6 py-2",
+            clickStep === "to" && open && "bg-[#EDEDED] "
+          )}
+        >
+          <Image src="/c.svg" alt="Check-out" width={20} height={20} className="h-8" />
+          <h5>
+            <span className="font-bold text-sm">Check Out</span>
+            <br />
+            <span className="text-gray-500">Pick a date</span>
+          </h5>
+        </div>
+      </>
+    )
+  ) : (
+    <span>Pick a date</span>
+  )}
+</main>
+
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="rounded-2xl w-full p-0" align="start">

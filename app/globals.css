@@ -38,6 +38,7 @@
 
 }
 
+
 @layer base {
   * {
     @apply border-border;
@@ -46,6 +47,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+@font-face {
+  font-family: "AirbnbCereal_W_XBd" !important;
+  src: url("/font/AirbnbCereal_W_XBd.otf") format("opentype");
+ 
+}
+
+body {
+  font-family: "AirbnbCereal_W_XBd", sans-serif !important;
+
+}
+
 html,
 body {
   overflow-x: visible !important;

@@ -38,11 +38,12 @@ export default function Home() {
       ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-  if (isLoading) return <div className="p-8">
-
-<Loading/>
-    
-  </div>;
+  if (isLoading)
+    return (
+      <div className="p-8">
+        <Loading />
+      </div>
+    );
   if (isError)
     return <div className="p-8 text-red-500">Error: {error.message}</div>;
 
@@ -50,7 +51,10 @@ export default function Home() {
     <div className="min-h-screen    overflow-x-hidden flex flex-col">
       <main className="flex-1">
         <div className="w-[83%] mx-auto py-6">
-          <PropertyCarousel imagesDummy={data[0].imagesDummy} listingId={listingId}  />
+          <PropertyCarousel
+            imagesDummy={data[0].imagesDummy}
+            listingId={listingId}
+          />
 
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="w-full lg:w-2/3">
@@ -84,13 +88,13 @@ export default function Home() {
                   <div ref={overviewRef}>
                     <PropertyOverview
                       dummyPropertyData={data[1].dummyPropertyData}
-                    stars={data[5]?.propertyReviews.ratingSummary?.stars}
+                      stars={data[5]?.propertyReviews.ratingSummary?.stars}
                     />
-                     <PropertyTransportation
+                    <PropertyTransportation
                       transportData={data[3].transportData}
                     />
                     <PropertyAmenities amenityData={data[2].amenityData} />
-                   
+
                     <PropertyRooms roomData={data[4].roomData} />
                   </div>
 
@@ -115,14 +119,14 @@ export default function Home() {
 
             <div className="w-full mt-12 lg:w-1/3">
               <div className="sticky top-24">
-         
                 <PropertyBooking
-                whatsup={data[0].whatsup}
-                listingId={listingId}
-                rate={data[8].rates[0].internalRatePlanId}
-                PricePerNight={data[0].PricePerNight}
+                  minNights={data[0].minNights}
+                  whatsup={data[0].whatsup}
+                  listingId={listingId}
+                  rate={data[8].rates[0].internalRatePlanId}
+                  PricePerNight={data[0].PricePerNight}
                   Cleaningfee={data[0].Cleaningfee}
-                  serviceFee={data[0].Servicefee ?data[0].Servicefee  :0  }
+                  serviceFee={data[0].Servicefee ? data[0].Servicefee : 0}
                   reviews={data[0].reviews}
                   numReviews={data[0].numReviews}
                   MaxNumofGuests={data[0].MaxNumofGuests}

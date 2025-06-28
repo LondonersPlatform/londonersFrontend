@@ -56,7 +56,7 @@ export default function Header() {
     pathname?.includes("/Dashboard") || pathname?.includes("/favourite");
   return (
     <>
-      <header className=" mx-auto w-[85%]  flex items-center justify-between py-4 px-4 md:px-6">
+      <header className=" mx-auto md:w-[85%] w-[90%]  flex items-center justify-between py-4 px-4 md:px-6">
         {!isLoading || (!session && hideLogo) ? (
           <Link href="/" className="mr-8">
             <Image
@@ -80,8 +80,8 @@ export default function Header() {
         )}
 
         <div className="   flex items-center">
-          <nav className=" hidden border w-full rounded-full px-4 p-0 lg:flex items-center  space-x-6">
-            <div className="relative border-e-2 pe-6">
+          <nav className=" hidden border pe-3 w-full rounded-full px-0 p-0 lg:flex items-center  ">
+            <div className="relative border-e-2 ">
               <div
                 className="flex items-center text-sm cursor-pointer"
                 onClick={() => {
@@ -94,7 +94,7 @@ export default function Header() {
               </div>
             </div>
 
-            <div className="relative pe-6">
+            <div className="relative px-6">
               <div
                 className="flex items-center text-sm cursor-pointer"
                 onClick={() => {
@@ -111,7 +111,7 @@ export default function Header() {
             </div>
             <Button
               variant="primary"
-              className="hidden mt-2 md:flex items-center rounded-full px-4 py-2 my-2 text-sm"
+              className="hidden  md:flex items-center rounded-full px-4  text-sm"
               onClick={() => {
                 const checkIn = selectedDateRange?.from
                   ? selectedDateRange.from.toISOString().split("T")[0]
@@ -138,7 +138,7 @@ export default function Header() {
             </Button>
           </nav>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center  space-x-4">
           <Button
             variant="primary"
             className=" mt-2 lg:hidden flex items-center rounded-full px-4 py-2 my-2 text-sm"
