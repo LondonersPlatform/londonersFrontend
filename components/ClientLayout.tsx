@@ -15,6 +15,7 @@ import {
   User,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { BookingProvider } from "@/context/DatePickerContext";
 
 export default function ClientLayout({
   children,
@@ -44,7 +45,9 @@ export default function ClientLayout({
   }
 
   return (
-    <>
+     <BookingProvider>
+
+      <>
       {!session ? (
         <>
           {!isAuthPath && <Header />}
@@ -60,5 +63,7 @@ export default function ClientLayout({
         </>
       )}
     </>
+     </BookingProvider>
+    
   );
 }

@@ -132,7 +132,7 @@ useEffect(() => {
 
   if (isError) {
     return (
-      <section className="md:w-[85%] w-[90%] mx-auto py-16 px-4 md:px-6">
+      <section className="md:w-[85%]  w-[96%] mx-auto py-16 px-4 md:px-6">
         <div className="text-center text-red-500">
           Failed to load featured listings
         </div>
@@ -141,7 +141,7 @@ useEffect(() => {
   }
 
   return (
-    <section className="md:w-[85%] w-[90%] mx-auto py-16 px-4 md:px-6">
+    <section className="md:w-[85%]  w-[96%] mx-auto py-16 px-4 md:px-6">
       <div className="text-center w-full">
         <h2 className="text-2xl font-bold">Featured listings</h2>
       </div>

@@ -221,7 +221,7 @@ const paramsObjectSearch = {
 
   if (isLoading && !listingsData) {
     return (
-      <div className="md:w-[85%] w-[90%] mx-auto px-4 py-8 space-y-6">
+      <div className="md:w-[85%]  w-[96%] mx-auto px-4 py-8 space-y-6">
         {[...Array(3)].map((_, index) => (
           <ListingSkeletonCard key={index} />
         ))}
@@ -238,7 +238,7 @@ const paramsObjectSearch = {
   }
 
   return (
-    <div className="md:w-[85%] w-[90%] w-[90%] mx-auto px-4 py-8">
+    <div className="md:w-[85%]  w-[96%] mx-auto px-4 py-8">
       <div className="mb-8">
         <SearchInput
           onSearchChange={handleSearchChange}
@@ -321,7 +321,7 @@ const paramsObjectSearch = {
                               width={400}
                               height={256}
                               sizes="100vw"
-                              className="w-full h-full object-cover"
+                              className="w-full rounded-t-2xl h-full object-cover"
                             />
                           </div>
                         </CarouselItem>
@@ -405,7 +405,7 @@ const paramsObjectSearch = {
 
                   <div>
                     <div className="my-4 text-sm">{listing.dateRange}</div>
-                    <div className="flex items-end gap-5">
+                    <div className="flex lg:flex-row flex-col  lg:items-end gap-5">
                       <div>
                         <span className="text-xl font-bold">
                           ${listing.pricePerNight}

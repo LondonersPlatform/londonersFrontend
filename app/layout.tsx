@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import Loading from "./loading";
 import QueryProvider from "@/components/QueryProvider";
 import { LoginModalProvider } from "@/context/login-modal-context";
+import { BookingProvider } from "@/context/DatePickerContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={"font-Helv"}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -35,9 +36,12 @@ export default function RootLayout({
             <AuthProvider>
               {/* Wrap your layout in Suspense to show the loader */}
               <Suspense fallback={<Loading />}>
+              < BookingProvider>
                 <ClientLayout>
                   <QueryProvider> {children}</QueryProvider>
                 </ClientLayout>
+              </BookingProvider>
+              
               </Suspense>
             </AuthProvider>
           </LoginModalProvider>

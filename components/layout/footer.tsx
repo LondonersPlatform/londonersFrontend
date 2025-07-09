@@ -5,7 +5,7 @@ import { Facebook, Instagram, Youtube } from "lucide-react";
 export default function Footer() {
   return (
     <footer className="bg-white py-12 text-white">
-      <div className="md:w-[85%] w-[90%] mx-auto px-4 md:px-6">
+      <div className="md:w-[85%]  w-[96%] mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center justify-between space-y-6 md:flex-row md:space-y-0">
           <div>
             <Image

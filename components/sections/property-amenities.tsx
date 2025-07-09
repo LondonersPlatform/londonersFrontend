@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"; // Assuming you use Radix or shadcn/ui
 import { useState } from "react";
+import { ResponsiveModal } from "../ui/ResponsiveModal";
 
 const iconMap: Record<string, React.ElementType> = {
   Wifi,
@@ -75,21 +76,20 @@ export function PropertyAmenities({ amenityData }: any) {
       </div>
 
       {hasMore && (
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="rounded-full">
-              Show more
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl py-6">
-            <DialogHeader>
-              <DialogTitle className=" py-6">All Amenities</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-6 max-h-[400px] overflow-y-auto">
-              {amenityData.map(renderAmenity)}
-            </div>
-          </DialogContent>
-        </Dialog>
+   <ResponsiveModal
+      open={open}
+      onOpenChange={setOpen}
+      title="All Amenities"
+      trigger={
+        <Button variant="outline" className="rounded-full">
+          Show more
+        </Button>
+      }
+    >
+      <div className="grid lg:grid-cols-2 grid-cols-1 gap-6 max-h-[400px] overflow-y-auto">
+        {amenityData.map(renderAmenity)}
+      </div>
+    </ResponsiveModal>
       )}
     </div>
   );

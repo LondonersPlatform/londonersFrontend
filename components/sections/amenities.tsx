@@ -76,7 +76,7 @@ export default function Amenities() {
 
 
   return (
-    <section className="md:w-[85%] w-[90%] mx-auto py-8  px-4 md:px-6">
+    <section className="md:w-[85%]  w-[96%] mx-auto py-8  px-4 md:px-6">
       <h2 className="mb-24 text-center lg:text-3xl  text-lg font-bold">We have everything you need</h2>
       <div className="grid grid-cols-1 gap-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
         {amenities.map((amenity, index) => (

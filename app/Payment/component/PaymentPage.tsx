@@ -55,24 +55,24 @@ export default function Payment() {
   const ratePlanIdParms = searchParams.get("ratePlanIdParms");
   const quoteIdParms = searchParams.get("quoteId");
   const GuestyId = localStorage.getItem("GuestyId") || "";
-  useEffect(() => {
-    const callReservation = async () => {
-      try {
-        const res = await createReservation({
-          quoteId: quoteIdParms, // replace with your actual quoteId
-          guestId: GuestyId, // assuming session exists from useAuth()
-          ratePlanId: ratePlanIdParms ?? undefined,
-        });
-        console.log("Reservation Response:", res);
-      } catch (error) {
-        console.error("Reservation Error:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const callReservation = async () => {
+  //     try {
+  //       const res = await createReservation({
+  //         quoteId: quoteIdParms, // replace with your actual quoteId
+  //         guestId: GuestyId, // assuming session exists from useAuth()
+  //         ratePlanId: ratePlanIdParms ?? undefined,
+  //       });
+  //       console.log("Reservation Response:", res);
+  //     } catch (error) {
+  //       console.error("Reservation Error:", error);
+  //     }
+  //   };
 
-    if (GuestyId) {
-      callReservation();
-    }
-  }, [GuestyId]);
+  //   if (GuestyId) {
+  //     callReservation();
+  //   }
+  // }, [GuestyId]);
   const [checkInDate, setCheckInDate] = useState<Date | undefined>(
     new Date(2025, 1, 12)
   );
@@ -177,7 +177,7 @@ export default function Payment() {
   const priceItems = [
     { label: "Price/night", value: "$120" },
     { label: "Cleaning fees", value: "$20" },
-    { label: "Monthly discount", value: "-$20", discount: true },
+  
   ];
 
   const { session, isLoading } = useAuth();

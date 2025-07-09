@@ -2,7 +2,7 @@ import Image from "next/image"
 
 export default function Experience() {
   return (
-    <section className="md:w-[85%] w-[90%] mx-auto py-16 px-4 md:px-6">
+    <section className="md:w-[85%]  w-[96%] mx-auto py-16 px-4 md:px-6">
       <div className="flex flex-col items-center">
         <div className="relative mb-8 flex w-full justify-between">
           <div className="lg:absolute left-0 top-1/2 -translate-y-1/2 transform">

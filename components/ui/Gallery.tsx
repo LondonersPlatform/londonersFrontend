@@ -86,28 +86,27 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
           <CarouselContent>
             {imagesDummy.map((image, index) => (
               <CarouselItem key={index} className="overflow-hidden relative">
-                <div className="w-full h-[300px] md:h-[500px] relative rounded-xl">
+                {/* Mobile clickable wrapper */}
+                <div
+                  className="w-full h-[300px] rounded-b-2xl md:h-[500px] relative rounded-xl md:pointer-events-none"
+                  onClick={() => {
+                    if (window.innerWidth < 768) {
+                      router.push(`/PhotoTour?listingId=${listingId}`);
+                    }
+                  }}
+                >
                   <Image
                     src={image}
                     alt={`Slide ${index + 1}`}
                     fill
-                    className="object-cover rounded-xl"
+                    className="object-cover lg:rounded-xl"
                     sizes="(min-width: 768px) 100vw, 100vw"
                     priority={index === 0}
                   />
                 </div>
-                     <div className="absolute bottom-2 right-2 md:hidden bg-black bg-opacity-50 flex items-end justify-end rounded-md">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/PhotoTour?listingId=${listingId}`);
-                  }}
-                  className="text-black flex items-center gap-2 py-2 bg-slate-50 text-sm px-4 rounded"
-                >
-                  <Image src="/show1.svg" width={18} height={18} alt="icon" />
-                  Show all photos
-                </button>
-              </div>
+
+                {/* Show all photos button (mobile only) */}
+                <div className="absolute bottom-2 right-2 md:hidden bg-black bg-opacity-50 flex items-end justify-end rounded-md"></div>
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -115,27 +114,27 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
           {/* Navigation Arrows */}
           <Button
             onClick={goToPrevious}
-            className="absolute left-4 bg-gray-900 hover:bg-gray-900 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-colors z-10"
+            className="absolute md:block hidden left-4 bg-gray-900 hover:bg-gray-900 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-colors z-10"
             size="icon"
             variant="ghost"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="text-white h-8 w-8" />
+            <ChevronLeft className="text-white " />
           </Button>
 
           <Button
             onClick={goToNext}
-            className="absolute right-4 bg-gray-900 hover:bg-black/50 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-colors z-10"
+            className="absolute md:block hidden right-6 bg-gray-900 hover:bg-black/50 top-1/2 transform -translate-y-1/2 p-2 rounded-full transition-colors z-10"
             size="icon"
             variant="ghost"
             aria-label="Next slide"
           >
-            <ChevronRight className="text-white h-8 w-8" />
+            <ChevronRight className="text-white " />
           </Button>
         </Carousel>
 
         {/* Image Counter */}
-        <div className="absolute top-4 right-4 bg-black/40 text-white px-3 py-1 rounded-full text-sm">
+        <div className="absolute bottom-6 left-4 bg-black/40 text-white px-3 py-1 rounded-full text-sm">
           {currentIndex + 1} / {imagesDummy.length}
         </div>
       </div>
@@ -160,7 +159,7 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
             />
 
             {/* Show More */}
-            {index === (imagesDummy.length)-1    && (
+            {index === imagesDummy.length - 1 && (
               <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 flex items-end justify-end rounded-md">
                 <button
                   onClick={(e) => {

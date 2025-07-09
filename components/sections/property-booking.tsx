@@ -50,6 +50,7 @@ minNights,
     to: tomorrow,
   });
   const [guestCount, setGuestCount] = useState(2);
+
   const [quoteData, setQuoteData] = useState<QuoteResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

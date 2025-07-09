@@ -27,6 +27,7 @@ import { toast } from "../ui/use-toast";
 import GeuestIcon from "@/public/svg-assets/GeuestIcon";
 import Beds from "@/public/svg-assets/Beds";
 import Bedrooms from "@/public/svg-assets/Bedrooms";
+import { ResponsiveModal } from "../ui/ResponsiveModal";
 
 function ShareModalListing({
   shareModalOpen,
@@ -121,170 +122,150 @@ function ShareModalListing({
 
   return (
     <div>
-      <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
-        <DialogContent className="sm:max-w-3xl  lg:px-12 overflow-y-auto lg:rounded-2xl py-12">
-          <DialogHeader>
-            <DialogTitle className=" text-2xl">Share this place</DialogTitle>
-      
-          </DialogHeader>
+    
+<ResponsiveModal
+  open={shareModalOpen}
+  onOpenChange={setShareModalOpen}
+  title="Share this place"
+  className="sm:max-w-3xl lg:px-12 overflow-y-auto lg:rounded-2xl   items-start"
+  trigger={<></>} // you can omit or pass null if you’re controlling open externally
+>
+  {!showEmbedCode ? (
+    <>
+      <div className="flex gap-3 items-center">
+        <img src={imagesDummy[0]} className="w-[60px] h-[60px] rounded-xl" />
+        <div>
+          <h1 className="my-2 flex gap-2 items-center font-semibold">
+            {title}{" "}
+            <span className="flex items-center text-meduim gap-2">
+              <Star fill="#F3DC0D" color="#F3DC0D" />
+              {rating}
+            </span>
+          </h1>
+          <div className="mb-4 flex flex-wrap gap-2">
+            <h2 className="text-[#0000008C]">{area}</h2>
+            <div className="flex items-center gap-2">
+              <Bedrooms />
+              <span className="text-sm">{bedroom} Bedroom</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Beds />
+              <span className="text-sm">{beds} Beds</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <BathIcon />
+              <span className="text-sm">{bath} Bath</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          {!showEmbedCode ? (
-            <>
-              <div className=" flex gap-3 items-center">
-                <img
-                  src={imagesDummy[0]}
-                  className=" w-[60px] h-[60px] rounded-xl"
-                />
-                <div>
-                  <h1 className="my-2 flex gap-2 items-center font-semibold">
-                    {title}{" "}
-                    <span className=" flex items-center  text-meduim gap-2">
-                      <Star fill="#F3DC0D" color="#F3DC0D" />
-
-                      {rating}
-                    </span>
-                  </h1>
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    <h2 className="text-[#0000008C]">{area}</h2>
-
-                    <div className="flex items-center gap-2">
-                      <Bedrooms />
-                      <span className="text-sm">{bedroom} Bedroom</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Beds />
-                      <span className="text-sm">{beds} Beds</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <BathIcon />
-                      <span className="text-sm">{bath} Bath</span>
-                    </div>
-                  
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-2">
-                <h4 className="text-sm font-medium mb-3">
-                  Share on social media
-                </h4>
-                <div className="grid grid-cols-2 justify-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleCopyLink}
-                    className="shrink-0 items-center gap-2 text-sm w-full"
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4" fill="#0000" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                    Copy link
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-lg  items-center gap-2 text-sm w-full w-full"
-                    onClick={shareOnTwitter}
-                  >
-                    <Twitter className="h-5 w-5" />
-                    Twitter
-                    <span className="sr-only">Share on Twitter</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-lg  items-center gap-2 text-sm w-full w-full"
-                    onClick={shareOnFacebook}
-                  >
-                    <Facebook className="h-5 w-5" />
-                    Facebook
-                    <span className="sr-only">Share on Facebook</span>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-lg  items-center gap-2 text-sm w-full w-full"
-                    onClick={shareViaEmail}
-                  >
-                    <Mail className="h-5 w-5" />
-                    Email
-                    <span className="sr-only">Share via Email</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-lg  items-center gap-2 text-sm w-full w-full"
-                    onClick={() => setShowEmbedCode(true)}
-                  >
-                    <Code className="h-5 w-5" />
-                    Embed
-                    <span className="sr-only">Share as embed code</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-lg  items-center gap-2 text-sm w-full w-full"
-                    onClick={shareViaWhatsApp}
-                  >
-                    <Phone className="h-5 w-5" />
-                    WhatsApp
-                    <span className="sr-only">Share via WhatsApp</span>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-lg  items-center gap-2 text-sm w-full w-full"
-                    onClick={handleShare}
-                  >
-                    <MessagesSquareIcon className="h-5 w-5" />
-                    Messages
-                    <span className="sr-only">Share via messages</span>
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="mt-4  max-w-2xl overflow-x-hidden">
-                <h4 className="text-sm font-medium mb-2">Embed Code</h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Copy and paste this code to embed this place on your website
-                </p>
-                <div className="relative flex">
-                  <pre className="p-3 bg-gray-100  rounded-md text-sm overflow-x-auto ">
-                    {iframeCode}
-                  </pre>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="p-6 border-s-0 rouned-s-xl "
-                    onClick={handleCopyEmbedCode}
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-         <div>
-                 <Button
-                variant="outline"
-                onClick={() => setShowEmbedCode(false)}
-                className="mt-4  "
-              >
-                Back 
-              </Button>
-         </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <div className="mt-2">
+        <h4 className="text-sm font-medium mb-3">Share on social media</h4>
+        <div className="grid grid-cols-2 justify-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleCopyLink}
+            className="shrink-0 items-center gap-2 text-sm w-full"
+          >
+            {copied ? (
+              <Check className="h-4 w-4" fill="#0000" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+            Copy link
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-lg items-center gap-2 text-sm w-full"
+            onClick={shareOnTwitter}
+          >
+            <Twitter className="h-5 w-5" />
+            Twitter
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-lg items-center gap-2 text-sm w-full"
+            onClick={shareOnFacebook}
+          >
+            <Facebook className="h-5 w-5" />
+            Facebook
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-lg items-center gap-2 text-sm w-full"
+            onClick={shareViaEmail}
+          >
+            <Mail className="h-5 w-5" />
+            Email
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-lg items-center gap-2 text-sm w-full"
+            onClick={() => setShowEmbedCode(true)}
+          >
+            <Code className="h-5 w-5" />
+            Embed
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-lg items-center gap-2 text-sm w-full"
+            onClick={shareViaWhatsApp}
+          >
+            <Phone className="h-5 w-5" />
+            WhatsApp
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-lg items-center gap-2 text-sm w-full"
+            onClick={handleShare}
+          >
+            <MessagesSquareIcon className="h-5 w-5" />
+            Messages
+          </Button>
+        </div>
+      </div>
+    </>
+  ) : (
+    <>
+      <div className="mt-4 max-w-2xl overflow-x-hidden">
+        <h4 className="text-sm font-medium mb-2">Embed Code</h4>
+        <p className="text-sm text-muted-foreground mb-3">
+          Copy and paste this code to embed this place on your website
+        </p>
+        <div className="relative flex">
+          <pre className="p-3 bg-gray-100 rounded-md text-sm overflow-x-auto">
+            {iframeCode}
+          </pre>
+          <Button
+            variant="outline"
+            size="sm"
+            className="p-6 border-s-0 rouned-s-xl"
+            onClick={handleCopyEmbedCode}
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          </Button>
+        </div>
+      </div>
+      <div>
+        <Button
+          variant="outline"
+          onClick={() => setShowEmbedCode(false)}
+          className="mt-4"
+        >
+          Back
+        </Button>
+      </div>
+    </>
+  )}
+</ResponsiveModal>
     </div>
   );
 }

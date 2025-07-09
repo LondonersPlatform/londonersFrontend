@@ -17,7 +17,7 @@ export default function PropertyReviews({ propertyReviews }: any) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-semibold mb-6">Reviews</h2>
+      <h2 className="text-2xl font-bold mb-6">Reviews</h2>
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left side - Rating summary */}
@@ -53,7 +53,7 @@ export default function PropertyReviews({ propertyReviews }: any) {
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         {propertyReviews.ratingSummary.categories.map((item, index) => (
           <div key={index} className="border rounded-lg p-3">
-            <div className="text-sm">{item.label}</div>
+            <div className="text-sm  font-[500] ">{item.label}</div>
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
               <span className="font-medium">{item.rating}</span>
@@ -72,7 +72,7 @@ export default function PropertyReviews({ propertyReviews }: any) {
                 <AvatarFallback>{review.user.initials}</AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-medium">{review.user.name}</h3>
+                <h3 className="font-semibold">{review.user.name}</h3>
                 <div className="flex items-center gap-2">
                   <div className="flex text-yellow-400">
                     {renderStars(review.rating)}

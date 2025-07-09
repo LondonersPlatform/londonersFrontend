@@ -3,27 +3,33 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 
-import Modal from "../ui/modal"
-import { ArrowBigLeft, ArrowLeftFromLine, ArrowLeftIcon } from "lucide-react"
 import Arrowright from "@/public/svg-assets/arrowright"
-
+import { ResponsiveModal } from "../ui/ResponsiveModal"
 
 export default function CancellationPolicyModal() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <>
-          <Button variant="outline" className="text-sm mt-6  hover:bg-transparent items-center gap-1 rounded-3xl mx-0 px-0  border-none underline " onClick={() => setIsOpen(true)}>
-       Show More
-       <Arrowright />
-      </Button>
-
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Cancellation Policy">
-         <div className="space-y-6">
+      <ResponsiveModal
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        title="Cancellation Policy"
+        trigger={
+          <Button
+            variant="outline"
+            className="text-sm mt-6 font-semibold hover:bg-transparent items-center gap-1 rounded-3xl mx-0 px-0 border-none underline"
+          >
+            Show More
+            <Arrowright />
+          </Button>
+        }
+        className="max-w-2xl"
+      >
+        <div className="space-y-6">
           <p className="text-sm text-gray-700 leading-relaxed">
-            {
-              "Make sure you're comfortable with this Host's policy. In rare cases, you may be eligible for a refund outside of this policy under Airbnb's"
-            }{" "}
+            Make sure you're comfortable with this Host's policy. In rare cases,
+            you may be eligible for a refund outside of this policy under Airbnb's{" "}
             <a href="#" className="underline text-gray-900">
               Major Disruptive Events Policy
             </a>
@@ -53,7 +59,9 @@ export default function CancellationPolicyModal() {
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-sm text-gray-900">Partial refund</p>
-                <p className="text-sm text-gray-700">Get back 50% of every night. No refund of the service fee.</p>
+                <p className="text-sm text-gray-700">
+                  Get back 50% of every night. No refund of the service fee.
+                </p>
               </div>
             </div>
 
@@ -77,7 +85,7 @@ export default function CancellationPolicyModal() {
             </a>
           </div>
         </div>
-      </Modal>
+      </ResponsiveModal>
     </>
   )
 }

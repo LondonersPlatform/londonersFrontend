@@ -24,7 +24,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-[60vh] overflow-y-auto">
       {reviews.map((review, index) => {
         const isExpanded = expandedReviews[review.id] || false;
         const shouldTruncate = review.comment.length > 150;
@@ -39,7 +39,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
               </div>
               <div className="flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
-                  <span className="font-medium">{review.author}</span>
+                  <span className="font-bold">{review.author}</span>
                   <span className="text-sm text-gray-500">{review.date}</span>
                 </div>
                 <div className="flex items-center gap-2 mb-2">

@@ -19,15 +19,7 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  const disableUnavailableDates = (date: Date) => {
-    if (availableDates.length === 0) return false;
-    
-    // Compare dates without time components
-    const dateTime = new Date(date).setHours(0, 0, 0, 0);
-    return !availableDates.some(availDate => 
-      new Date(availDate).setHours(0, 0, 0, 0) === dateTime
-    );
-  };
+
 
   return (
     <>
@@ -39,7 +31,7 @@ function Calendar({
       )}
 
       <DayPicker
-        disabled={disableUnavailableDates}
+      
         showOutsideDays={showOutsideDays}
         className={cn("p-3 z-[100]", className)}
         classNames={{

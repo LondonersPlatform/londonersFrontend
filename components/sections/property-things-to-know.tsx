@@ -18,7 +18,7 @@ export function PropertyThingsToKnow({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {sections.map((section:any, index:number) => (
           <div key={index} className="space-y-4">
-            <h3 className="font-medium">{section.title}</h3>
+            <h3 className="font-bold">{section.title}</h3>
             
             {section.isParagraph ? (
               <p className="text-sm text-gray-700">{section.items[0]}</p>

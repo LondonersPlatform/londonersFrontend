@@ -49,13 +49,16 @@
 }
 
 @font-face {
-  font-family: "AirbnbCereal_W_XBd" !important;
-  src: url("/font/AirbnbCereal_W_XBd.otf") format("opentype");
+  font-family: 'Helvetica Neue' !important;
+  src: url('/fonts/HelveticaNeue.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
  
 }
 
 body {
-  font-family: "AirbnbCereal_W_XBd", sans-serif !important;
+  font-family: "Helvetica Neue", sans-serif !important;
 
 }
 

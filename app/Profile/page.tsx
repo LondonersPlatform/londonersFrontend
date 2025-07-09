@@ -7,7 +7,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Calendar } from "@/components/ui/calendar"
+
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
@@ -31,6 +31,7 @@ import { SidebarContent } from "@/components/layout/Sidebar"
 import { getUserByGuestId, updateUser } from "../all-listings/Listing"
 import { useRouter } from "next/navigation"
 import LogoLoader from "@/components/logo-loader"
+import CalenderYearly from "@/components/ui/CalenderYearly"
 
 const countries = [
   { code: "+1", name: "United States", flag: "🇺🇸", country: "US" },
@@ -296,6 +297,8 @@ export default function Component() {
       handleFileUpload(files[0])
     }
   }
+const [open, setOpen] = useState(false)
+  const [date, setDate] = useState<Date | undefined>(undefined)
 
   const removeFile = () => {
     const fileName = uploadedFile?.name
@@ -481,7 +484,8 @@ export default function Component() {
                 <div className="flex flex-col items-center lg:items-start">
                   <div className="relative mb-4">
                     <Image
-                      src={profileImage || "/placeholder.svg"}
+                    src={`https://ui-avatars.com/api/?name=${firstName}&background=%23ededed`}
+                   
                       alt="Profile picture"
                       width={200}
                       height={200}
@@ -542,33 +546,7 @@ export default function Component() {
                   </div>
 
                   {/* Date of Birth */}
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-[#8c8c8c]">Date of birth</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal border-[#d9d9d9] hover:bg-[#f5f5f5]",
-                            !dateOfBirth && "text-muted-foreground",
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {dateOfBirth ? format(dateOfBirth, "dd MMM yyyy") : <span>Pick a date</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                        showheader={false}
-                          mode="single"
-                          selected={dateOfBirth}
-                          onSelect={handleDateChange}
-                          disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+<CalenderYearly onDateChange={handleDateChange} />
 
                   {/* Phone Number */}
                   <div className="space-y-2">
