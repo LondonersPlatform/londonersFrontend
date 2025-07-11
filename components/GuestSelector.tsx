@@ -8,15 +8,18 @@ import {
 } from "@/components/ui/popover";
 import { useBooking } from "@/context/DatePickerContext";
 
+interface GuestSelectorProps {
+  MaxNumofGuests: number;
+}
 
-const GuestSelector = () => {
+const GuestSelector = ({ MaxNumofGuests }: GuestSelectorProps) => {
   const {
     guestBreakdown,
     guests,
-    MaxNumofGuests,
+
     handleGuestChange,
   } = useBooking();
-
+  console.log("MaxNumofGuests", MaxNumofGuests);
   const [isOpen, setIsOpen] = useState(false);
   const [localGuestCounts, setLocalGuestCounts] = useState(guestBreakdown);
 
@@ -27,11 +30,17 @@ const GuestSelector = () => {
     setLocalGuestCounts(guestBreakdown);
   }, [guestBreakdown]);
 
-  const updateGuestCount = (type: keyof typeof guestBreakdown, increment: boolean) => {
+  const updateGuestCount = (
+    type: keyof typeof guestBreakdown,
+    increment: boolean
+  ) => {
     const newCounts = { ...localGuestCounts };
 
     if (increment) {
-      if ((type === "adults" || type === "children") && totalGuests < MaxNumofGuests) {
+      if (
+        (type === "adults" || type === "children") &&
+        totalGuests < MaxNumofGuests
+      ) {
         newCounts[type]++;
       } else if (type === "infants" && newCounts.infants < 5) {
         newCounts.infants++;
@@ -106,9 +115,13 @@ const GuestSelector = () => {
             <div className="text-sm text-gray-900">
               {totalGuests} guest{totalGuests > 1 ? "s" : ""}
               {localGuestCounts.infants > 0 &&
-                `, ${localGuestCounts.infants} infant${localGuestCounts.infants > 1 ? "s" : ""}`}
+                `, ${localGuestCounts.infants} infant${
+                  localGuestCounts.infants > 1 ? "s" : ""
+                }`}
               {localGuestCounts.pets > 0 &&
-                `, ${localGuestCounts.pets} pet${localGuestCounts.pets > 1 ? "s" : ""}`}
+                `, ${localGuestCounts.pets} pet${
+                  localGuestCounts.pets > 1 ? "s" : ""
+                }`}
             </div>
           </div>
           <ChevronDown className="h-4 w-4 text-gray-500" />
@@ -157,7 +170,8 @@ const GuestSelector = () => {
 
         <div className="mt-4 pt-4 border-t border-gray-200">
           <p className="text-xs text-gray-600">
-            This place has a maximum of {MaxNumofGuests} guests, not including infants. Pets aren't allowed.
+            This place has a maximum of {MaxNumofGuests} guests, not including
+            infants. Pets aren't allowed.
           </p>
         </div>
       </PopoverContent>

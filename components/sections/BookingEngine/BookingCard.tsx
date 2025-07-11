@@ -22,6 +22,7 @@ import WIcon from "@/public/svg-assets/WIcon";
 import {
   createQuote,
   getCalendarByListingId,
+  getMinDaysByListingId,
 } from "@/app/all-listings/Listing";
 import { useLoginModal } from "@/context/login-modal-context";
 import GuestSelector from "@/components/GuestSelector";
@@ -33,7 +34,6 @@ const BookingCard = ({
   serviceFee,
   rate,
   nameBook,
-  minNight,
   Cleaningfee,
   whatsup,
   MaxNumofGuests,
@@ -50,6 +50,7 @@ const BookingCard = ({
     isDatePickerOpen,
     setIsDatePickerOpen,
     quoteData,
+    minNight,
     setQuoteData,
     guestCount,
     handleGuestChange,
@@ -60,12 +61,12 @@ const BookingCard = ({
   } = useBooking();
 
   const [loadingDates, setLoadingDates] = useState(true);
-
   const [isOpenDate, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setRedirectPath, setLoginOpen } = useLoginModal();
   const [error, setError] = useState<string | null>(null);
   const basePrice = PricePerNight;
+
   const nights =
     dateRange.from && dateRange.to
       ? Math.ceil(
@@ -76,6 +77,7 @@ const BookingCard = ({
 
   const subtotal = basePrice * nights;
   const earlyBirdDiscount = 22.08;
+
   const invoiceItems =
     quoteData?.guesty_quote.rates.ratePlans[0].money.money.invoiceItems;
 
@@ -83,7 +85,6 @@ const BookingCard = ({
     (sum: any, item: any) => sum + item.amount,
     0
   );
-
 
   const pathname = usePathname();
 
@@ -93,6 +94,7 @@ const BookingCard = ({
   const whatsappLink = `https://wa.me/${whatsup}?text=I'm%20interested%20in%20this%20listing:%20${encodeURIComponent(
     currentUrl
   )}`;
+
   const openLoginModal = () => {
     const query = new URLSearchParams({
       quoteId: quoteData?.guesty_quote._id,
@@ -102,16 +104,34 @@ const BookingCard = ({
       whatsup: whatsup,
       MaxNumofGuests: MaxNumofGuests,
       listingId: listingId,
-   nameBook :nameBook
-
-
+      nameBook: nameBook
     });
 
     setRedirectPath(`/Payment?${query.toString()}`);
     setLoginOpen(true);
   };
 
-  // Fetch quote data whenever dates or guest count changes
+  useEffect(() => {
+    const fetchMinNights = async () => {
+      if (!dateRange?.from) return;
+
+      try {
+        const response = await getMinDaysByListingId(
+          listingId,
+          format(dateRange.from, "yyyy-MM-dd")
+        );
+
+        if (response?.minNights) {
+          setMinNight(response.minNights);
+        }
+      } catch (error) {
+        console.error("Error fetching min nights:", error);
+      }
+    };
+
+    fetchMinNights();
+  }, [dateRange?.from, listingId]);
+
   useEffect(() => {
     const fetchQuote = async () => {
       if (!dateRange?.from || !dateRange?.to) return;
@@ -163,14 +183,13 @@ const BookingCard = ({
       ratePlanIdParms: rate,
       MaxNumofGuests: MaxNumofGuests,
       listingId: listingId,
-        nameBook :nameBook
+      nameBook: nameBook
     });
 
     router.push(`/Payment?${query.toString()}`);
   };
 
   useEffect(() => {
-    
     const fetchDates = async () => {
       try {
         const dates = await getCalendarByListingId(listingId);
@@ -185,45 +204,54 @@ const BookingCard = ({
     fetchDates();
   }, [listingId]);
 
+  // ✅ Reset on listingId change
+  useEffect(() => {
+    setDateRange({ from: undefined, to: undefined });
+    setQuoteData(null);
+    setGuestCount(1);
+  }, [listingId]);
 
+  // ✅ Reset on unmount
+  useEffect(() => {
+    return () => {
+      setDateRange({ from: undefined, to: undefined });
+      setQuoteData(null);
+      setGuestCount(1);
+    };
+  }, []);
 
   return (
     <>
-
-
       <Card className="w-full mx-auto p-6 md:block hidden shadow-xl border border-gray-200 rounded-xl bg-white">
-        {/* Price header */}
-        <div className=" flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-semibold text-gray-900">
               £{basePrice} /
             </span>
             <span className="text-gray-600">night</span>
           </div>
-          <div className="flex font-bold gap-3 items-center  mt-1">
+          <div className="flex font-bold gap-3 items-center mt-1">
             <div className="flex items-center">
               <span className="ml-1 text-sm font-semibold font-medium text-gray-900">
                 4.9
               </span>
             </div>
-
             <span className="text-sm text-gray-600 underline">
               (73 reviews)
             </span>
           </div>
         </div>
+
         {error && (
           <div className="text-red-500 my-2 text-sm p-2 bg-red-50 rounded">
             {error}
           </div>
         )}
 
-        {/* Date and Guest selection */}
-        <div className="border border-gray-300  rounded-lg overflow-hidden mb-4">
-          {/* Date selection */}
+        <div className="border border-gray-300 rounded-lg overflow-hidden mb-4">
           <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
             <PopoverTrigger asChild>
-              <div className="grid grid-cols-2 cursor-pointer  hover:bg-gray-50 transition-colors">
+              <div className="grid grid-cols-2 cursor-pointer hover:bg-gray-50 transition-colors">
                 <div className="p-3 border-r border-gray-300">
                   <div className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-1">
                     CHECK-IN
@@ -246,7 +274,7 @@ const BookingCard = ({
                 </div>
               </div>
             </PopoverTrigger>
-            <PopoverContent className="w-auto border-none bg-transparent  scale-[.85]  -translate-y-36 -translate-x-[4rem]  shadow-none p-0" align="start">
+            <PopoverContent className="w-auto border-none bg-transparent scale-[.85] -translate-y-36 -translate-x-[4rem] shadow-none p-0" align="start">
               <DateRangePicker
                 dateRange={dateRange}
                 minNights={minNight}
@@ -258,14 +286,13 @@ const BookingCard = ({
           </Popover>
           <div className="border-t border-gray-300">
             <GuestSelector
-              maxGuests={MaxNumofGuests}
+              MaxNumofGuests={MaxNumofGuests}
               onGuestChange={handleGuestChange}
               initialGuests={guests}
             />
           </div>
         </div>
 
-        {/* Reserve button */}
         <Button
           className="w-full bg-gradient-to-r from-black to-black hover:from-gray-600 hover:to-black text-white font-semibold py-4 rounded-lg text-base transition-all duration-200 shadow-lg"
           onClick={() => {
@@ -286,14 +313,12 @@ const BookingCard = ({
             ? "Check Availability"
             : "Book Now"}
         </Button>
+
         {quoteData && (
           <>
-            {/* No charge message */}
             <p className="text-center text-sm text-gray-600 mt-4">
               You won't be charged yet
             </p>
-
-            {/* Pricing breakdown */}
             <PricingBreakdown
               basePrice={basePrice}
               nights={nights}
@@ -306,24 +331,22 @@ const BookingCard = ({
         )}
       </Card>
 
+      <BottomBookingBar
+        quoteData={quoteData}
+        basePrice={basePrice}
+        nights={nights}
+        subtotal={subtotal}
+        earlyBirdDiscount={earlyBirdDiscount}
+        Cleaningfee={Cleaningfee}
+        total={total}
+        loading={loading}
+        setIsOpen={setIsOpen}
+        handleClick={handleClick}
+        openLoginModal={openLoginModal}
+      />
 
-<BottomBookingBar
-  quoteData={quoteData}
-  basePrice={basePrice}
-  nights={nights}
-  subtotal={subtotal}
-  earlyBirdDiscount={earlyBirdDiscount}
-  Cleaningfee={Cleaningfee}
-  total={total}
-  loading={loading}
-  setIsOpen={setIsOpen}
-  handleClick={handleClick}
-  openLoginModal={openLoginModal}
-/>
       <div className="flex flex-col gap-2 my-6">
-        <Button className="bg-[#8C8C8C] p-5 text-center">
-          Contact the host
-        </Button>
+        <Button className="bg-[#8C8C8C] p-5 text-center">Contact the host</Button>
         <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
           <Button className="bg-[#59D750] w-full hover:bg-[#67e15e] p-5 text-center flex items-center justify-center gap-2">
             <WIcon />

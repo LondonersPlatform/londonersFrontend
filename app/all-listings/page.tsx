@@ -408,13 +408,13 @@ const paramsObjectSearch = {
                     <div className="flex lg:flex-row flex-col  lg:items-end gap-5">
                       <div>
                         <span className="text-xl font-bold">
-                          ${listing.pricePerNight}
+                          £{listing.pricePerNight}
                         </span>
                         <span className="text-sm text-gray-500">/night</span>
                       </div>
                       <div className="text-right flex items-center gap-2">
                         <span className="text-xl font-bold">
-                          ${listing.totalPrice}
+                          £{listing.totalPrice}
                         </span>
                         <div className="text-sm text-gray-500">
                           Total (including fees and taxes)

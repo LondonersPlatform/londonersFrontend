@@ -64,7 +64,7 @@ export const BookingProvider = ({
   const [availableDates, setAvailableDates] = useState<any[]>([]);
   const [loadingDates, setLoadingDates] = useState(true);
   const [MaxNumofGuests, setMaxNumofGuests] = useState<number>(0);
-  const [minNight, setMinNight] = useState<number>(1);
+  const [minNight, setMinNight] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
 
   const handleGuestChange = (

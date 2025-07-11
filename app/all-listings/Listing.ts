@@ -1,3 +1,26 @@
+
+// app/api/listings/getMinDaysByListingId.ts
+export async function getMinDaysByListingId(listingId: string, startDate: string) {
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-min-days`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ listingId, startDate }),
+    }
+  );
+
+  if (!res.ok) throw new Error("Failed to fetch minimum nights");
+
+  const data = await res.json();
+  return data; // should return { minNight: number }
+}
+
 export async function checkFavorite(guestyUserId: string, listingId: string) {
 
 

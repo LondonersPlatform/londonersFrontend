@@ -94,7 +94,7 @@ const BottomBookingBar = ({
             <div className="flex flex-col gap-1 text-sm text-gray-800">
               <div className="font-medium text-xl underline">
                 <span className="text-gray-900 font-semibold">{total}</span>{" "}
-                &euro;
+             £
               </div>
               <div className="font-medium text-sm">
                 <span className="text-gray-600 font-normal">

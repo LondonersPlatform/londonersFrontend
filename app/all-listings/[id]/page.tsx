@@ -112,6 +112,7 @@ function PropertyPageContent({
     setDateRange, 
     setIsDatePickerOpen,
     availableDates,
+    
     setAvailableDates,
     setLoadingDates
   } = useBooking();
@@ -202,6 +203,7 @@ function PropertyPageContent({
                              </div>
    <DateRangePickerList
                   dateRange={dateRange}
+                  listingId={listingId}
                   minNights={data[0].minNights}
                   onDateRangeChange={setDateRange}
                   onClose={() => setIsDatePickerOpen(false)}
@@ -225,7 +227,7 @@ function PropertyPageContent({
                   reviews={data[0].reviews}
                   nameBook={name}
                   numReviews={data[0].numReviews}
-                  MaxNumofGuests={data[0].MaxNumofGuests}
+                  MaxNumofGuests={Number(data[0].MaxNumofGuests)}
                 />
               </div>
             </div>

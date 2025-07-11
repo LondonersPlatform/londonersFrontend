@@ -21,6 +21,8 @@ interface DateRange {
 
 interface CalendarMonthProps {
   month: Date;
+  minCheckoutDate?: Date;
+  maxCheckoutDate?: Date;
   dateRange: DateRange;
   selectingStart: boolean;
   hoverDate: Date | undefined;
@@ -34,6 +36,8 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
   month,
   dateRange,
   selectingStart,
+  minCheckoutDate,
+  maxCheckoutDate,
   hoverDate,
   availableDates,
   minNights,
@@ -49,11 +53,12 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
     );
   };
 
-  console.log("availableDates===>", availableDates);
-
-  const availableDatesSet = new Set(
-    (availableDates || []).map((d: Date | string) => new Date(d).toDateString())
+  const availableDatesSet: Set<string> = new Set(
+    (availableDates || []).map((d: Date | string) =>
+      new Date(d).toDateString()
+    )
   );
+
   const isDateInHoverRange = (date: Date) => {
     if (selectingStart || !dateRange.from || !hoverDate) return false;
 
@@ -104,52 +109,83 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
 
   const getDateTooltip = (date: Date) => {
     if (dateRange.from && isSameDay(date, dateRange.from)) {
-      return `Minimum ${minNights - 3} nights`;
+      return `Minimum ${minNights} nights`;
     }
 
     if (dateRange.from && !selectingStart && !dateRange.to) {
       const nightsDiff = differenceInDays(date, dateRange.from);
       if (nightsDiff > 0 && nightsDiff < minNights) {
-        return `Minimum stay is ${minNights - 3} nights`;
+        return `Minimum stay is ${minNights} nights`;
       }
     }
     return null;
   };
 
+  const hasMinConsecutiveAvailableNights = (
+    start: Date,
+    nights: number,
+    availableDatesSet: Set<string>
+  ) => {
+    for (let i = 0; i < nights; i++) {
+      const current = new Date(start);
+      current.setDate(start.getDate() + i);
+      if (!availableDatesSet.has(current.toDateString())) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const days: React.ReactNode[] = [];
   const monthStart = new Date(month.getFullYear(), month.getMonth(), 1);
   const monthEnd = new Date(month.getFullYear(), month.getMonth() + 1, 0);
-  const startDate = new Date(monthStart);
-  startDate.setDate(startDate.getDate() - monthStart.getDay());
+  const leadingEmptyCells = monthStart.getDay();
 
-  const days = [];
-  const currentDate = new Date(startDate);
+  // Add empty divs for weekday alignment
+  for (let i = 0; i < leadingEmptyCells; i++) {
+    days.push(<div key={`empty-${i}`} className="w-10 h-10" />);
+  }
 
-  for (let i = 0; i < 42; i++) {
+  let currentDate = new Date(monthStart);
+  while (currentDate <= monthEnd) {
     const date = new Date(currentDate);
-    const isCurrentMonth = isSameMonth(date, month);
     const isSelected = isDateSelected(date);
     const isInRange = isDateInRange(date);
     const isInHoverRange = isDateInHoverRange(date);
     const isToday = isSameDay(date, new Date());
     const tooltip = getDateTooltip(date);
+const blockCheckoutDueToUnavailability =
+  !selectingStart &&
+  dateRange.from &&
+  minNights > 1 &&
+  !hasMinConsecutiveAvailableNights(
+    dateRange.from,
+    minNights,
+    availableDatesSet
+  );
 
-    const isDisabled =
-      !isCurrentMonth ||
-      !availableDatesSet.has(date.toDateString()) ||
+const isDisabled =
+  blockCheckoutDueToUnavailability ||
+  (selectingStart &&
+    (!availableDatesSet.has(date.toDateString()) ||
+      !hasMinConsecutiveAvailableNights(
+        date,
+        minNights,
+        availableDatesSet
+      ))) ||
+  (!selectingStart &&
+    ((!availableDatesSet.has(date.toDateString()) &&
+      !(maxCheckoutDate && isSameDay(date, maxCheckoutDate))) ||
       (dateRange.from &&
-        !selectingStart &&
-        differenceInDays(date, dateRange.from) > 0 &&
-        differenceInDays(date, dateRange.from) < minNights) ||
-      (dateRange.from && !selectingStart && isBefore(date, dateRange.from));
+        minCheckoutDate &&
+        isBefore(date, minCheckoutDate)) ||
+      (maxCheckoutDate && isAfter(date, maxCheckoutDate)))
+  );
 
-    // Determine background styling for continuous range
+
     let rangeBackgroundClass = "";
     let roundedClass = "";
-    if (
-      (isInRange || isInHoverRange) &&
-    
-      isSameMonth(date, month)
-    ) {
+    if (isInRange || isInHoverRange) {
       rangeBackgroundClass =
         "bg-gray-100 transition-all duration-200 hover:bg-gray-150";
 
@@ -168,33 +204,19 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
         className={`relative h-10 flex items-center justify-center ${rangeBackgroundClass} ${roundedClass}`}
       >
         <button
-          onClick={() => isCurrentMonth && !isDisabled && onDateClick(date)}
+          onClick={() => !isDisabled && onDateClick(date)}
           onMouseEnter={() =>
             !selectingStart && dateRange.from && onDateHover(date)
           }
           onMouseLeave={() => onDateHover(undefined)}
-          disabled={!isCurrentMonth || isDisabled}
+          disabled={isDisabled}
           className={`
             w-10 h-10 text-sm rounded-full transition-all duration-200 relative font-medium flex items-center justify-center z-10
-            ${
-              isCurrentMonth && !isDisabled
-                ? "hover:bg-gray-100 hover:border-[2px] hover:border-[#000] text-gray-900 cursor-pointer"
-                : "text-gray-300 cursor-not-allowed"
-            }
-            ${
-              isSelected && isCurrentMonth
-                ? "bg-black text-white hover:bg-gray-800   border-2 border-black"
-                : ""
-            }
-            ${
-              (isInRange || isInHoverRange) && !isSelected
-                ? "hover:border-2 hover:border-black"
-                : ""
-            }
+            ${!isDisabled ? " text-gray-900 cursor-pointer" : "text-gray-300 cursor-not-allowed"}
+            ${isSelected ? "bg-black text-white border-2 border-black" : ""}
+            ${(isInRange || isInHoverRange) && !isSelected ? "hover:border-2 hover:border-black" : ""}
             ${isToday && !isSelected ? "font-bold border border-gray-400" : ""}
-            ${
-              isDisabled ? "text-gray-300  line-through cursor-not-allowed" : ""
-            }
+    ${isDisabled && !isSelected ? "text-gray-300 line-through cursor-not-allowed" : ""}
           `}
         >
           {date.getDate()}
@@ -221,7 +243,7 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
   }
 
   return (
-    <div className="flex-1 ">
+    <div className="flex-1">
       <h3 className="font-semibold text-lg text-center mb-6 text-gray-900">
         {format(month, "MMMM yyyy")}
       </h3>
