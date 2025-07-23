@@ -23,7 +23,7 @@ export default function ProtectedRoute({
     return <Loading />;
   }
 
-  if (session === null || !session) return null;
+
 
   return (
     <Suspense

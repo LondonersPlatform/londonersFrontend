@@ -14,6 +14,8 @@ import {
   MessageSquare,
   User,
 } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { BookingProvider } from "@/context/DatePickerContext";
 
 export default function ClientLayout({
   children,
@@ -22,6 +24,18 @@ export default function ClientLayout({
 }) {
   const { isLoading, session } = useAuth();
 
+  const pathname = usePathname();
+  const hideHeader =
+    pathname?.includes("/Dashboard") ||
+    pathname?.includes("/Favourite") ||
+    pathname?.includes("/Profile") ||
+    pathname?.includes("/update-password");
+  const isAuthPath = pathname?.includes("/update-password");
+
+  const hideFooter =  pathname?.includes("/Dashboard") ||
+    pathname?.includes("/Favourite") ||
+    pathname?.includes("/Profile") ||
+    pathname?.includes("/update-password");
   if (isLoading) {
     return (
       <div className="text-center py-20">
@@ -31,22 +45,25 @@ export default function ClientLayout({
   }
 
   return (
-    <>
-      {!session ? (
-        <>
-          <Header />
-          {children}
-          <Footer />
-        </>
-      ) : (
-        <>
+     <BookingProvider>
 
-         <Header />
+      <main>
+      {!session ? (
+        <section>
+          {!isAuthPath && <Header />}
           {children}
-          <Footer />
-         
-        </>
+          {!isAuthPath && <Footer />}
+        </section>
+      ) : (
+        <section>
+          {!hideHeader && <Header />}
+
+          {children}
+           {!hideFooter && <Footer />}
+        </section>
       )}
-    </>
+    </main>
+     </BookingProvider>
+    
   );
 }

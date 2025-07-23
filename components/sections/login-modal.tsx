@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation";
 import RegisterModal from "./register-modal";
 import { Button } from "../ui/button";
 import ResetModal from "./resetPassword-modal";
+import { useLoginModal } from "@/context/login-modal-context";
+import { getGuestyId } from "@/app/all-listings/Listing";
 
 // Define validation schema
 const loginSchema = z.object({
@@ -35,7 +37,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
   const router = useRouter();
-
+const { redirectPath } = useLoginModal();
   // Initialize react-hook-form
   const {
     register,
@@ -88,7 +90,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     e.preventDefault();
     setShowRegister(true);
   };
-  
+
   const handleResetClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowReset(true);
@@ -100,37 +102,48 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   };
 
   const handleEmailLogin = async (formData: LoginFormData) => {
-    setLoading(true);
-    setError(null);
+  setLoading(true);
+  setError(null);
 
+  try {
+    // Sign in with email/password
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    if (error) throw error;
+
+    // Get session data
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) throw new Error("No session data received");
+
+    // Save tokens to localStorage
+    localStorage.setItem("access_token", session.access_token);
+    localStorage.setItem("email", formData.email);
+
+    // Fetch Guesty ID
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (error) throw error;
-
-      // Get session data
-      const session = await supabase.auth.getSession();
-
-      if (session.data.session) {
-        // Save to localStorage
-        localStorage.setItem("access_token", session.data.session.access_token);
-        localStorage.setItem("email", formData.email);
-
-        // Navigate to dashboard
-        router.push("/Dashboard");
-        onClose();
-      } else {
-        throw new Error("No session data received");
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Login failed");
-    } finally {
-      setLoading(false);
+      const guestyData = await getGuestyId(formData.email);
+      localStorage.setItem("GuestyId", guestyData.guesty_user_id);
+     
+    } catch (guestyError) {
+      console.error("Failed to fetch Guesty ID:", guestyError);
     }
-  };
+
+    // Navigate and close modal
+    router.push(redirectPath);
+    onClose();
+  } catch (error) {
+    setError(error instanceof Error ? error.message : "Login failed");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -278,7 +291,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div>
@@ -291,7 +306,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 {...register("password")}
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 

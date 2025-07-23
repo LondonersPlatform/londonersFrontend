@@ -1,219 +1,194 @@
+"use client";
+
 import Image from "next/image";
-import { Star } from "lucide-react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Bath, Heart, MapPin, Star, Users } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import { Card, CardContent, CardDescription } from "../ui/card";
+import BathIcon from "@/public/svg-assets/BathIcon";
+import Bedrooms from "@/public/svg-assets/Bedrooms";
+import { addFavorite, getNearbyListingsById } from "@/app/all-listings/Listing";
+import { FavoriteButton } from "../listings/listing-client-components";
 
 interface PropertyDetails {
   beds: number;
   baths: number;
-  kitchens: number;
+  kitchens?: number;
 }
 
 interface NearbyProperty {
-  id: number;
+  id: string;
   imageUrl: string;
   title: string;
-  rating: number;
-  reviewCount: number;
+  rating: string | number;
+  reviewCount?: number;
   details: PropertyDetails;
+  area?: string;
+  price: number;
+  guests: number;
 }
 
 interface PropertyNearbyProps {
   title?: string;
-  properties?: NearbyProperty[];
+  properties?:any
+  onFavoriteClick?:any,
+  loading?:boolean,
+  listingId?: string;
 }
 
-const dummyNearby: NearbyProperty[] = 
+export function NearbyPropertySkeleton() {
+  return (
+    <CarouselItem className="md:basis-1/2 py-12 lg:basis-1/4">
+      <div className="rounded-xl transition-shadow shadow-lg border-none bg-white h-full flex flex-col animate-pulse">
+        {/* Image Placeholder */}
+        <div className="relative aspect-3/4 h-[200px] w-full bg-gray-200 rounded-t-2xl" />
 
-[
-  {
-    id: 1,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Book",
-    rating: 4.9,
-    reviewCount: 42,
-    details: {
-      beds: 2,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 2,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Loft",
-    rating: 4.8,
-    reviewCount: 36,
-    details: {
-      beds: 1,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 3,
-    imageUrl: "/dt2.png",
-    title: "Marylebone View",
-    rating: 4.7,
-    reviewCount: 28,
-    details: {
-      beds: 3,
-      baths: 2,
-      kitchens: 1
-    }
-  },
-  {
-    id: 4,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Haven",
-    rating: 4.9,
-    reviewCount: 51,
-    details: {
-      beds: 2,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 5,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Retreat",
-    rating: 4.6,
-    reviewCount: 33,
-    details: {
-      beds: 1,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 6,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Nook",
-    rating: 4.8,
-    reviewCount: 47,
-    details: {
-      beds: 2,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 7,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Spot",
-    rating: 4.7,
-    reviewCount: 39,
-    details: {
-      beds: 1,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 8,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Place",
-    rating: 4.9,
-    reviewCount: 58,
-    details: {
-      beds: 3,
-      baths: 2,
-      kitchens: 1
-    }
-  },
-  {
-    id: 9,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Space",
-    rating: 4.8,
-    reviewCount: 42,
-    details: {
-      beds: 2,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 10,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Pad",
-    rating: 4.7,
-    reviewCount: 31,
-    details: {
-      beds: 1,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 11,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Flat",
-    rating: 4.9,
-    reviewCount: 49,
-    details: {
-      beds: 2,
-      baths: 1,
-      kitchens: 1
-    }
-  },
-  {
-    id: 12,
-    imageUrl: "/dt2.png",
-    title: "Marylebone Suite",
-    rating: 4.8,
-    reviewCount: 44,
-    details: {
-      beds: 3,
-      baths: 2,
-      kitchens: 1
-    }
-  }
-];
+        {/* Content Placeholder */}
+        <CardContent className="p-4 space-y-3">
+          <div className="flex justify-between items-center">
+            <div className="h-4 bg-gray-200 rounded w-1/2" />
+            <div className="h-4 bg-gray-200 rounded w-6" />
+          </div>
 
-export function PropertyNearby({ 
-  title = "Nearby Apartments", 
-  properties = dummyNearby 
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-4 h-4 bg-gray-300 rounded-full" />
+            <div className="h-3 bg-gray-200 rounded w-1/4" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-xs mt-2">
+            <div className="h-3 bg-gray-200 rounded w-3/4" />
+            <div className="h-3 bg-gray-200 rounded w-3/4" />
+            <div className="h-3 bg-gray-200 rounded w-3/4" />
+          </div>
+
+          <div className="pt-3 border-t mt-3 flex justify-between items-center">
+            <div className="h-4 bg-gray-200 rounded w-20" />
+          </div>
+        </CardContent>
+      </div>
+    </CarouselItem>
+  );
+}
+
+
+export function PropertyNearby({
+  title = "Nearby Apartments",
+
+  loading,
+  onFavoriteClick,
+  properties,
 }: PropertyNearbyProps) {
+  
+
+
   return (
     <div className="my-12">
-      <h2 className="text-xl font-semibold mb-6">{title}</h2>
+      <h2 className="text-2xl font-semibold mb-2">{title}</h2>
+      <h3 className="text font-medium">Sub next similar listing</h3>
 
+      {loading ? (
       <Carousel className="w-full">
-        <CarouselContent>
-          {properties.map((property) => (
-            <CarouselItem key={property.id} className="md:basis-1/2 lg:basis-1/4">
-              <div className="p-1">
-                <div className="space-y-2">
-                  <div className="relative aspect-square w-full overflow-hidden rounded-lg">
-                    <Image
-                      src={property.imageUrl}
-                      alt={`Nearby property ${property.title}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <h3 className="font-medium">{property.title}</h3>
-                  <div className="flex items-center text-sm">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="ml-1">{property.rating}</span>
-                    <span className="text-gray-500 ml-2">({property.reviewCount})</span>
-                  </div>
-                  <div className="text-sm text-gray-700">
-                    <span>{property.details.beds} {property.details.beds === 1 ? 'bed' : 'beds'}</span>
-                    <span> • </span>
-                    <span>{property.details.baths} {property.details.baths === 1 ? 'bath' : 'baths'}</span>
-                    <span> • </span>
-                    <span>{property.details.kitchens} {property.details.kitchens === 1 ? 'kitchen' : 'kitchens'}</span>
-                  </div>
-                </div>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="left-0" />
-        <CarouselNext className="right-0" />
-      </Carousel>
+    <CarouselContent>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <NearbyPropertySkeleton key={i} />
+      ))}
+    </CarouselContent>
+  </Carousel>
+
+  
+      ) : (
+        <Carousel className="w-full">
+          <CarouselContent>
+            {properties.map((property:any) => (
+              <CarouselItem
+                key={property.id}
+                className="md:basis-1/2 py-12 lg:basis-1/4"
+              >
+                <Link
+                  href={`/all-listings/${property.id}?area=${encodeURIComponent(
+                    property.area || ""
+                  )}`}
+                  className="rounded-xl transition-shadow hover:shadow-sm"
+                >
+                  <Card className="h-full flex flex-col shadow-lg border-none  rounded-2xl overflow-hidden bg-white">
+                    {/* Image Section */}
+                    <div className="relative aspect-3/4 w-full overflow-hidden rounded-t-2xl">
+                      <Image
+                        src={property.imageUrl}
+                        alt={property.title}
+                        width={300}
+                        height={100}
+                        className="w-full h-full object-cover transition-transform duration-300 scale-105"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => onFavoriteClick(e, property.id)}
+                        className="absolute top-3 right-3  bg-white scale-90 rounded-full flex items-center justify-center p-1   shadow-md z-10"
+                      >
+
+                      
+                    <FavoriteButton
+                                           isFavorite={property.isFavorite}
+                                           listingId={property.id}
+                                         />
+                      </button>
+                    </div>
+
+                    {/* Card Content */}
+                    <CardContent className="p-4 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg hover:underline font-bold text-gray-900">
+                          {property.title}
+                        </h3>
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="ml-1 text-sm text-gray-700">
+                            {property.rating == "no rating available" && 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      <CardDescription className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="w-4 h-4 text-red-500" />
+                        {property.area}
+                      </CardDescription>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs text-gray-700 mt-2">
+                        <span className="flex items-center gap-2">
+                          <Bedrooms className="w-4 h-4" />
+                          {property.details.beds}{" "}
+                          {property.details.beds === 1 ? "Bed" : "Beds"}
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <BathIcon className="w-4 h-4" />
+                          {property.details.baths}{" "}
+                          {property.details.baths === 1 ? "Bath" : "Baths"}
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <Users className="w-4 h-4" />
+                          {property.guests}{" "}
+                          {property.guests === 1 ? "Guest" : "Guests"}
+                        </span>
+                      </div>
+
+                      <div className="pt-3 border-t text-sm text-gray-800 flex justify-between items-center">
+                        <span className="font-semibold">
+                          £{property.price}/night
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      )}
     </div>
   );
 }

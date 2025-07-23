@@ -19,6 +19,11 @@ const config = {
       },
     },
     extend: {
+       fontFamily: {
+        Helv: ["Helvetica Neue"],
+        // You can also define others like:
+        // serif: ["YourSerifFont", ...defaultTheme.fontFamily.serif],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

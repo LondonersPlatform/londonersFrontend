@@ -1,25 +1,29 @@
-'use client'
+"use client";
 
-import { useRef, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import Image from 'next/image'
-import { X } from 'lucide-react'
-import { Button } from '../ui/button'
-import { createClient } from '@/utils/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import Image from "next/image";
+import { X } from "lucide-react";
+import { Button } from "../ui/button";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
+import { getGuestyId, signUpUser } from "@/app/all-listings/Listing";
 
 interface RegisterModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onLoginClick: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onLoginClick: () => void;
 }
 
 interface FormData {
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-  agreeTerms: boolean
+  name: string;
+  email: string;
+  phone_number: string;
+  gender: string;
+  birthday: string;
+  password: string;
+  confirmPassword: string;
+  agreeTerms: boolean;
 }
 
 export default function RegisterModal({
@@ -36,119 +40,128 @@ export default function RegisterModal({
     setError: setFormError,
   } = useForm<FormData>({
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      name: "",
+    phone_number: "01017732268",
+    gender: "male",
+    birthday: "1990-01-01",
+      email: "",
+      password: "",
+      confirmPassword: "",
       agreeTerms: false,
     },
-  })
+  });
 
-  const modalRef = useRef<HTMLDivElement>(null)
-  const supabase = createClient()
-  const router = useRouter()
-  const password = watch('password')
+  const modalRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
+  const router = useRouter();
+  const password = watch("password");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        onClose()
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose();
       }
-    }
+    };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose()
+      if (event.key === "Escape") {
+        onClose();
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      document.addEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'hidden'
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('keydown', handleEscape)
-      document.body.style.overflow = ''
-      reset()
-    }
-  }, [isOpen, onClose, reset])
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "";
+      reset();
+    };
+  }, [isOpen, onClose, reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
-      // Sign up with Supabase
-      const { data: authData, error } = await supabase.auth.signUp({
-        email: data.email,
+      const response = await signUpUser({
         password: data.password,
-        options: {
-          data: {
-            full_name: data.name,
-          },
-          emailRedirectTo: `${location.origin}/auth/callback`,
-        },
-      })
+        user_type: "guest",
+         phone_number:"01017732268",
+         gender:"male",
+         birthday:"1990-01-01",
+        email: data.email,
+        fullname: data.name,
+      });
+   
+      const session = response.session;
 
-      if (error) throw error
-      const session = await supabase.auth.getSession()
-      
-      if (session.data.session) {
-        // Save to localStorage
-        localStorage.setItem('access_token', session.data.session.access_token)
-        localStorage.setItem('email', data.email)
-        
-        // Navigate to dashboard
-        router.push('/Dashboard')
-        onClose()
+      const { error: sessionError } = await supabase.auth.setSession(session);
+    
+      if (session) {
+        localStorage.setItem("access_token", session.access_token);
+        localStorage.setItem("session", JSON.stringify(session));
+
+    
+
+        localStorage.setItem("email", data.email);
+
+        router.push("/Dashboard");
+        onClose();
       } else {
-        throw new Error('No session data received')
+        throw new Error("No session data received");
       }
     } catch (error) {
-      setFormError('root', {
-        type: 'manual',
-        message: error instanceof Error ? error.message : 'Registration failed',
-      })
+      setFormError("root", {
+        type: "manual",
+        message: error instanceof Error ? error.message : "Registration failed",
+      });
     }
-  }
+  };
 
   const handleGoogleSignUp = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${location.origin}/auth/callback`,
         },
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
     } catch (error) {
-      setFormError('root', {
-        type: 'manual',
-        message: error instanceof Error ? error.message : 'Google signup failed',
-      })
+      setFormError("root", {
+        type: "manual",
+        message:
+          error instanceof Error ? error.message : "Google signup failed",
+      });
     }
-  }
+  };
 
   const handleFacebookSignUp = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'facebook',
+        provider: "facebook",
         options: {
           redirectTo: `${location.origin}/auth/callback`,
         },
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
     } catch (error) {
-      setFormError('root', {
-        type: 'manual',
-        message: error instanceof Error ? error.message : 'Facebook signup failed',
-      })
+      setFormError("root", {
+        type: "manual",
+        message:
+          error instanceof Error ? error.message : "Facebook signup failed",
+      });
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center h-full justify-center bg-black/50">
@@ -176,12 +189,12 @@ export default function RegisterModal({
           <h2 className="text-2xl font-bold text-center mb-4">Register</h2>
 
           <p className="text-center mb-6">
-            Do you already have an account?{' '}
+            Do you already have an account?{" "}
             <a
               href="#"
               onClick={(e) => {
-                e.preventDefault()
-                onLoginClick()
+                e.preventDefault();
+                onLoginClick();
               }}
               className="text-black underline hover:underline"
             >
@@ -194,28 +207,7 @@ export default function RegisterModal({
               {errors.root.message}
             </div>
           )}
-{/* 
-          <div className="space-y-2">
-            <Button
-              variant="outline"
-              className="w-full lg:text-[15px] text-[13px] flex items-center py-3 justify-center gap-2 bg-[#1877F2] text-white hover:bg-blue-700"
-              onClick={handleFacebookSignUp}
-              disabled={isSubmitting}
-            >
-              <Image src="./face0.png" alt="facebook" width={20} height={20} />
-              Signup with Facebook
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full lg:text-[15px] text-[13px] flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-300"
-              onClick={handleGoogleSignUp}
-              disabled={isSubmitting}
-            >
-              <Image src="./goagle0.png" alt="google" width={20} height={20} />
-              Signup with Google
-            </Button>
-          </div> */}
+          
 
           <div className="my-6 relative">
             <div className="absolute inset-0 flex items-center">
@@ -228,18 +220,20 @@ export default function RegisterModal({
             </div>
           </div>
 
-          <form className="space-y-2 " onSubmit={handleSubmit(onSubmit)} >
+          <form className="space-y-2 " onSubmit={handleSubmit(onSubmit)}>
             <div>
               <input
                 type="text"
                 placeholder="Name"
                 className={`w-full px-4 py-3 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                  errors.name ? 'border-red-500' : ''
+                  errors.name ? "border-red-500" : ""
                 }`}
-                {...register('name', { required: 'Name is required' })}
+                {...register("name", { required: "Name is required" })}
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.name.message}
+                </p>
               )}
             </div>
             <div>
@@ -247,18 +241,20 @@ export default function RegisterModal({
                 type="email"
                 placeholder="Email"
                 className={`w-full px-4 py-3 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                  errors.email ? 'border-red-500' : ''
+                  errors.email ? "border-red-500" : ""
                 }`}
-                {...register('email', {
-                  required: 'Email is required',
+                {...register("email", {
+                  required: "Email is required",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Invalid email address',
+                    message: "Invalid email address",
                   },
                 })}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div>
@@ -266,18 +262,20 @@ export default function RegisterModal({
                 type="password"
                 placeholder="Password (min 6 characters)"
                 className={`w-full px-4 py-3 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                  errors.password ? 'border-red-500' : ''
+                  errors.password ? "border-red-500" : ""
                 }`}
-                {...register('password', {
-                  required: 'Password is required',
+                {...register("password", {
+                  required: "Password is required",
                   minLength: {
                     value: 6,
-                    message: 'Password must be at least 6 characters',
+                    message: "Password must be at least 6 characters",
                   },
                 })}
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.password.message}
+                </p>
               )}
             </div>
             <div>
@@ -285,12 +283,12 @@ export default function RegisterModal({
                 type="password"
                 placeholder="Confirm password"
                 className={`w-full px-4 py-3 border bg-white border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
-                  errors.confirmPassword ? 'border-red-500' : ''
+                  errors.confirmPassword ? "border-red-500" : ""
                 }`}
-                {...register('confirmPassword', {
-                  required: 'Please confirm your password',
+                {...register("confirmPassword", {
+                  required: "Please confirm your password",
                   validate: (value) =>
-                    value === password || 'Passwords do not match',
+                    value === password || "Passwords do not match",
                 })}
               />
               {errors.confirmPassword && (
@@ -305,25 +303,27 @@ export default function RegisterModal({
                 type="checkbox"
                 id="terms"
                 className={`h-4 w-4 rounded bg-white border-gray-300 text-black focus:ring-black ${
-                  errors.agreeTerms ? 'border-red-500' : ''
+                  errors.agreeTerms ? "border-red-500" : ""
                 }`}
-                {...register('agreeTerms', {
-                  required: 'You must agree to the terms and conditions',
+                {...register("agreeTerms", {
+                  required: "You must agree to the terms and conditions",
                 })}
               />
               <label htmlFor="terms" className="ml-2 text-sm text-gray-700">
-                I agree with your{' '}
+                I agree with your{" "}
                 <a href="#" className="text-black hover:underline">
                   Terms & Conditions
                 </a>
               </label>
-     
             </div>
-            <div>   {errors.agreeTerms && (
+            <div>
+              {" "}
+              {errors.agreeTerms && (
                 <p className="mt-1 text-sm text-red-600 ml-2">
                   {errors.agreeTerms.message}
                 </p>
-              )}</div>
+              )}
+            </div>
 
             <Button
               variant="primary"
@@ -331,11 +331,11 @@ export default function RegisterModal({
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Registering...' : 'Register'}
+              {isSubmitting ? "Registering..." : "Register"}
             </Button>
           </form>
         </div>
       </div>
     </div>
-  )
+  );
 }

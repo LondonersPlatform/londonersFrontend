@@ -2,8 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+ font-family: 'Helvetica Neue';
+  src: url('/fonts/HelveticaNeue.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Helvetica Neue", sans-serif !important;
 }
 
 @layer utilities {
@@ -11,6 +19,27 @@ body {
     text-wrap: balance;
   }
 }
+
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+/* Fix for Leaflet z-index overflow */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+.leaflet-pane,
+.leaflet-map-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane {
+  z-index: 0 !important;
+}
+
 
 @layer base {
   :root {

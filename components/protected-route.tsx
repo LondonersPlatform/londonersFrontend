@@ -24,10 +24,8 @@ export default function ProtectedRoute({
   if (isLoading) {
     return <div>Loading...</div> // Or your custom loading component
   }
-
-  if (!session) {
-    return null // or return a redirect component if preferred
-  }
-
-  return <>{children}</>
+if (!isLoading && !session) {
+  window.location.href = window.location.href 
+}
+  return <main>{children}</main>
 }

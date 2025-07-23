@@ -1,3 +1,4 @@
+
 // app/(protected)/layout.tsx
 import ProtectedRoute from '@/components/protected-route'
 

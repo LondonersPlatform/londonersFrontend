@@ -1,6 +1,7 @@
 "use client"
 
 
+import StarIcon from "@/public/svg-assets/star-icon";
 import { Star } from "lucide-react";
 interface CategoryRatingProps {
   name: string;
@@ -16,7 +17,7 @@ export function CategoryRating({ name, rating, icon }: CategoryRatingProps) {
         <div className="font-medium">{name}</div>
       </div>
       <div className="flex items-center gap-2">
-        <Star/>
+        <StarIcon/>
         <span className="text-sm font-medium">{rating.toFixed(2)}</span>
       </div>
     </div>

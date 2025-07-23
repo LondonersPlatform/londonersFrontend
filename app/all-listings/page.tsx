@@ -1,6 +1,4 @@
 "use client";
-
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,30 +17,83 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import Bedrooms from "../../public/svg-assets/Bedrooms";
 import BathIcon from "../../public/svg-assets/BathIcon";
+
 import Beds from "../../public/svg-assets/Beds";
 import GeuestIcon from "../../public/svg-assets/GeuestIcon";
 import LocationIcon from "../../public/svg-assets/LocationIcon";
 import DistarrowIcon from "../../public/svg-assets/DistarrowIcon";
-import Loading from "../loading";
 import { fetchListings } from "./Listing";
 import { ListingSkeletonCard } from "@/components/ui/ListingSkeletonCard";
-import { useState } from "react";
-import { Home, Search } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  FileQuestion,
+  HomeIcon,
+  Search,
+  X,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import Home from "../page";
 
 const LIMIT = 5;
 
 export default function AllListingsPage() {
-  const searchParamsHook = useSearchParams();
   const [page, setPage] = useState(1);
   const [sortOrder, setSortOrder] = useState("default");
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchParams = useSearchParams();
 
-  const getSearchParamsObject = () => {
-    const params: Record<string, string> = {};
-    searchParamsHook.forEach((value, key) => {
+  const paramsObject = useMemo(() => {
+    const params: any = {};
+    searchParams.forEach((value, key) => {
       params[key] = value;
     });
     return params;
+  }, [searchParams]);
+
+  const paramsObjectSearch = {
+    ...(paramsObject &&
+      Object.keys(paramsObject).length > 0 && {
+        available: {
+          checkIn: paramsObject.checkIn,
+          checkOut: paramsObject.checkOut,
+          minOccupancy: paramsObject.minOccupancy,
+          ignoreFlexibleBlocks: paramsObject.ignoreFlexibleBlocks,
+        },
+      }),
   };
+
+  // Separate filters state
+  const [filters, setFilters] = useState<any>({
+    bedrooms: null,
+    beds: 1,
+    bathrooms: 1,
+    priceRange: [0, 10000],
+    amenities: [],
+  });
+
+  // Fetch all listings once - no API calls on filter changes
+  const {
+    data: listingsData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["listings", paramsObjectSearch],
+    queryFn: () => fetchListings(paramsObjectSearch),
+  });
+
+  // Track if we have active filters (move this after useQuery)
+  const hasActiveFilters =
+    filters.bedrooms !== null ||
+    filters.beds !== 1 ||
+    filters.bathrooms !== 1 ||
+    filters.priceRange[0] !== 0 ||
+    filters.priceRange[1] !== 10000 ||
+    filters.amenities.length > 0;
 
   const sortListings = (listings: any[], sort: string) => {
     if (sort === "low-to-high") {
@@ -53,15 +104,26 @@ export default function AllListingsPage() {
     return listings; // default
   };
 
-  const {
-    data: listingsData,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["listings", searchParamsHook.toString()],
-    queryFn: () => fetchListings(getSearchParamsObject()),
-  });
+  // Client-side search function
+  const searchListings = (listings: any[], query: string) => {
+    if (!listings || !query.trim()) return listings;
+
+    const searchTerm = query.toLowerCase();
+    return listings.filter((listing) => {
+      return (
+        // Search by name/title
+        listing.title?.toLowerCase().includes(searchTerm) ||
+        // Search by location
+        listing.location?.toLowerCase().includes(searchTerm) ||
+        listing.area?.toLowerCase().includes(searchTerm) ||
+        // Search by price (convert to string to search)
+        listing.pricePerNight?.toString().includes(searchTerm) ||
+        listing.totalPrice?.toString().includes(searchTerm) ||
+        // Search by rating
+        listing.rating?.toString().includes(searchTerm)
+      );
+    });
+  };
 
   const filterListings = (listings: any[], filters: any) => {
     if (!listings) return [];
@@ -90,11 +152,9 @@ export default function AllListingsPage() {
         return false;
       }
 
-      // Filter by amenities (all selected amenities must be present)
-      console.log("Amenities=", filters.amenities);
       if (filters.amenities.length > 0) {
         const hasAllAmenities = filters.amenities.every(
-          (amenityLabel: string) => listing.amenities.includes(amenityLabel) // Directly check if label exists
+          (amenityLabel: string) => listing.amenities.includes(amenityLabel)
         );
         if (!hasAllAmenities) {
           return false;
@@ -105,25 +165,56 @@ export default function AllListingsPage() {
     });
   };
 
-  // Remove the hardcoded 'listed' data and use listingsData from the query
-  const [filters, setFilters] = useState<any>({
-    bedrooms: null,
-    beds: 1,
-    bathrooms: 1,
-    priceRange: [0, 10000],
-    amenities: [],
-  });
+const router = useRouter();
 
-  // Filter the actual listings data
-  const filteredListings = listingsData?.listings
-    ? filterListings(listingsData.listings, filters)
-    : [];
+const handleResetFilters = () => {
+  const newParams = new URLSearchParams(searchParams.toString());
 
-  const sortedListings = filteredListings
-    ? sortListings(filteredListings, sortOrder)
-    : [];
+  newParams.delete("checkIn");
+  newParams.delete("checkOut");
+  newParams.delete("minOccupancy");
 
-  const visibleListings = sortedListings.slice(0, page * LIMIT);
+  // You can reset additional filters if needed:
+  // newParams.delete("someOtherParam");
+
+  // Update URL to trigger refetch via searchParams change
+  router.push(`?${newParams.toString()}`);
+};
+
+  // Reset page when search or filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, filters]);
+
+  // Process listings: Search first, then filter, then sort
+  const processedListings = useMemo(() => {
+    if (!listingsData?.listings) return [];
+
+    let result = listingsData.listings;
+
+    // Apply search first (client-side)
+    if (searchQuery.trim()) {
+      result = searchListings(result, searchQuery);
+    }
+
+    // Apply filters if we have active filters
+    if (hasActiveFilters) {
+      result = filterListings(result, filters);
+    }
+
+    // Apply sorting
+    result = sortListings(result, sortOrder);
+
+    return result;
+  }, [
+    listingsData?.listings,
+    searchQuery,
+    filters,
+    sortOrder,
+    hasActiveFilters,
+  ]);
+
+  const visibleListings = processedListings.slice(0, page * LIMIT);
 
   const showMore = () => {
     setPage((prev) => prev + 1);
@@ -135,11 +226,29 @@ export default function AllListingsPage() {
 
   const handleSortChange = (value: string) => {
     setSortOrder(value);
+    setPage(1);
+  };
+
+  const handleFiltersApply = (newFilters: any) => {
+    // Clear search when applying filters
+    setSearchQuery("");
+    setFilters(newFilters);
+    setPage(1);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setPage(1);
+  };
+
+  const handleFilterButtonClick = () => {
+    // Clear search when filter button is clicked
+    setSearchQuery("");
   };
 
   if (isLoading && !listingsData) {
     return (
-      <div className="container mx-auto px-4 py-8 space-y-6">
+      <div className="md:w-[85%]  w-[96%] mx-auto px-4 py-8 space-y-6">
         {[...Array(3)].map((_, index) => (
           <ListingSkeletonCard key={index} />
         ))}
@@ -149,33 +258,77 @@ export default function AllListingsPage() {
 
   if (isError) {
     return (
-      <div className="p-10 text-center text-red-600">
-        Error: {error.message}
+      <div className="flex items-center justify-center bg-background p-4">
+        <Card className="w-full border-none max-w-md">
+          <div className="text-center">
+            <div className="flex justify-center mb-4">
+              <img src={"./Document_empty.svg"} />
+            </div>
+            <CardTitle className="text-xl font-bold">
+              {error?.message || "The page you're looking for Not work."}
+            </CardTitle>
+            <span className=" text-gray-600">Something went wrong</span>
+          </div>
+          <CardContent className="space-y-4 text-center">
+            <div className="pt-4">
+              <Button asChild className="w-full flex items-center">
+                <Link
+                  href="/"
+                  className="w-full flex items-center justify-center"
+                >
+                  Back to home
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
+  const hasResettableParams =
+  paramsObject.checkIn || paramsObject.checkOut || paramsObject.minOccupancy;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="md:w-[85%]  w-[96%] mx-auto px-4 py-8">
       <div className="mb-8">
-        <SearchInput />
+        <SearchInput
+          onSearchChange={handleSearchChange}
+          searchValue={searchQuery}
+        />
         <div className="flex flex-col w-full gap-4 md:items-center md:flex-row">
           <h1 className="text-2xl font-bold flex-grow">
-            {filteredListings.length} Rentals
+            {processedListings.length} Rentals
+            {searchQuery.trim() && (
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                (search results{hasActiveFilters ? ", filtered" : ""})
+              </span>
+            )}
+            {!searchQuery.trim() && hasActiveFilters && (
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                (filtered from {listingsData?.listings?.length || 0} total)
+              </span>
+            )}
           </h1>
           <div className="flex items-center gap-3 justify-end w-full md:w-auto">
+        {hasResettableParams &&
+           <Button className=" bg-transparent  text-red-500 hover:bg-transparent"  onClick={handleResetFilters} >
+              <X />
+              <span className=" underline ">Reset</span>
+            </Button>
+        }    
+         
             <FilterButton
-              onApply={(newFilters: any) => {
-                setFilters(newFilters);
-              }}
-              filterListings={filteredListings}
+              onApply={handleFiltersApply}
+              filterListings={processedListings}
+              onFilterClick={handleFilterButtonClick}
             />
             <SortSelect value={sortOrder} onChange={handleSortChange} />
+
           </div>
         </div>
       </div>
-      
-      {filteredListings.length > 0 ? (
+
+      {processedListings.length > 0 ? (
         <div className="space-y-6">
           {visibleListings.map((listing: any) => (
             <Link
@@ -227,7 +380,7 @@ export default function AllListingsPage() {
                               width={400}
                               height={256}
                               sizes="100vw"
-                              className="w-full h-full object-cover"
+                              className="w-full rounded-t-2xl h-full object-cover"
                             />
                           </div>
                         </CarouselItem>
@@ -243,7 +396,10 @@ export default function AllListingsPage() {
                   <div>
                     <div className="mb-2 flex items-center justify-between">
                       <h2 className="text-xl font-bold">{listing.title}</h2>
-                      <FavoriteButton isFavorite={listing.isFavorite} />
+                      <FavoriteButton
+                        isFavorite={listing.isFavorite}
+                        listingId={listing.id}
+                      />
                     </div>
 
                     <div className="mb-4 flex items-center space-x-2">
@@ -254,7 +410,7 @@ export default function AllListingsPage() {
                       <span className="text-gray-400">
                         <DistarrowIcon />
                       </span>
-                      <span className="text-sm   text-gray-600">
+                      <span className="text-sm text-gray-600">
                         {listing.area}
                       </span>
                     </div>
@@ -308,20 +464,12 @@ export default function AllListingsPage() {
 
                   <div>
                     <div className="my-4 text-sm">{listing.dateRange}</div>
-                    <div className="flex items-end gap-5">
+                    <div className="flex lg:flex-row flex-col  lg:items-end gap-5">
                       <div>
                         <span className="text-xl font-bold">
-                          ${listing.pricePerNight}
+                          £{listing.pricePerNight}
                         </span>
                         <span className="text-sm text-gray-500">/night</span>
-                      </div>
-                      <div className="text-right flex items-center gap-2">
-                        <span className="text-xl font-bold">
-                          ${listing.totalPrice}
-                        </span>
-                        <div className="text-sm text-gray-500">
-                          Total (including fees and taxes)
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -332,35 +480,32 @@ export default function AllListingsPage() {
         </div>
       ) : (
         <div>
-          <div className="min-h-screen  flex items-center justify-center px-4">
-            <div className="text-center max-w-md mx-auto">
+          <div className=" flex items-center justify-center px-4">
+            <div className="text-center mt-24  mx-auto">
               {/* Icon */}
-              <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-blue-100 to-orange-100 rounded-full flex items-center justify-center">
-                <div className="relative">
-                  <Search className="w-16 h-16 text-gray-400" />
-                  <div className="w-4 h-4 bg-red-500 rounded-full absolute -top-1 -right-1 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">!</span>
-                  </div>
-                </div>
-              </div>
+              <img src={"./Search_empty.svg"} alt=" Not found" />
 
               {/* Text */}
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <h1 className="text-3xl mt-4 font-bold text-gray-900 mb-4">
                 Not found room
               </h1>
 
               <p className="text-gray-600 mb-8 leading-relaxed">
-                The Filters you're looking for doesn't exist .
+                {searchQuery.trim()
+                  ? `No listings match your search "${searchQuery}"${
+                      hasActiveFilters ? " and current filters" : ""
+                    }.`
+                  : hasActiveFilters
+                  ? "No listings match your current filters."
+                  : "No listings available."}
               </p>
-
-              {/* Action button */}
             </div>
           </div>
         </div>
       )}
 
       <div className="mt-10 text-center space-x-4">
-        {visibleListings.length < sortedListings.length && (
+        {visibleListings.length < processedListings.length && (
           <Button
             onClick={showMore}
             disabled={isLoading}

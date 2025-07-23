@@ -24,9 +24,10 @@ export function StarRating({ rating, size = "md", className }: StarRatingProps) 
         key={i}
         className={cn(
           starSize,
-          isFilled ? "text-yellow-400 fill-yellow-400" : "text-gray-300",
+          isFilled ? "text-yellow-400 fill-yellow-400" : "text-gray-300 fill-yellow-400",
         )}
       />
+      
     );
   });
 

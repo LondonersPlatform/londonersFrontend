@@ -1,25 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CalendarIcon, ChevronDown } from "lucide-react";
-import { format } from "date-fns";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { DateRange } from "react-day-picker";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createQuote } from "@/app/all-listings/Listing";
+import {
+  createQuote,
+  getCalendarByListingId,
+} from "@/app/all-listings/Listing";
 import WIcon from "@/public/svg-assets/WIcon";
+import { usePathname, useRouter } from "next/navigation";
+import { useLoginModal } from "@/context/login-modal-context";
+import { DatePickerWithRange } from "../ui/DateRangePicker";
+import { DatePickerWithRangeSmall } from "../ui/DateRangePickersmall";
 
 interface QuoteResponse {
   total: number;
@@ -32,39 +33,94 @@ interface QuoteResponse {
 export function PropertyBooking({
   PricePerNight,
   serviceFee,
+  rate,
+minNights,
+
   Cleaningfee,
   whatsup,
   MaxNumofGuests,
   listingId,
 }: any) {
-  const [checkInDate, setCheckInDate] = useState<Date>(new Date(2025, 2, 30));
-  const [checkOutDate, setCheckOutDate] = useState<Date>(new Date(2025, 3, 6));
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: today,
+    to: tomorrow,
+  });
   const [guestCount, setGuestCount] = useState(2);
+
   const [quoteData, setQuoteData] = useState<QuoteResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { setRedirectPath, setLoginOpen } = useLoginModal();
+  const [loadingDates, setLoadingDates] = useState(true);
+  const [availableDates, setAvailableDates] = useState<any>([]);
+    const [isOpenDate, setIsOpen] = useState(false);
+         
+  useEffect(() => {
+    const fetchDates = async () => {
+      try {
+        const dates = await getCalendarByListingId(listingId);
+        setAvailableDates(dates);
+      
+      } catch (error) {
+        console.error("Error loading calendar dates:", error);
+      } finally {
+        setLoadingDates(false);
+      }
+    };
+
+    fetchDates();
+  }, [listingId]);
+
   // Calculate the number of nights between check-in and check-out
-  const nights = Math.ceil(
-    (checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const nights =
+    dateRange?.from && dateRange?.to
+      ? Math.ceil(
+          (dateRange.to.getTime() - dateRange.from.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      : 0;
+
+  const session = JSON.parse(localStorage.getItem("session") || "{}");
+
+  const openLoginModal = () => {
+    const query = new URLSearchParams({
+      quoteId: quoteData?.guesty_quote._id,
+      PricePerNight: PricePerNight,
+      serviceFee: serviceFee,
+      Cleaningfee: Cleaningfee,
+      whatsup: whatsup,
+      MaxNumofGuests: MaxNumofGuests,
+      listingId: listingId,
+    });
+
+    setRedirectPath(`/Payment?${query.toString()}`);
+    setLoginOpen(true);
+  };
 
   // Fetch quote data whenever dates or guest count changes
   useEffect(() => {
     const fetchQuote = async () => {
+      if (!dateRange?.from || !dateRange?.to) return;
+
       try {
         setLoading(true);
         setError(null);
 
         const payload = {
           listing_id: listingId,
-          check_in_date_localized: checkInDate.toISOString().split("T")[0],
-          check_out_date_localized: checkOutDate.toISOString().split("T")[0],
+          check_in_date_localized: dateRange.from.toISOString().split("T")[0],
+          check_out_date_localized: dateRange.to.toISOString().split("T")[0],
           guests_count: guestCount,
           source: "website",
         };
 
         const response = await createQuote(payload);
+
         setQuoteData(response);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch quote");
@@ -75,8 +131,33 @@ export function PropertyBooking({
     };
 
     fetchQuote();
-  }, [checkInDate, checkOutDate, guestCount, listingId]);
+  }, [dateRange, guestCount, listingId]);
 
+  const router = useRouter();
+
+  const handleClick = () => {
+    setLoading(true);
+
+    const query = new URLSearchParams({
+      quoteId: quoteData?.guesty_quote._id,
+      PricePerNight: PricePerNight,
+      serviceFee: serviceFee,
+      Cleaningfee: Cleaningfee,
+      whatsup: whatsup,
+      ratePlanIdParms: rate,
+      MaxNumofGuests: MaxNumofGuests,
+      listingId: listingId,
+    });
+
+    router.push(`/Payment?${query.toString()}`);
+  };
+  const pathname = usePathname();
+  const currentUrl =
+    typeof window !== "undefined" ? window.location.origin + pathname : "";
+
+  const whatsappLink = `https://wa.me/${whatsup}?text=I'm%20interested%20in%20this%20listing:%20${encodeURIComponent(
+    currentUrl
+  )}`;
   // Calculate costs based on API response or fallback to props
   const nightlyRate = PricePerNight;
   const subtotal = nightlyRate * nights;
@@ -85,17 +166,14 @@ export function PropertyBooking({
   const total =
     quoteData?.guesty_quote?.rates?.ratePlans?.[0]?.money?.money
       ?.hostPayoutUsd ?? 0;
-  const handleCheckInChange = (date: Date | undefined) => {
-    if (date) {
-      setCheckInDate(date);
-      // Ensure check-out date is after check-in date
-      if (date >= checkOutDate) {
-        const newCheckOut = new Date(date);
-        newCheckOut.setDate(newCheckOut.getDate() + 1);
-        setCheckOutDate(newCheckOut);
-      }
-    }
-  };
+  const invoiceItems =
+    quoteData?.guesty_quote.rates.ratePlans[0].money.money.invoiceItems;
+
+  const totalAmount = invoiceItems?.reduce(
+    (sum: any, item: any) => sum + item.amount,
+    0
+  );
+
 
   return (
     <section className="sticky top-6">
@@ -103,7 +181,7 @@ export function PropertyBooking({
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-2xl font-bold">${nightlyRate}</span>
+              <span className="text-2xl font-bold">£{nightlyRate}</span>
               <span className="text-gray-500"> / night</span>
             </div>
             <div className="flex items-center">
@@ -118,50 +196,21 @@ export function PropertyBooking({
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-2 border rounded-xl overflow-hidden">
-            {/* Check-in Date Picker */}
-            <div className="p-3 border-r hover:bg-gray-200 border-b">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button className="w-full bg-transparent hover:bg-transparent text-grey-800 flex flex-col gap-1 py-0 items-start p-0 h-full font-normal">
-                    <div className="text-xs font-medium">CHECK-IN</div>
-                    <span>{format(checkInDate, "M/d/yyyy")}</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={checkInDate}
-                    onSelect={handleCheckInChange}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Check-out Date Picker */}
-            <div className="p-3 border-b hover:bg-gray-200">
-              <Popover>
-                <PopoverTrigger asChild className=" ">
-                  <Button className="w-full bg-transparent hover:bg-transparent text-grey-800 flex flex-col gap-1 py-0 items-start p-0 h-full font-normal">
-                    <div className="text-xs font-medium">CHECK-OUT</div>
-                    <span>{format(checkOutDate, "M/d/yyyy")}</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <Calendar
-                    mode="single"
-                    selected={checkOutDate}
-                    onSelect={(date) => date && setCheckOutDate(date)}
-                    initialFocus
-                    disabled={(date) => date <= checkInDate}
-                  />
-                </PopoverContent>
-              </Popover>
+          <div className="border rounded-xl overflow-hidden">
+            {/* Date Range Picker */}
+            <div className="p-3 border-b hover:bg-gray-50">
+              <DatePickerWithRangeSmall
+              minNights={minNights}
+              isOpen={isOpenDate}
+              onOpenChange={setIsOpen}
+                onDateChange={setDateRange}
+                availableDates={availableDates}
+                className="w-full"
+              />
             </div>
 
             {/* Guests Dropdown */}
-            <div className="col-span-2">
+            <div className="p-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -203,27 +252,60 @@ export function PropertyBooking({
             </div>
           </div>
 
-          <Button className="w-full" disabled={loading}>
-            {loading ? "Loading..." : "Book Now"}
-          </Button>
-          <p className="text-center text-sm text-gray-500">
-            You won't be charged yet
-          </p>
+       <Button
+  className="w-full"
 
-          <div className="space-y-3 pt-3">
-            <div className="flex items-center justify-between">
-              <div className="underline">Cleaning fee</div>
-              <div>${cleaningFee}</div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="underline">Service fee</div>
-              <div>${serviceFeeValue.toFixed(2)}</div>
-            </div>
-            <div className="flex items-center justify-between border-t pt-3 font-semibold">
-              <div>Total</div>
-              <div>${total}</div>
-            </div>
-          </div>
+  onClick={() => {
+    if (!quoteData) {
+      setIsOpen(true);
+    } else {
+      if (localStorage.getItem("access_token")) {
+        handleClick();
+      } else {
+        openLoginModal();
+      }
+    }
+  }}
+>
+  {loading
+    ? "Loading..."
+    : !quoteData
+    ? "Check Availability"
+    : "Book Now"}
+</Button>
+
+
+          {quoteData && (
+            <section>
+              <p className="text-center text-sm text-gray-500">
+                You won't be charged yet
+              </p>
+
+              <div className="space-y-3 pt-3">
+                <div className="flex items-center justify-between">
+                  <div className="underline">Cleaning fee</div>
+                  <div>£{cleaningFee}</div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="underline">Service fee</div>
+                  <div>£{Number(serviceFeeValue).toFixed(2)}</div>
+                </div>
+                <div className="flex items-center justify-between border-t pt-3 font-semibold">
+                  <div>Total</div>
+                  <div>
+                    £
+                    {quoteData
+                      ? totalAmount
+                      : (
+                          Number(PricePerNight) * nights +
+                          Number(cleaningFee) +
+                          Number(serviceFeeValue)
+                        ).toFixed(2)}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       </div>
 
@@ -231,13 +313,9 @@ export function PropertyBooking({
         <Button className="bg-[#8C8C8C] p-5 text-center">
           Contact the host
         </Button>
-        <a
-          href={`https://wa.me/${whatsup}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
           <Button className="bg-[#59D750] w-full hover:bg-[#67e15e] p-5 text-center flex items-center justify-center gap-2">
-         <WIcon/>
+            <WIcon />
             Chat on WhatsApp
           </Button>
         </a>

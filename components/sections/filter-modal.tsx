@@ -562,7 +562,7 @@ export default function FiltersModal({
           <div className="my-8">
             <h2 className="text-xl font-semibold mb-6">Amenities</h2>
 
-            <>
+            <section>
               <div className="flex flex-wrap gap-2">
                 {visibleAmenities.map((amenity) => (
                   <button
@@ -586,17 +586,17 @@ export default function FiltersModal({
                   className="flex items-center mt-4 font-semibold"
                 >
                   {showAll ? (
-                    <>
+                    <div>
                       Show less <ChevronLeft className="w-4 h-4 ml-1" />
-                    </>
+                    </div>
                   ) : (
-                    <>
+                    <div>
                       Show more <ChevronRight className="w-4 h-4 ml-1" />
-                    </>
+                    </div>
                   )}
                 </button>
               )}
-            </>
+            </section>
 
             <div className="mt-6 border-b border-gray-200"></div>
           </div>

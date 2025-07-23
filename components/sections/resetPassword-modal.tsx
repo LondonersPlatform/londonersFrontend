@@ -69,7 +69,7 @@ export default function ResetModal({ isOpen, onClose }: ResetModalProps) {
       setSuccess(false)
       
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
+        redirectTo: `${window.location.origin}/update-password`,
       })
 
       if (error) {
@@ -127,7 +127,7 @@ export default function ResetModal({ isOpen, onClose }: ResetModalProps) {
               </Button>
             </div>
           ) : (
-            <>
+            <section>
               <p className="text-center mb-6">
                 Enter your email address to receive a password reset link.
               </p>
@@ -179,7 +179,7 @@ export default function ResetModal({ isOpen, onClose }: ResetModalProps) {
                   {isSubmitting ? 'Sending...' : 'Send Reset Link'}
                 </Button>
               </form>
-            </>
+            </section>
           )}
         </div>
       </div>

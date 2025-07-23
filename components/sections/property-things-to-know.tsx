@@ -1,4 +1,7 @@
 import { Button } from "@/components/ui/button";
+import HouseRulesModal from "../listings/house-rules-modal";
+import CancellationPolicyModal from "../listings/cancellation-policy-modal";
+import SafetyPropertyModal from "../listings/safety-property-modal";
 
 
 
@@ -15,7 +18,7 @@ export function PropertyThingsToKnow({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {sections.map((section:any, index:number) => (
           <div key={index} className="space-y-4">
-            <h3 className="font-medium">{section.title}</h3>
+            <h3 className="font-bold">{section.title}</h3>
             
             {section.isParagraph ? (
               <p className="text-sm text-gray-700">{section.items[0]}</p>
@@ -26,16 +29,17 @@ export function PropertyThingsToKnow({
                 ))}
               </ul>
             )}
-
+    {index == 0 && <HouseRulesModal />}
+            {index == 1 && <CancellationPolicyModal />}
+            {index == 2 && <SafetyPropertyModal />}
+ 
          
           </div>
         ))}   
          
          
       </div>
-         <Button variant="outline" className="text-sm mt-6 rounded-3xl ">
-            Show more
-          </Button>
+        
     </div>
   );
 }

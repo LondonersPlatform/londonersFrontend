@@ -38,6 +38,7 @@
 
 }
 
+
 @layer base {
   * {
     @apply border-border;
@@ -46,6 +47,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+@font-face {
+  font-family: 'Helvetica Neue' !important;
+  src: url('/fonts/HelveticaNeue.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+ 
+}
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+body {
+  font-family: "Helvetica Neue", sans-serif !important;
+
+}
+
 html,
 body {
   overflow-x: visible !important;
@@ -78,3 +97,19 @@ body {
   background: #555; 
 }
 
+
+/* Fix for Leaflet z-index overflow */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+.leaflet-pane,
+.leaflet-map-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane {
+  z-index: 0 !important;
+}
