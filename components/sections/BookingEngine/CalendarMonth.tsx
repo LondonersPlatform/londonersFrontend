@@ -24,6 +24,7 @@ interface CalendarMonthProps {
   minCheckoutDate?: Date;
   maxCheckoutDate?: Date;
   dateRange: DateRange;
+  loadingMin?: boolean;
   selectingStart: boolean;
   hoverDate: Date | undefined;
   minNights: number;
@@ -35,6 +36,7 @@ interface CalendarMonthProps {
 export const CalendarMonth: React.FC<CalendarMonthProps> = ({
   month,
   dateRange,
+  loadingMin,
   selectingStart,
   minCheckoutDate,
   maxCheckoutDate,
@@ -61,12 +63,9 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
 
   const isDateInHoverRange = (date: Date) => {
     if (selectingStart || !dateRange.from || !hoverDate) return false;
-
     const startDate = dateRange.from;
     const endDate = hoverDate;
-
     if (isBefore(endDate, startDate)) return false;
-
     return (
       (isAfter(date, startDate) && isBefore(date, endDate)) ||
       isSameDay(date, startDate) ||
@@ -82,36 +81,29 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
   };
 
   const isRangeStart = (date: Date) => {
-    if (dateRange.from && dateRange.to && isSameDay(date, dateRange.from))
-      return true;
-    if (
-      !selectingStart &&
-      dateRange.from &&
-      hoverDate &&
-      isSameDay(date, dateRange.from)
-    )
-      return true;
-    return false;
+    return (
+      (dateRange.from && isSameDay(date, dateRange.from)) ||
+      (!selectingStart &&
+        dateRange.from &&
+        hoverDate &&
+        isSameDay(date, dateRange.from))
+    );
   };
 
   const isRangeEnd = (date: Date) => {
-    if (dateRange.from && dateRange.to && isSameDay(date, dateRange.to))
-      return true;
-    if (
-      !selectingStart &&
-      dateRange.from &&
-      hoverDate &&
-      isSameDay(date, hoverDate)
-    )
-      return true;
-    return false;
+    return (
+      (dateRange.to && isSameDay(date, dateRange.to)) ||
+      (!selectingStart &&
+        dateRange.from &&
+        hoverDate &&
+        isSameDay(date, hoverDate))
+    );
   };
 
   const getDateTooltip = (date: Date) => {
     if (dateRange.from && isSameDay(date, dateRange.from)) {
       return `Minimum ${minNights} nights`;
     }
-
     if (dateRange.from && !selectingStart && !dateRange.to) {
       const nightsDiff = differenceInDays(date, dateRange.from);
       if (nightsDiff > 0 && nightsDiff < minNights) {
@@ -141,7 +133,6 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
   const monthEnd = new Date(month.getFullYear(), month.getMonth() + 1, 0);
   const leadingEmptyCells = monthStart.getDay();
 
-  // Add empty divs for weekday alignment
   for (let i = 0; i < leadingEmptyCells; i++) {
     days.push(<div key={`empty-${i}`} className="w-10 h-10" />);
   }
@@ -154,34 +145,36 @@ export const CalendarMonth: React.FC<CalendarMonthProps> = ({
     const isInHoverRange = isDateInHoverRange(date);
     const isToday = isSameDay(date, new Date());
     const tooltip = getDateTooltip(date);
-const blockCheckoutDueToUnavailability =
-  !selectingStart &&
-  dateRange.from &&
-  minNights > 1 &&
-  !hasMinConsecutiveAvailableNights(
-    dateRange.from,
-    minNights,
-    availableDatesSet
-  );
 
-const isDisabled =
-  blockCheckoutDueToUnavailability ||
-  (selectingStart &&
-    (!availableDatesSet.has(date.toDateString()) ||
+    const blockCheckoutDueToUnavailability =
+      !selectingStart &&
+      dateRange.from &&
+      !dateRange.to &&
+      minNights > 1 &&
       !hasMinConsecutiveAvailableNights(
-        date,
+        dateRange.from,
         minNights,
         availableDatesSet
-      ))) ||
-  (!selectingStart &&
-    ((!availableDatesSet.has(date.toDateString()) &&
-      !(maxCheckoutDate && isSameDay(date, maxCheckoutDate))) ||
-      (dateRange.from &&
-        minCheckoutDate &&
-        isBefore(date, minCheckoutDate)) ||
-      (maxCheckoutDate && isAfter(date, maxCheckoutDate)))
-  );
+      );
 
+    const effectiveSelectingStart = !dateRange.from || selectingStart;
+
+    const isDisabled =
+      blockCheckoutDueToUnavailability ||
+      (effectiveSelectingStart &&
+        (!availableDatesSet.has(date.toDateString()) ||
+          !hasMinConsecutiveAvailableNights(
+            date,
+            minNights,
+            availableDatesSet
+          ))) ||
+      (!effectiveSelectingStart &&
+        ((!availableDatesSet.has(date.toDateString()) &&
+          !(maxCheckoutDate && isSameDay(date, maxCheckoutDate))) ||
+          (dateRange.from &&
+            minCheckoutDate &&
+            isBefore(date, minCheckoutDate)) ||
+          (maxCheckoutDate && isAfter(date, maxCheckoutDate))));
 
     let rangeBackgroundClass = "";
     let roundedClass = "";
@@ -198,46 +191,56 @@ const isDisabled =
       }
     }
 
-    const dateButton = (
-      <div
-        key={date.toISOString()}
-        className={`relative h-10 flex items-center justify-center ${rangeBackgroundClass} ${roundedClass}`}
-      >
-        <button
-          onClick={() => !isDisabled && onDateClick(date)}
-          onMouseEnter={() =>
-            !selectingStart && dateRange.from && onDateHover(date)
-          }
-          onMouseLeave={() => onDateHover(undefined)}
-          disabled={isDisabled}
-          className={`
-            w-10 h-10 text-sm rounded-full transition-all duration-200 relative font-medium flex items-center justify-center z-10
-            ${!isDisabled ? " text-gray-900 cursor-pointer" : "text-gray-300 cursor-not-allowed"}
-            ${isSelected ? "bg-black text-white border-2 border-black" : ""}
-            ${(isInRange || isInHoverRange) && !isSelected ? "hover:border-2 hover:border-black" : ""}
-            ${isToday && !isSelected ? "font-bold border border-gray-400" : ""}
-    ${isDisabled && !isSelected ? "text-gray-300 line-through cursor-not-allowed" : ""}
-          `}
+    // 🔄 Render skeleton if after check-in and loadingMin is true
+    if (loadingMin && dateRange.from && isAfter(date, dateRange.from)) {
+      days.push(
+        <div
+          key={`skeleton-${date.toISOString()}`}
+          className="w-10 h-10 animate-pulse bg-gray-200 rounded-full"
+        />
+      );
+    } else {
+      const dateButton = (
+        <div
+          key={date.toISOString()}
+          className={`relative h-10 flex items-center justify-center ${rangeBackgroundClass} ${roundedClass}`}
         >
-          {date.getDate()}
-        </button>
-      </div>
-    );
+          <button
+            onClick={() => !isDisabled && onDateClick(date)}
+            onMouseEnter={() =>
+              !selectingStart && dateRange.from && onDateHover(date)
+            }
+            onMouseLeave={() => onDateHover(undefined)}
+            disabled={isDisabled}
+            className={`
+              w-10 h-10 text-sm rounded-full transition-all duration-200 relative font-medium flex items-center justify-center z-10
+              ${!isDisabled ? "text-gray-900 cursor-pointer" : "text-gray-300 cursor-not-allowed"}
+              ${isSelected ? "bg-black text-white border-2 border-black" : ""}
+              ${(isInRange || isInHoverRange) && !isSelected ? "hover:border-2 hover:border-black" : ""}
+              ${isToday && !isSelected ? "font-bold border border-gray-400" : ""}
+              ${isDisabled && !isSelected ? "text-gray-300 line-through cursor-not-allowed" : ""}
+            `}
+          >
+            {date.getDate()}
+          </button>
+        </div>
+      );
 
-    days.push(
-      tooltip ? (
-        <TooltipProvider key={date.toISOString()}>
-          <Tooltip>
-            <TooltipTrigger asChild>{dateButton}</TooltipTrigger>
-            <TooltipContent>
-              <p>{tooltip}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      ) : (
-        dateButton
-      )
-    );
+      days.push(
+        tooltip ? (
+          <TooltipProvider key={date.toISOString()}>
+            <Tooltip>
+              <TooltipTrigger asChild>{dateButton}</TooltipTrigger>
+              <TooltipContent>
+                <p>{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          dateButton
+        )
+      );
+    }
 
     currentDate.setDate(currentDate.getDate() + 1);
   }
@@ -257,7 +260,9 @@ const isDisabled =
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-0 rounded-2xl">{days}</div>
+      <div className="grid grid-cols-7 gap-0 rounded-2xl transition-opacity duration-300">
+        {days}
+      </div>
     </div>
   );
 };

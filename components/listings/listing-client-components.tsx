@@ -23,7 +23,7 @@ export function FilterButton({ onApply, filterListings, onFilterClick }: any) {
   }
 
   return (
-    <>
+    <section>
       {/* Mobile view: Icon only */}
       <Button
         variant="outline"
@@ -54,7 +54,7 @@ export function FilterButton({ onApply, filterListings, onFilterClick }: any) {
           filterListings={filterListings}
         />
       )}
-    </>
+    </section>
   )
 }
 

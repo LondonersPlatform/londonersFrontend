@@ -17,6 +17,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import Bedrooms from "../../public/svg-assets/Bedrooms";
 import BathIcon from "../../public/svg-assets/BathIcon";
+
 import Beds from "../../public/svg-assets/Beds";
 import GeuestIcon from "../../public/svg-assets/GeuestIcon";
 import LocationIcon from "../../public/svg-assets/LocationIcon";
@@ -24,8 +25,18 @@ import DistarrowIcon from "../../public/svg-assets/DistarrowIcon";
 import { fetchListings } from "./Listing";
 import { ListingSkeletonCard } from "@/components/ui/ListingSkeletonCard";
 import { useState, useMemo, useEffect } from "react";
-import { Search } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import {
+  AlertCircle,
+  AlertTriangle,
+  FileQuestion,
+  HomeIcon,
+  Search,
+  X,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import Home from "../page";
 
 const LIMIT = 5;
 
@@ -38,22 +49,22 @@ export default function AllListingsPage() {
   const paramsObject = useMemo(() => {
     const params: any = {};
     searchParams.forEach((value, key) => {
-   
       params[key] = value;
     });
     return params;
   }, [searchParams]);
 
-const paramsObjectSearch = {
-  ...(paramsObject && Object.keys(paramsObject).length > 0 && {
-    available: {
-      checkIn: paramsObject.checkIn,
-      checkOut: paramsObject.checkOut,
-      minOccupancy: paramsObject.minOccupancy,
-      ignoreFlexibleBlocks: paramsObject.ignoreFlexibleBlocks
-    }
-  })
-};
+  const paramsObjectSearch = {
+    ...(paramsObject &&
+      Object.keys(paramsObject).length > 0 && {
+        available: {
+          checkIn: paramsObject.checkIn,
+          checkOut: paramsObject.checkOut,
+          minOccupancy: paramsObject.minOccupancy,
+          ignoreFlexibleBlocks: paramsObject.ignoreFlexibleBlocks,
+        },
+      }),
+  };
 
   // Separate filters state
   const [filters, setFilters] = useState<any>({
@@ -154,6 +165,22 @@ const paramsObjectSearch = {
     });
   };
 
+const router = useRouter();
+
+const handleResetFilters = () => {
+  const newParams = new URLSearchParams(searchParams.toString());
+
+  newParams.delete("checkIn");
+  newParams.delete("checkOut");
+  newParams.delete("minOccupancy");
+
+  // You can reset additional filters if needed:
+  // newParams.delete("someOtherParam");
+
+  // Update URL to trigger refetch via searchParams change
+  router.push(`?${newParams.toString()}`);
+};
+
   // Reset page when search or filters change
   useEffect(() => {
     setPage(1);
@@ -231,11 +258,35 @@ const paramsObjectSearch = {
 
   if (isError) {
     return (
-      <div className="p-10 text-center text-red-600">
-        Error: {error.message}
+      <div className="flex items-center justify-center bg-background p-4">
+        <Card className="w-full border-none max-w-md">
+          <div className="text-center">
+            <div className="flex justify-center mb-4">
+              <img src={"./Document_empty.svg"} />
+            </div>
+            <CardTitle className="text-xl font-bold">
+              {error?.message || "The page you're looking for Not work."}
+            </CardTitle>
+            <span className=" text-gray-600">Something went wrong</span>
+          </div>
+          <CardContent className="space-y-4 text-center">
+            <div className="pt-4">
+              <Button asChild className="w-full flex items-center">
+                <Link
+                  href="/"
+                  className="w-full flex items-center justify-center"
+                >
+                  Back to home
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
+  const hasResettableParams =
+  paramsObject.checkIn || paramsObject.checkOut || paramsObject.minOccupancy;
 
   return (
     <div className="md:w-[85%]  w-[96%] mx-auto px-4 py-8">
@@ -259,12 +310,20 @@ const paramsObjectSearch = {
             )}
           </h1>
           <div className="flex items-center gap-3 justify-end w-full md:w-auto">
+        {hasResettableParams &&
+           <Button className=" bg-transparent  text-red-500 hover:bg-transparent"  onClick={handleResetFilters} >
+              <X />
+              <span className=" underline ">Reset</span>
+            </Button>
+        }    
+         
             <FilterButton
               onApply={handleFiltersApply}
               filterListings={processedListings}
               onFilterClick={handleFilterButtonClick}
             />
             <SortSelect value={sortOrder} onChange={handleSortChange} />
+
           </div>
         </div>
       </div>
@@ -412,14 +471,6 @@ const paramsObjectSearch = {
                         </span>
                         <span className="text-sm text-gray-500">/night</span>
                       </div>
-                      <div className="text-right flex items-center gap-2">
-                        <span className="text-xl font-bold">
-                          £{listing.totalPrice}
-                        </span>
-                        <div className="text-sm text-gray-500">
-                          Total (including fees and taxes)
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -429,20 +480,13 @@ const paramsObjectSearch = {
         </div>
       ) : (
         <div>
-          <div className="min-h-screen flex items-center justify-center px-4">
-            <div className="text-center max-w-md mx-auto">
+          <div className=" flex items-center justify-center px-4">
+            <div className="text-center mt-24  mx-auto">
               {/* Icon */}
-              <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-blue-100 to-orange-100 rounded-full flex items-center justify-center">
-                <div className="relative">
-                  <Search className="w-16 h-16 text-gray-400" />
-                  <div className="w-4 h-4 bg-red-500 rounded-full absolute -top-1 -right-1 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">!</span>
-                  </div>
-                </div>
-              </div>
+              <img src={"./Search_empty.svg"} alt=" Not found" />
 
               {/* Text */}
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <h1 className="text-3xl mt-4 font-bold text-gray-900 mb-4">
                 Not found room
               </h1>
 

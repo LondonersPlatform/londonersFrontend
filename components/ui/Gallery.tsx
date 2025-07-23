@@ -140,7 +140,7 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
       </div>
 
       {/* Thumbnails */}
-      <div className="md:grid hidden flex-1 lg:grid-cols-6  overflow-x-auto w-full gap-4 p-4">
+      <div className="lg:grid hidden flex-1 md:grid-cols-6  overflow-x-auto w-full gap-4 p-4">
         {imagesDummy.slice(0, 100).map((image, index) => (
           <div
             key={index}

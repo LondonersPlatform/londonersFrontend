@@ -10,7 +10,7 @@ export default function CancellationPolicyModal() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <>
+    <div>
       <ResponsiveModal
         open={isOpen}
         onOpenChange={setIsOpen}
@@ -86,6 +86,6 @@ export default function CancellationPolicyModal() {
           </div>
         </div>
       </ResponsiveModal>
-    </>
+    </div>
   )
 }

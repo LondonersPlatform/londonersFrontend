@@ -51,7 +51,7 @@ function ShareModalListing({
     if (typeof window !== "undefined") {
       const url = (urlPathId ? `${urlPathId}`: window.location.href);
       setplaceUrl(url);
-      console.log(url,"url====>")
+   
       setIframeCode(
         `<iframe src="${url}" width="600" height="400" frameborder="0" style="border:0" allowfullscreen></iframe>`
       );
@@ -128,10 +128,10 @@ function ShareModalListing({
   onOpenChange={setShareModalOpen}
   title="Share this place"
   className="sm:max-w-3xl lg:px-12 overflow-y-auto lg:rounded-2xl   items-start"
-  trigger={<></>} // you can omit or pass null if you’re controlling open externally
+  trigger={<div></div>} // you can omit or pass null if you’re controlling open externally
 >
   {!showEmbedCode ? (
-    <>
+    <div>
       <div className="flex gap-3 items-center">
         <img src={imagesDummy[0]} className="w-[60px] h-[60px] rounded-xl" />
         <div>
@@ -232,9 +232,9 @@ function ShareModalListing({
           </Button>
         </div>
       </div>
-    </>
+    </div>
   ) : (
-    <>
+    <div>
       <div className="mt-4 max-w-2xl overflow-x-hidden">
         <h4 className="text-sm font-medium mb-2">Embed Code</h4>
         <p className="text-sm text-muted-foreground mb-3">
@@ -263,7 +263,7 @@ function ShareModalListing({
           Back
         </Button>
       </div>
-    </>
+    </div>
   )}
 </ResponsiveModal>
     </div>

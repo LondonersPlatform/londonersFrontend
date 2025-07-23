@@ -18,6 +18,9 @@ interface RegisterModalProps {
 interface FormData {
   name: string;
   email: string;
+  phone_number: string;
+  gender: string;
+  birthday: string;
   password: string;
   confirmPassword: string;
   agreeTerms: boolean;
@@ -38,6 +41,9 @@ export default function RegisterModal({
   } = useForm<FormData>({
     defaultValues: {
       name: "",
+    phone_number: "01017732268",
+    gender: "male",
+    birthday: "1990-01-01",
       email: "",
       password: "",
       confirmPassword: "",
@@ -85,6 +91,9 @@ export default function RegisterModal({
       const response = await signUpUser({
         password: data.password,
         user_type: "guest",
+         phone_number:"01017732268",
+         gender:"male",
+         birthday:"1990-01-01",
         email: data.email,
         fullname: data.name,
       });
@@ -198,28 +207,7 @@ export default function RegisterModal({
               {errors.root.message}
             </div>
           )}
-          {/* 
-          <div className="space-y-2">
-            <Button
-              variant="outline"
-              className="w-full lg:text-[15px] text-[13px] flex items-center py-3 justify-center gap-2 bg-[#1877F2] text-white hover:bg-blue-700"
-              onClick={handleFacebookSignUp}
-              disabled={isSubmitting}
-            >
-              <Image src="./face0.png" alt="facebook" width={20} height={20} />
-              Signup with Facebook
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full lg:text-[15px] text-[13px] flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-300"
-              onClick={handleGoogleSignUp}
-              disabled={isSubmitting}
-            >
-              <Image src="./goagle0.png" alt="google" width={20} height={20} />
-              Signup with Google
-            </Button>
-          </div> */}
+          
 
           <div className="my-6 relative">
             <div className="absolute inset-0 flex items-center">

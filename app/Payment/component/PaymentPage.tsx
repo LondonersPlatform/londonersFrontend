@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CardNumberElement,
   CardExpiryElement,
@@ -38,16 +38,16 @@ import { useSearchParams } from "next/navigation";
 
 // Add these components
 const PaymentSuccess = () => (
-  <>
+  <React.Fragment>
     <PaymentStatus status="success" />
-  </>
+  </React.Fragment>
 );
 
 const PaymentFailed = ({ error }: { error: string }) => (
-  <>
+  <React.Fragment>
     <PaymentStatus status={error} amount={"180$"} transactionType="visa" />
     <div className="p-4 mb-4 bg-red-100 text-red-700 rounded-md">{error}</div>
-  </>
+  </React.Fragment>
 );
 
 export default function Payment() {
@@ -187,7 +187,7 @@ export default function Payment() {
   }
 
   return (
-    <>
+    <React.Fragment>
       {paymentSuccess && <PaymentSuccess />}
       {stripeError && <PaymentFailed error={stripeError} />}
       {!stripeError &&
@@ -367,6 +367,6 @@ export default function Payment() {
             </div>
           </form>
         ))}
-    </>
+    </React.Fragment>
   );
 }

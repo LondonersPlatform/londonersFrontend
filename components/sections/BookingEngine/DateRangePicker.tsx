@@ -10,6 +10,7 @@ import { DateRangeHeader } from "./DateRangeHeader";
 import { CalendarNavigation } from "./CalendarNavigation";
 import { CalendarMonth } from "./CalendarMonth";
 import { DateRangeFooter } from "./DateRangeFooter";
+import { useBooking } from "@/context/DatePickerContext";
 
 interface DateRange {
   from: Date | undefined;
@@ -22,11 +23,13 @@ interface DateRangePickerProps {
   onClose: () => void;
   availableDates: any;
   minNights?: any;
+  loadingMin?: boolean; 
 }
 
 export const DateRangePicker: React.FC<DateRangePickerProps> = ({
   dateRange,
   minNights,
+  loadingMin,
   onDateRangeChange,
   onClose,
   availableDates,
@@ -40,7 +43,10 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
   );
 
   const [minCheckoutDate, setMinCheckoutDate] = useState<Date | undefined>();
-
+  const {
+    
+    setMinNight
+  } = useBooking();
   // Calculate nights based on dateRange
   const nights =
     dateRange.from && dateRange.to
@@ -67,103 +73,116 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   useEffect(() => {
-  if (dateRange.from && !dateRange.to) {
-    setSelectingStart(false);
+    if (dateRange.from && !dateRange.to) {
+      setSelectingStart(false);
 
-    const minCheckout = new Date(dateRange.from);
-    minCheckout.setDate(minCheckout.getDate() + Number(minNights));
-    setMinCheckoutDate(minCheckout);
+      const minCheckout = new Date(dateRange.from);
+      minCheckout.setDate(minCheckout.getDate() + Number(minNights));
+      setMinCheckoutDate(minCheckout);
 
-    const unavailableAfter = findFirstUnavailableDateAfter(
-      minCheckout,
-      availableDates
-    );
-    setMaxCheckoutDate(unavailableAfter || undefined);
-  }
-}, [dateRange.from, dateRange.to, availableDates, minNights]);
+      const unavailableAfter = findFirstUnavailableDateAfter(
+        minCheckout,
+        availableDates
+      );
+      setMaxCheckoutDate(unavailableAfter || undefined);
+    }
+  }, [dateRange.from, dateRange.to, availableDates, minNights]);
+
+  useEffect(() => {
+    if (dateRange.from && selectingStart === false) {
+      const minCheckout = new Date(dateRange.from);
+      minCheckout.setDate(minCheckout.getDate() + minNights);
+      setMinCheckoutDate(minCheckout);
+
+      const unavailableAfter = findFirstUnavailableDateAfter(
+        minCheckout,
+        availableDates
+      );
+
+      if (unavailableAfter) {
+        setMaxCheckoutDate(new Date(unavailableAfter));
+      } else {
+        setMaxCheckoutDate(undefined);
+      }
+    }
+  }, [dateRange.from, minNights, availableDates, selectingStart]);
+
+  const handleDateClick = (date: Date) => {
+    if (selectingStart || !dateRange.from) {
+      const minNightsValue = Number(minNights ?? 1); // ensure it's a number
+
+      // Optimistically calculate min/max checkout dates
+      const minCheckout = new Date(date);
+      minCheckout.setDate(minCheckout.getDate() + minNightsValue);
+      setMinCheckoutDate(minCheckout);
+
+      const unavailableAfter = findFirstUnavailableDateAfter(
+        minCheckout,
+        availableDates
+      );
+      setMaxCheckoutDate(unavailableAfter || undefined);
+
+      // Set the range
+      onDateRangeChange({ from: date, to: undefined });
+      setSelectingStart(false);
+    } else {
+      // Selecting checkout
+      if (isBefore(date, dateRange.from)) {
+        onDateRangeChange({ from: date, to: dateRange.from });
+      } else {
+        onDateRangeChange({ from: dateRange.from, to: date });
+      }
+
+      setSelectingStart(true);
+      setMinCheckoutDate(undefined);
+      setMaxCheckoutDate(undefined);
+    }
+
+    setHoverDate(undefined);
+  };
+
+const clearDates = () => {
+  // Reset calendar logic first
+  setSelectingStart(true);
+  setHoverDate(undefined);
+  setMinCheckoutDate(undefined);
+  setMaxCheckoutDate(undefined);
+  setMinNight(1);
+  // Then update the selected date range
+  onDateRangeChange({ from: undefined, to: undefined });
+};
 
 
 useEffect(() => {
-  if (dateRange.from && selectingStart === false) {
-    const minCheckout = new Date(dateRange.from);
-    minCheckout.setDate(minCheckout.getDate() + minNights);
-    setMinCheckoutDate(minCheckout);
-
-    const unavailableAfter = findFirstUnavailableDateAfter(
-      minCheckout,
-      availableDates
-    );
-
-    if (unavailableAfter) {
-      setMaxCheckoutDate(new Date(unavailableAfter));
-    } else {
-      setMaxCheckoutDate(undefined);
-    }
-  }
-}, [dateRange.from, minNights, availableDates, selectingStart]);
-
-
-const handleDateClick = (date: Date) => {
-  if (selectingStart || !dateRange.from) {
-    const minNightsValue = Number(minNights ?? 1); // ensure it's a number
-
-    // Optimistically calculate min/max checkout dates
-    const minCheckout = new Date(date);
-    minCheckout.setDate(minCheckout.getDate() + minNightsValue);
-    setMinCheckoutDate(minCheckout);
-
-    const unavailableAfter = findFirstUnavailableDateAfter(
-      minCheckout,
-      availableDates
-    );
-    setMaxCheckoutDate(unavailableAfter || undefined);
-
-    // Set the range
-    onDateRangeChange({ from: date, to: undefined });
-    setSelectingStart(false);
-  } else {
-    // Selecting checkout
-    if (isBefore(date, dateRange.from)) {
-      onDateRangeChange({ from: date, to: dateRange.from });
-    } else {
-      onDateRangeChange({ from: dateRange.from, to: date });
-    }
-
+  if (!dateRange.from && !dateRange.to) {
     setSelectingStart(true);
+    setHoverDate(undefined);
     setMinCheckoutDate(undefined);
     setMaxCheckoutDate(undefined);
+  
+    setMinNight(1); // reset minimum night to default
   }
-
-  setHoverDate(undefined);
-};
-
-
-
- const clearDates = () => {
-  onDateRangeChange({ from: undefined, to: undefined });
-  setSelectingStart(true);
-  setHoverDate(undefined);
-  setMinCheckoutDate(undefined);  // ✅ Clear min checkout
-  setMaxCheckoutDate(undefined);  // ✅ Clear max checkout
-};
-
-
+}, [dateRange.from, dateRange.to]);
   return (
     <div className=" relative">
       <div className="bg-white scale-100 rounded-3xl shadow-2xl border border-gray-200 w-[850px] max-w-[90vw] ">
-        <DateRangeHeader
-          dateRange={dateRange}
-          nights={nights}
-          onDateRangeChange={onDateRangeChange}
-        />
+     <DateRangeHeader
+  key={dateRange.from ? "editing" : "cleared"}
+  dateRange={dateRange}
+  nights={nights}
+  onDateRangeChange={onDateRangeChange}
+/>
 
         <CalendarNavigation
           currentMonth={currentMonth}
           onMonthChange={setCurrentMonth}
         />
 
-        <div className="lg:grid lg:grid-cols-2 px-4 pb-6 gap-6">
+        <div className="lg:grid lg:grid-cols-2 px-4 pb-6 gap-6"
+          key={loadingMin ? "loading" : "ready"} // ✅ This forces unmount/remount
+        >
           <CalendarMonth
+          loadingMin={loadingMin}
             availableDates={availableDates}
             minCheckoutDate={minCheckoutDate}
             maxCheckoutDate={maxCheckoutDate}
@@ -179,6 +198,7 @@ const handleDateClick = (date: Date) => {
             <CalendarMonth
               availableDates={availableDates}
               month={nextMonth}
+              loadingMin={loadingMin}
               dateRange={dateRange}
               minCheckoutDate={minCheckoutDate}
               maxCheckoutDate={maxCheckoutDate}

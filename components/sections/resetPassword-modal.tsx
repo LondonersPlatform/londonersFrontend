@@ -127,7 +127,7 @@ export default function ResetModal({ isOpen, onClose }: ResetModalProps) {
               </Button>
             </div>
           ) : (
-            <>
+            <section>
               <p className="text-center mb-6">
                 Enter your email address to receive a password reset link.
               </p>
@@ -179,7 +179,7 @@ export default function ResetModal({ isOpen, onClose }: ResetModalProps) {
                   {isSubmitting ? 'Sending...' : 'Send Reset Link'}
                 </Button>
               </form>
-            </>
+            </section>
           )}
         </div>
       </div>

@@ -81,18 +81,26 @@ const categoryRatings: CategoryRatingType[] = [
   { name: "Value", rating: 4.65, icon: <DollarSign className="h-4 w-4" /> },
 ];
 
-export function ReviewModalDemo() {
+export function ReviewModalDemo({reviews}:any) {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="flex border-b-2 flex-col items-start gap-4">
-      <Button
+
+      {reviews && reviews.length > 0 &&
+      
+          <Button
         variant="outline"
         className="rounded-full flex items-center gap-1  border-[#000000] mb-6 w-auto"
         onClick={() => setOpen(true)}
       >
         Show all reviews <Arrowright />
       </Button>
+      
+      }
+
+
+  
 
       <ReviewModal
         open={open}

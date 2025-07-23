@@ -49,7 +49,7 @@ export const SidebarContent = () => {
     router.push("/");
   };
   return (
-    <>
+    <section>
       <div
         className="p-6 flex w-full justify-center cursor-pointer"
         onClick={() => router.push("/")}
@@ -94,6 +94,6 @@ export const SidebarContent = () => {
           </div>
         </div>
       </nav>
-    </>
+    </section>
   );
 };

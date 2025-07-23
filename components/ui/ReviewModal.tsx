@@ -82,7 +82,7 @@ useEffect(() => {
   open={open}
   onOpenChange={onOpenChange}
   title={`${reviews.length} Reviews`}
-  trigger={<></>} // or pass a real trigger if you want one
+  trigger={<section></section>} // or pass a real trigger if you want one
   className="max-w-4xl max-h-[90vh] overflow-y-auto"
 >
   <div className="grid grid-cols-1  md:grid-cols-3 gap-6">

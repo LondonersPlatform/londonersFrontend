@@ -21,12 +21,14 @@ import {
 import Image from "next/image"
 import { SidebarContent } from "@/components/layout/Sidebar"
 import { useRouter } from "next/navigation"
+import { getReservationsByGuestId } from "../all-listings/Listing"
 
 const reservations = [
   {
     id: "#8987776754",
     apartment: "Marlybone book",
     guests: 8,
+    reservationIcon: "",
     checkIn: "10 Jun 2025, 14:00",
     checkOut: "12 Jun 2025, 12:00",
     amount: "$252",
@@ -154,6 +156,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("All")
   const [searchQuery, setSearchQuery] = useState("")
   const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [reservationsData, setReservationsData] = useState([]);
+  const [loading, setLoading] = useState(true);
  const router = useRouter();
  useEffect(() => {
     const isAuth = localStorage.getItem("access_token") || localStorage.getItem("session");
@@ -162,7 +166,21 @@ export default function Dashboard() {
     }
   }, []);
   const tabs = ["All", "Previous reservations", "Current reservations", "Upcoming reservations"]
+  useEffect(() => {
+    const fetchReservations = async () => {
+      try {
+        const data = await getReservationsByGuestId();
+        setReservationsData(data);
+       
+      } catch (error) {
+        console.error("Error fetching reservations:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchReservations();
+  }, []);
   return (
     <div className="flex h-screen   bg-[#f5f5f5]">
       {/* Desktop Sidebar */}

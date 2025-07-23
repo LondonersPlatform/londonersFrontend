@@ -1,4 +1,72 @@
 
+export async function getReservationsByGuestId() {
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+   const guestyUserId = localStorage.getItem("GuestyId") || null;
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-reservations`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ guestId:guestyUserId }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch reservations");
+  }
+
+  const data = await res.json();
+  return data; // expect an array of reservations
+}
+
+export async function getReviewsByListingId(listingId: string, limit = 10) {
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-review?listing_id=${listingId}&limit=${limit}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch reviews");
+  }
+
+  const data = await res.json();
+  return data; // expect an array of reviews
+}
+
+export async function getNearbyListingsById(listingId: string) {
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const guestyUserId = localStorage.getItem("GuestyId") || null;
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-coords`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ listing_id: listingId , guesty_user_id: guestyUserId }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch nearby listings");
+  }
+
+  const data = await res.json();
+  return data; // includes { target_listing, nearby_listings, ... }
+}
+
+
 // app/api/listings/getMinDaysByListingId.ts
 export async function getMinDaysByListingId(listingId: string, startDate: string) {
   const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -260,10 +328,10 @@ export async function getFavorite({
 export async function fetchListings(searchParams?: any): Promise<any> {
   const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/listing-search`;
   const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
+  const guestyUserId = localStorage.getItem("GuestyId") || null;
   const requestBody = {
- ...searchParams
-   
+    ...searchParams,
+    "guesty_user_id": guestyUserId
   };
 
 
@@ -299,7 +367,7 @@ export async function fetchListingById(id: string): Promise<any> {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id }),
+    body: JSON.stringify({ id , guesty_user_id: localStorage.getItem("GuestyId") || null }),
     next: { revalidate: 60 }, // optional if using Next.js caching
   });
 

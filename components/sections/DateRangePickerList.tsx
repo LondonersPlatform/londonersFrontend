@@ -17,6 +17,7 @@ interface DateRangePickerListProps {
   dateRange: DateRange;
   onDateRangeChange: (range: DateRange) => void;
   onClose: () => void;
+
   availableDates: any;
   minNights?: any;
   listingId?: any;
@@ -24,6 +25,7 @@ interface DateRangePickerListProps {
 
 export const DateRangePickerList: React.FC<DateRangePickerListProps> = ({
   listingId,
+
   onDateRangeChange,
   onClose,
   availableDates
@@ -37,6 +39,7 @@ export const DateRangePickerList: React.FC<DateRangePickerListProps> = ({
     dateRange,
     setDateRange,
     setQuoteData,
+    
     setGuestCount,
     minNight,
     setMinNight,
@@ -47,7 +50,7 @@ export const DateRangePickerList: React.FC<DateRangePickerListProps> = ({
   );
 
   const [minCheckoutDate, setMinCheckoutDate] = useState<Date | undefined>();
-
+  const [loadingMin, setLoadingMin] = useState(false);
 
   const findFirstUnavailableDateAfter = (
     start: Date,
@@ -147,9 +150,11 @@ const handleDateClick = (date: Date) => {
   setMinCheckoutDate(undefined);  // ✅ Clear min checkout
   setMaxCheckoutDate(undefined);  // ✅ Clear max checkout
 };
-  useEffect(() => {
+   useEffect(() => {
     const fetchMinNights = async () => {
       if (!dateRange?.from) return;
+
+      setLoadingMin(true); 
 
       try {
         const response = await getMinDaysByListingId(
@@ -162,6 +167,8 @@ const handleDateClick = (date: Date) => {
         }
       } catch (error) {
         console.error("Error fetching min nights:", error);
+      } finally {
+        setLoadingMin(false); 
       }
     };
 
@@ -200,8 +207,11 @@ const handleDateClick = (date: Date) => {
           onMonthChange={setCurrentMonth}
         />
 
-        <div className="grid lg:grid-cols-2 lg:px-4 pb-6 gap-8">
+        <div className="grid lg:grid-cols-2 lg:px-4 pb-6 gap-8"
+                key={loadingMin ? "loading" : "ready"} // ✅ This forces unmount/remount
+        >
           <CalendarMonth
+          loadingMin={loadingMin}
             availableDates={availableDates}
             month={currentMonth}
             dateRange={dateRange}
@@ -217,6 +227,7 @@ const handleDateClick = (date: Date) => {
             <CalendarMonth
               availableDates={availableDates}
               month={nextMonth}
+              loadingMin={loadingMin}
               dateRange={dateRange}
                   minCheckoutDate={minCheckoutDate}
               maxCheckoutDate={maxCheckoutDate}

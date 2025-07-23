@@ -129,7 +129,7 @@ const { redirectPath } = useLoginModal();
     try {
       const guestyData = await getGuestyId(formData.email);
       localStorage.setItem("GuestyId", guestyData.guesty_user_id);
-      console.log("Guesty ID:", guestyData);
+     
     } catch (guestyError) {
       console.error("Failed to fetch Guesty ID:", guestyError);
     }

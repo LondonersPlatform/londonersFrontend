@@ -15,7 +15,13 @@ import { PropertyThingsToKnow } from "@/components/sections/property-things-to-k
 import { PropertyTransportation } from "@/components/sections/property-transportation";
 import Loading from "@/app/loading";
 import BookingCard from "@/components/sections/BookingEngine/BookingCard";
-import { fetchListingById, getCalendarByListingId } from "../Listing";
+import {
+  addFavorite,
+  fetchListingById,
+  getCalendarByListingId,
+  getNearbyListingsById,
+  getReviewsByListingId,
+} from "../Listing";
 import { usePhotoTourImages } from "@/app/PhotoTour/query/query";
 
 import { BookingProvider, useBooking } from "@/context/DatePickerContext";
@@ -27,9 +33,11 @@ export default function PropertyPage() {
   const [showStickyTabs, setShowStickyTabs] = useState(false);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
-  const listing_id = searchParams.get('listingId');
-  const { data: dataImage, isLoading: isLoadingImage } = usePhotoTourImages(listingId ?? "");
-  
+  const listing_id = searchParams.get("listingId");
+  const { data: dataImage, isLoading: isLoadingImage } = usePhotoTourImages(
+    listingId ?? ""
+  );
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["listing", listingId],
     enabled: !!listingId,
@@ -43,7 +51,8 @@ export default function PropertyPage() {
   useEffect(() => {
     const handleScroll = () => {
       if (tabsContainerRef.current) {
-        const containerTop = tabsContainerRef.current.getBoundingClientRect().top;
+        const containerTop =
+          tabsContainerRef.current.getBoundingClientRect().top;
         setShowStickyTabs(containerTop <= 0);
       }
     };
@@ -51,36 +60,102 @@ export default function PropertyPage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loadingNearby, setLoadingNearby] = useState(false);
+  const [properties_List, setproperties_List] = useState(undefined);
 
+  const [favorited, setFavorited] = useState<Set<string>>(new Set());
+const hasFetchedNearby = useRef(false);
+  useEffect(() => {
+    const fetchNearby = async () => {
+      if (!listingId || hasFetchedNearby.current) return;
+  hasFetchedNearby.current = true;
+      setLoadingNearby(true);
+
+      try {
+        const res = await getNearbyListingsById(listingId);
+        const json = await res;
+        setproperties_List(json);
+        const mapped = json?.nearby_listings
+          .filter((listing: any) => listing.title && listing.pictures?.length)
+          .map((listing: any) => ({
+            id: listing.listing_id,
+            imageUrl: listing.pictures?.[0]?.thumbnail ?? null,
+            title: listing.title ?? "Untitled Listing",
+            rating: listing.overall_average_rating ?? "no rating",
+            details: {
+              beds: listing.beds ?? 0,
+              baths: listing.bathrooms ?? 0,
+              kitchens: 1,
+            },
+            area: listing.location?.city ?? "Unknown",
+            price: listing.price_per_night?.base_price ?? 0,
+            guests: listing.guests ?? 1,
+            isFavorite: listing.isFavorite,
+          }));
+
+        setProperties(mapped);
+      } catch (error) {
+        console.error("Error fetching nearby listings:", error);
+      } finally {
+        setLoadingNearby(false);
+      }
+    };
+
+    fetchNearby();
+  }, [listingId]);
+
+  const handleFavoriteClick = async (
+    e: React.MouseEvent,
+    listingId: string
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const guestyUserId = localStorage.getItem("GuestyId");
+      await addFavorite({ guestyUserId, listingId });
+      setFavorited((prev) => new Set(prev).add(listingId));
+    } catch (error) {
+      console.error("Failed to add favorite:", error);
+    }
+  };
   const handleTabClick = (ref: React.RefObject<HTMLDivElement>) => {
     if (ref?.current) {
       const offset = 104;
-      const elementPosition = ref.current.getBoundingClientRect().top + window.scrollY;
+      const elementPosition =
+        ref.current.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
         top: elementPosition - offset,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
   };
 
-  if (isLoading) return <div className="p-8"><Loading /></div>;
-  if (isError) return <div className="p-8 text-red-500">Error: {error.message}</div>;
+  if (isLoading)
+    return (
+      <div className="p-8">
+        <Loading />
+      </div>
+    );
+  if (isError)
+    return <div className="p-8 text-red-500">Error: {error.message}</div>;
 
   return (
- 
-      <PropertyPageContent 
-        id={id}
-        listingId={listingId}
-        data={data}
-        dataImage={dataImage}
-        showStickyTabs={showStickyTabs}
-        tabsContainerRef={tabsContainerRef}
-        overviewRef={overviewRef}
-        reviewsRef={reviewsRef}
-        locationRef={locationRef}
-        handleTabClick={handleTabClick}
-      />
-   
+    <PropertyPageContent
+      properties={properties}
+      id={id}
+      listingId={listingId}
+      data={data}
+      dataImage={dataImage}
+      showStickyTabs={showStickyTabs}
+      tabsContainerRef={tabsContainerRef}
+      overviewRef={overviewRef}
+      reviewsRef={reviewsRef}
+      locationRef={locationRef}
+      handleTabClick={handleTabClick}
+      loadingNearby={loadingNearby}
+      properties_List={properties_List}
+    />
   );
 }
 
@@ -88,13 +163,18 @@ function PropertyPageContent({
   id,
   listingId,
   data,
+  properties,
+
+  handleFavoriteClick,
+  loadingNearby,
+  properties_List,
   dataImage,
   showStickyTabs,
   tabsContainerRef,
   overviewRef,
   reviewsRef,
   locationRef,
-  handleTabClick
+  handleTabClick,
 }: {
   id: string | string[];
   listingId: string;
@@ -107,21 +187,47 @@ function PropertyPageContent({
   locationRef: React.RefObject<HTMLDivElement>;
   handleTabClick: (ref: React.RefObject<HTMLDivElement>) => void;
 }) {
-  const { 
-    dateRange, 
-    setDateRange, 
+  const {
+    dateRange,
+    setDateRange,
     setIsDatePickerOpen,
     availableDates,
-    
+
     setAvailableDates,
-    setLoadingDates
+    setLoadingDates,
   } = useBooking();
+
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!listingId) return;
+
+    const fetchReviews = async () => {
+      try {
+        setLoading(true);
+        const fetchedReviews = await getReviewsByListingId(listingId, 10);
+        setReviews(fetchedReviews);
+ 
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (listingId) {
+      fetchReviews();
+   
+    }
+  }, []);
 
   // Fetch available dates when listingId changes
   useEffect(() => {
     const fetchDates = async () => {
       try {
         setLoadingDates(true);
+
         const dates = await getCalendarByListingId(listingId);
         setAvailableDates(dates);
       } catch (error) {
@@ -135,10 +241,10 @@ function PropertyPageContent({
       fetchDates();
     }
   }, [listingId, setAvailableDates, setLoadingDates]);
-  
-  
-    const searchParams = useSearchParams();
+
+  const searchParams = useSearchParams();
   const name = searchParams.get("title");
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Sticky Header Tabs */}
@@ -178,17 +284,22 @@ function PropertyPageContent({
         <div className="">
           <div className="mx-auto md:w-[83%]">
             <PropertyCarousel
+              isFavorite={data[0].isFavorite}
               imagesDummy={data[0].imagesDummy}
               listingId={listingId}
             />
           </div>
 
-          <div ref={tabsContainerRef} className="flex div-content flex-col mx-auto w-[83%] lg:flex-row gap-8 relative">
+          <div
+            ref={tabsContainerRef}
+            className="flex div-content flex-col mx-auto w-[83%] lg:flex-row gap-8 relative"
+          >
             {/* Left Content Column */}
             <div className="w-full lg:w-2/3 space-y-6 ">
               {/* Content Sections */}
               <div ref={overviewRef} className="scroll-mt-[104px]   space-y-12">
                 <PropertyOverview
+                  reviews={reviews}
                   dummyPropertyData={data[1].dummyPropertyData}
                   stars={data[5]?.propertyReviews.ratingSummary?.stars}
                 />
@@ -198,19 +309,19 @@ function PropertyPageContent({
               </div>
 
               <div ref={reviewsRef} className="scroll-mt-[104px]">
-                <PropertyReviews propertyReviews={data[5].propertyReviews} />
-
-                             </div>
-   <DateRangePickerList
-                  dateRange={dateRange}
-                  listingId={listingId}
-                  minNights={data[0].minNights}
-                  onDateRangeChange={setDateRange}
-                  onClose={() => setIsDatePickerOpen(false)}
-                  availableDates={availableDates}
+                <PropertyReviews
+                  propertyReviews={data[5].propertyReviews}
+                  reviews={reviews}
                 />
-           
- 
+              </div>
+              <DateRangePickerList
+                dateRange={dateRange}
+                listingId={listingId}
+                minNights={data[0].minNights}
+                onDateRangeChange={setDateRange}
+                onClose={() => setIsDatePickerOpen(false)}
+                availableDates={availableDates}
+              />
             </div>
 
             {/* Right Sidebar - Sticky Booking Card */}
@@ -232,21 +343,30 @@ function PropertyPageContent({
               </div>
             </div>
           </div>
-          
-
 
           <div className="mx-auto w-[83%]">
-   <div ref={locationRef} className="scroll-mt-[104px] space-y-12">
-                <PropertyLocation location={data[6].dummyLocationData} />
-                <PropertyThingsToKnow
-                  title={data[7].dummyThingsToKnowData.title}
-                  sections={data[7].dummyThingsToKnowData.sections}
+            <div ref={locationRef} className="scroll-mt-[104px] space-y-12">
+              {!loadingNearby && (
+                <PropertyLocation
+                  location={data[6].dummyLocationData}
+                  imagesDummy={data[0].imagesDummy}
+                  listingId={listingId}
+                  properties_List={properties_List}
+                  loading={loadingNearby}
                 />
+              )}
+              <PropertyThingsToKnow
+                title={data[7].dummyThingsToKnowData.title}
+                sections={data[7].dummyThingsToKnowData.sections}
+              />
+            </div>
 
-             
-              </div>
-
-            <PropertyNearby />
+            <PropertyNearby
+              title="Nearby Apartments"
+              properties={properties}
+              loading={loadingNearby}
+              onFavoriteClick={handleFavoriteClick}
+            />
           </div>
         </div>
       </main>

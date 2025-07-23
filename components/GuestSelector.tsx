@@ -19,7 +19,7 @@ const GuestSelector = ({ MaxNumofGuests }: GuestSelectorProps) => {
 
     handleGuestChange,
   } = useBooking();
-  console.log("MaxNumofGuests", MaxNumofGuests);
+ 
   const [isOpen, setIsOpen] = useState(false);
   const [localGuestCounts, setLocalGuestCounts] = useState(guestBreakdown);
 

@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ReviewModalDemo } from "./ReviewModalDemo";
 
-export default function PropertyReviews({ propertyReviews }: any) {
+export default function PropertyReviews({ propertyReviews, reviews }: any) {
   // Helper function to render stars
   const renderStars = (rating: number, totalStars = 5) => {
     return Array.from({ length: totalStars }).map((_, i) => (
@@ -15,6 +15,19 @@ export default function PropertyReviews({ propertyReviews }: any) {
     ));
   };
 
+  const distribution = reviews?.data?.statistics?.rating_distribution || {};
+const total = reviews?.data?.statistics?.total_reviews || 0;
+
+const ratingBars = [5, 4, 3, 2, 1].map((star) => {
+  const count = distribution[star] || 0;
+  const percentage = total > 0 ? (count / total) * 100 : 0;
+
+  return {
+    label: `${star} star`,
+    percentage,
+  };
+});
+
   return (
     <div className="space-y-8">
       <h2 className="text-2xl font-bold mb-6">Reviews</h2>
@@ -23,44 +36,48 @@ export default function PropertyReviews({ propertyReviews }: any) {
         {/* Left side - Rating summary */}
         <div className="bg-white rounded-lg border p-6 flex flex-col items-center justify-center w-full md:w-auto">
           <div className="text-5xl font-bold">
-            {propertyReviews.ratingSummary.average}
+            {reviews?.data?.statistics?.overall_average_rating?.toFixed(1) || "0.0"}
           </div>
           <div className="flex text-yellow-400 my-1">
-            {renderStars(propertyReviews.ratingSummary.stars)}
+            {renderStars(reviews?.data?.statistics?.overall_average_rating || 0)}
           </div>
           <div className="text-gray-500 text-sm">
-            ({propertyReviews.ratingSummary.count} Review)
+            ({reviews?.data?.statistics?.total_reviews || 0} Review)
           </div>
         </div>
 
         {/* Right side - Rating bars */}
         <div className="flex-1 space-y-2">
-          {propertyReviews.ratingSummary.ratingBars.map((item, index) => (
-            <div key={index} className="flex items-center gap-3">
-              <div className="w-16 text-sm">{item.label}</div>
-              <div className="h-2 bg-gray-200 rounded-full flex-1">
-                <div
-                  className="h-2 bg-black rounded-full"
-                  style={{ width: `${item.percentage}%` }}
-                ></div>
-              </div>
-            </div>
-          ))}
-        </div>
+  {ratingBars.map((item, index) => (
+    <div key={index} className="flex items-center gap-3">
+      <div className="w-16 text-sm">{item.label}</div>
+      <div className="h-2 bg-gray-200 rounded-full flex-1">
+        <div
+          className="h-2 bg-black rounded-full"
+          style={{ width: `${item.percentage}%` }}
+        ></div>
+      </div>
+    </div>
+  ))}
+</div>
+
       </div>
 
       {/* Category ratings */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        {propertyReviews.ratingSummary.categories.map((item, index) => (
+  <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+      {reviews?.data?.statistics?.category_averages &&
+        Object.entries(reviews?.data?.statistics?.category_averages).map(([label, rating], index) => (
           <div key={index} className="border rounded-lg p-3">
-            <div className="text-sm  font-[500] ">{item.label}</div>
+            <div className="text-sm font-[500] capitalize">
+              {label.replace("_", " ")}
+            </div>
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="font-medium">{item.rating}</span>
+              <span className="font-medium">{rating.toFixed(1)}</span>
             </div>
           </div>
         ))}
-      </div>
+    </div>
 
       {/* Reviews */}
       <div className="space-y-8 border-t  pt-8">
@@ -87,7 +104,7 @@ export default function PropertyReviews({ propertyReviews }: any) {
         ))}
      
 
-         <ReviewModalDemo />
+         <ReviewModalDemo  reviews={propertyReviews.reviews}/>
       </div>
     </div>
   );

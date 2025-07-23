@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, X } from "lucide-react";
@@ -50,13 +50,13 @@ export default function Header() {
       : `${total} guest${total !== 1 ? "s" : ""}`;
   };
   const { session, isLoading } = useAuth();
-  console.log(session, "sessionsessionsession");
+
   const access_token = localStorage.getItem("access_token");
   const pathname = usePathname();
   const hideLogo =
     pathname?.includes("/Dashboard") || pathname?.includes("/favourite");
   return (
-    <>
+    <React.Fragment>
       <header className=" mx-auto md:w-[85%]  w-[96%]  flex items-center justify-between py-4 px-4 md:px-6">
         {!isLoading || (!session && hideLogo) ? (
           <Link href="/" className="mr-8">
@@ -80,7 +80,7 @@ export default function Header() {
           </Link>
         )}
 
-        <div className="   flex items-center">
+        <div className="  flex items-center">
           <nav className=" hidden border pe-3 w-full rounded-full px-0 p-0 lg:flex items-center  ">
             <div className="relative border-e-2 ">
               <div
@@ -169,14 +169,14 @@ export default function Header() {
         <SheetTitle>
           <SheetContent
             side="top"
-            className="p-6 max:h-[60vh] overflow-y-auto rounded-b-xl"
+            className="p-6 max:h-[60vh]   overflow-y-auto rounded-b-xl"
           >
             <div className="flex w-full items-start py-12 h-full justify-center">
               <div className="w-full gap-4 flex flex-col items-center">
-                <nav className="rounded-full p-0 gap-4 flex flex-col w-full items-center ">
-                  <div className="relative w-full justify-between border-2  rounded-lg py-2 ">
+                <nav className="rounded-lg   p-0 gap-4 flex flex-col w-full items-center ">
+                  <div className="relative w-full   flex   border-2  rounded-lg py-2 ">
                     <div
-                      className="grid items-center text-sm cursor-pointer"
+                      className="grid items-center w-full  text-sm cursor-pointer"
                       onClick={() => {
                         setCheckInOpen(!checkInOpen);
                         setCheckOutOpen(false);
@@ -241,6 +241,6 @@ export default function Header() {
       </Sheet>
       {/* Login Modal */}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
-    </>
+    </React.Fragment>
   );
 }

@@ -7,46 +7,18 @@ import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
-import {
-  CalendarIcon,
-  Menu,
-  Upload,
-  Camera,
-  FileText,
-  ImageIcon,
-  X,
-  Save,
-  ChevronDown,
-  AlertCircle,
-  Loader2,
-} from "lucide-react"
+import { Menu, Camera, Save, AlertCircle, Loader2 } from "lucide-react"
 import Image from "next/image"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
 import { SidebarContent } from "@/components/layout/Sidebar"
 import { getUserByGuestId, updateUser } from "../all-listings/Listing"
 import { useRouter } from "next/navigation"
 import LogoLoader from "@/components/logo-loader"
 import CalenderYearly from "@/components/ui/CalenderYearly"
+import { detectCountryFromPhone, validatePhoneForCountry } from "@/lib/phoneValidation"
+import SmartPhoneInput from "@/components/ui/SmartPhoneInput"
 
-const countries = [
-  { code: "+1", name: "United States", flag: "🇺🇸", country: "US" },
-  { code: "+20", name: "Egypt", flag: "🇪🇬", country: "EG" },
-  { code: "+44", name: "United Kingdom", flag: "🇬🇧", country: "GB" },
-  { code: "+33", name: "France", flag: "🇫🇷", country: "FR" },
-  { code: "+49", name: "Germany", flag: "🇩🇪", country: "DE" },
-  { code: "+86", name: "China", flag: "🇨🇳", country: "CN" },
-  { code: "+91", name: "India", flag: "🇮🇳", country: "IN" },
-  { code: "+81", name: "Japan", flag: "🇯🇵", country: "JP" },
-  { code: "+82", name: "South Korea", flag: "🇰🇷", country: "KR" },
-  { code: "+61", name: "Australia", flag: "🇦🇺", country: "AU" },
-  { code: "+971", name: "UAE", flag: "🇦🇪", country: "AE" },
-  { code: "+966", name: "Saudi Arabia", flag: "🇸🇦", country: "SA" },
-]
 
 export default function Component() {
   const { toast } = useToast()
@@ -54,77 +26,85 @@ export default function Component() {
   const [firstName, setFirstName] = useState("Mohamed")
   const [lastName, setLastName] = useState("Hany")
   const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(new Date(1990, 5, 20))
-  const [phoneNumber, setPhoneNumber] = useState("282 573 812")
+  const [phoneNumber, setPhoneNumber] = useState("282573812")
+  const [phoneError, setPhoneError] = useState<string>("")
   const [countryCode, setCountryCode] = useState("+20")
   const [gender, setGender] = useState("male")
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [profileImage, setProfileImage] = useState<string>("/Dufltpofile.png?height=200&width=200")
-  const [isDragOver, setIsDragOver] = useState(false)
-  const [isCountryOpen, setIsCountryOpen] = useState(false)
-
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const guestId = localStorage.getItem("GuestyId")
   const [isSaving, setIsSaving] = useState(false)
-
   const [initialState, setInitialState] = useState({
     firstName: "Mohamed",
     lastName: "Hany",
     dateOfBirth: new Date(1990, 5, 20),
-    phoneNumber: "282 573 812",
+    phoneNumber: "282573812",
     countryCode: "+20",
     gender: "male",
     profileImage: "/Dufltpofile.png?height=200&width=200",
-    uploadedFile: null,
   })
-
   const [isFormTouched, setIsFormTouched] = useState(false)
 
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setIsLoading(true)
         setError(null)
-
         const response = await getUserByGuestId(guestId)
 
         if (response.success && response.data) {
           const userData = response.data
-
           const newFirstName = userData.firstName || ""
           const newLastName = userData.lastName || ""
-          const newDateOfBirth = userData.dateOfBirth ? new Date(userData.dateOfBirth) : undefined
-          const newPhoneNumber = userData.phone ? userData.phone.replace(/^\+\d+\s*/, "") : ""
+          const birthday = userData.birthday ? new Date(userData.birthday) : undefined
+          const newGender = userData.gender || "male"
 
-          let newCountryCode = "+1"
-          if (userData.phone) {
-            const phoneMatch = userData.phone.match(/^(\+\d+)/)
-            if (phoneMatch) {
-              newCountryCode = phoneMatch[1]
-            }
-          }
+          // Clean phone number - remove country code and formatting
+
+       let newPhoneNumber = ""
+let newCountryCode = "+44" // fallback
+
+if (userData.phone && userData.phone.trim()) {
+  const { countryCode, nationalNumber } = detectCountryFromPhone(userData.phone)
+  newPhoneNumber = nationalNumber
+  newCountryCode = countryCode
+}
 
           setFirstName(newFirstName)
           setLastName(newLastName)
-          setDateOfBirth(newDateOfBirth)
-          setPhoneNumber(newPhoneNumber)
+          setDateOfBirth(birthday)
+   setPhoneNumber(newPhoneNumber)
           setCountryCode(newCountryCode)
+          setGender(newGender)
 
-          const newProfileImage = userData.picture || "/Dufltpofile.png?height=200&width=200"
+          let newProfileImage = "/Dufltpofile.png?height=200&width=200"
+          // Handle the nested picture structure from your API
+          if (userData.picture && userData.picture.url) {
+            if (typeof userData.picture.url === "string") {
+              newProfileImage = userData.picture.url
+            } else if (userData.picture.url.url) {
+              if (typeof userData.picture.url.url === "string") {
+                newProfileImage = userData.picture.url.url
+              } else if (userData.picture.url.url.url) {
+                newProfileImage = userData.picture.url.url.url
+              }
+            }
+          }
+
           setProfileImage(newProfileImage)
 
           setInitialState({
             firstName: newFirstName,
             lastName: newLastName,
-            dateOfBirth: newDateOfBirth || new Date(),
+            dateOfBirth: birthday || new Date(),
             phoneNumber: newPhoneNumber,
             countryCode: newCountryCode,
-            gender: "male",
+            gender: newGender,
             profileImage: newProfileImage,
-            uploadedFile: null,
           })
 
-          // Show success toast for data loading
           toast({
             title: "Profile loaded successfully",
             description: "Your profile information has been retrieved.",
@@ -134,8 +114,6 @@ export default function Component() {
       } catch (err) {
         console.error("Error fetching user data:", err)
         setError("Failed to load user data. Please try again.")
-
-        // Show error toast for loading failure
         toast({
           variant: "destructive",
           title: "Failed to load profile",
@@ -160,43 +138,47 @@ export default function Component() {
       phoneNumber !== initialState.phoneNumber ||
       countryCode !== initialState.countryCode ||
       gender !== initialState.gender ||
-      profileImage !== initialState.profileImage ||
-      uploadedFile !== initialState.uploadedFile
+      profileImage !== initialState.profileImage
 
     setIsFormTouched(hasChanges)
   }
 
+  // Call checkIfFormTouched whenever any field changes
+  useEffect(() => {
+    checkIfFormTouched()
+  }, [firstName, lastName, dateOfBirth, phoneNumber, countryCode, gender, profileImage])
+
   const handleFirstNameChange = (value: string) => {
     setFirstName(value)
-    setTimeout(checkIfFormTouched, 0)
   }
 
   const handleLastNameChange = (value: string) => {
     setLastName(value)
-    setTimeout(checkIfFormTouched, 0)
   }
 
   const handleDateChange = (date: Date | undefined) => {
     setDateOfBirth(date)
-    setTimeout(checkIfFormTouched, 0)
   }
 
   const handlePhoneChange = (value: string) => {
     setPhoneNumber(value)
-    setTimeout(checkIfFormTouched, 0)
+    // Validate the phone number with country-specific rules
+    const validationError = validatePhoneForCountry(value, countryCode)
+    setPhoneError(validationError)
   }
 
   const handleCountryCodeChange = (code: string) => {
     setCountryCode(code)
-    setTimeout(checkIfFormTouched, 0)
+    // Re-validate phone number with new country
+    if (phoneNumber) {
+      const validationError = validatePhoneForCountry(phoneNumber, code)
+      setPhoneError(validationError)
+    }
   }
 
   const handleGenderChange = (value: string) => {
     setGender(value)
-    setTimeout(checkIfFormTouched, 0)
   }
-
-  const selectedCountry = countries.find((country) => country.code === countryCode)
 
   const handleProfileImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -206,7 +188,7 @@ export default function Component() {
         toast({
           variant: "destructive",
           title: "Invalid file type",
-          description: "Please upload only image files (JPG, PNG).",
+          description: "Please upload only image files (JPG, PNG ,JPEG).",
           duration: 4000,
         })
         return
@@ -215,8 +197,6 @@ export default function Component() {
       const reader = new FileReader()
       reader.onload = (e) => {
         setProfileImage(e.target?.result as string)
-        setTimeout(checkIfFormTouched, 0)
-
         toast({
           title: "Profile picture updated",
           description: "Your profile picture has been changed successfully.",
@@ -229,8 +209,6 @@ export default function Component() {
 
   const handleDeleteProfileImage = () => {
     setProfileImage("/Dufltpofile.png?height=200&width=200")
-    setTimeout(checkIfFormTouched, 0)
-
     toast({
       title: "Profile picture removed",
       description: "Your profile picture has been reset to default.",
@@ -238,96 +216,25 @@ export default function Component() {
     })
   }
 
-  const handleFileUpload = (file: File) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "application/pdf"]
-    const maxSize = 5 * 1024 * 1024 // 5MB
-
-    if (!allowedTypes.includes(file.type)) {
-      toast({
-        variant: "destructive",
-        title: "Invalid file type",
-        description: "Please upload only PDF or image files (JPG, PNG).",
-        duration: 4000,
-      })
-      return
-    }
-
-    if (file.size > maxSize) {
-      toast({
-        variant: "destructive",
-        title: "File too large",
-        description: "File size should be less than 5MB.",
-        duration: 4000,
-      })
-      return
-    }
-
-    setUploadedFile(file)
-    setTimeout(checkIfFormTouched, 0)
-
-    toast({
-      title: "ID card uploaded",
-      description: `${file.name} has been uploaded successfully.`,
-      duration: 3000,
-    })
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-    const files = Array.from(e.dataTransfer.files)
-    if (files.length > 0) {
-      handleFileUpload(files[0])
-    }
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-  }
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (files && files.length > 0) {
-      handleFileUpload(files[0])
-    }
-  }
-const [open, setOpen] = useState(false)
-  const [date, setDate] = useState<Date | undefined>(undefined)
-
-  const removeFile = () => {
-    const fileName = uploadedFile?.name
-    setUploadedFile(null)
-    setTimeout(checkIfFormTouched, 0)
-
-    toast({
-      title: "File removed",
-      description: `${fileName} has been removed from your profile.`,
-      duration: 3000,
-    })
-  }
-
-  const getFileIcon = (fileType: string) => {
-    if (fileType.startsWith("image/")) {
-      return <ImageIcon size={20} className="text-[#59d750]" />
-    }
-    return <FileText size={20} className="text-[#ff3d00]" />
-  }
-
   const handleSave = async () => {
+    // Validate phone number before saving
+    const phoneValidationError = validatePhoneForCountry(phoneNumber, countryCode)
+    if (phoneValidationError) {
+      toast({
+        variant: "destructive",
+        title: "Cannot save profile",
+        description: phoneValidationError,
+        duration: 4000,
+      })
+      return
+    }
+
     try {
       setIsSaving(true)
-
-      // Show loading toast
-      const loadingToast = toast({
+      toast({
         title: "Saving profile...",
         description: "Please wait while we update your information.",
-        duration: 0, // Don't auto-dismiss
+        duration: 0,
       })
 
       const userDetails = {
@@ -335,11 +242,12 @@ const [open, setOpen] = useState(false)
         firstName: firstName,
         lastName: lastName,
         birthday: dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : undefined,
-        picture: profileImage !== "/Dufltpofile.png?height=200&width=200" ? profileImage : null,
+        picture: profileImage !== "/Dufltpofile.png?height=200&width=200" ? { url: profileImage } : null,
+        phone: phoneNumber ? `${countryCode} ${phoneNumber}` : "",
+        gender: gender,
       }
 
-      console.log("Saving profile data:", userDetails)
-
+    
       const response = await updateUser(userDetails)
 
       if (response.success) {
@@ -351,12 +259,9 @@ const [open, setOpen] = useState(false)
           countryCode,
           gender,
           profileImage,
-          uploadedFile,
         })
-
         setIsFormTouched(false)
 
-        // Show success toast
         toast({
           title: "Profile saved successfully! ✨",
           description: "Your profile information has been updated.",
@@ -368,8 +273,6 @@ const [open, setOpen] = useState(false)
       }
     } catch (error: any) {
       console.error("Error saving profile:", error)
-
-      // Show detailed error toast
       toast({
         variant: "destructive",
         title: "Failed to save profile",
@@ -382,6 +285,7 @@ const [open, setOpen] = useState(false)
   }
 
   const router = useRouter()
+
   useEffect(() => {
     const isAuth = localStorage.getItem("access_token") || localStorage.getItem("session")
     if (!isAuth) {
@@ -422,7 +326,7 @@ const [open, setOpen] = useState(false)
   }
 
   return (
-    <>
+    <div>
       <div className="flex h-screen bg-white">
         {/* Desktop Sidebar */}
         <div className="hidden lg:flex w-64 bg-[#000000] text-white flex-col">
@@ -457,8 +361,8 @@ const [open, setOpen] = useState(false)
               {isFormTouched && (
                 <Button
                   onClick={handleSave}
-                  disabled={isSaving}
-                  className="bg-[#59d750] hover:bg-[#59d750]/90 transition-all duration-200"
+                  disabled={isSaving || !!phoneError}
+                  className="bg-[#59d750] hover:bg-[#59d750]/90 transition-all duration-200 disabled:opacity-50"
                 >
                   {isSaving ? (
                     <>
@@ -466,10 +370,10 @@ const [open, setOpen] = useState(false)
                       Saving...
                     </>
                   ) : (
-                    <>
+                    <div>
                       <Save size={16} className="mr-2" />
                       Save
-                    </>
+                    </div>
                   )}
                 </Button>
               )}
@@ -484,8 +388,11 @@ const [open, setOpen] = useState(false)
                 <div className="flex flex-col items-center lg:items-start">
                   <div className="relative mb-4">
                     <Image
-                    src={`https://ui-avatars.com/api/?name=${firstName}&background=%23ededed`}
-                   
+                      src={
+                        profileImage && profileImage !== "/Dufltpofile.png?height=200&width=200"
+                          ? profileImage
+                          : `https://ui-avatars.com/api/?name=${firstName}&background=%23ededed`
+                      }
                       alt="Profile picture"
                       width={200}
                       height={200}
@@ -502,7 +409,7 @@ const [open, setOpen] = useState(false)
                     </Button>
                     <Button
                       variant="outline"
-                      className="text-[#8c8c8c] border-[#d9d9d9] hover:bg-[#f5f5f5] w-full"
+                      className="text-[#8c8c8c] border-[#d9d9d9] hover:bg-[#f5f5f5] w-full bg-transparent"
                       onClick={handleDeleteProfileImage}
                     >
                       Delete picture
@@ -546,56 +453,21 @@ const [open, setOpen] = useState(false)
                   </div>
 
                   {/* Date of Birth */}
-<CalenderYearly onDateChange={handleDateChange} />
-
-                  {/* Phone Number */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-[#8c8c8c]">Phone number</Label>
-                    <div className="flex">
-                      <Popover open={isCountryOpen} onOpenChange={setIsCountryOpen}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-40 justify-between border-[#d9d9d9] rounded-r-none border-r-0 hover:bg-[#f5f5f5]"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">{selectedCountry?.flag}</span>
-                              <span className="text-sm">{selectedCountry?.code}</span>
-                            </div>
-                            <ChevronDown size={16} className="text-[#8c8c8c]" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80 p-0" align="start">
-                          <div className="max-h-60 overflow-y-auto">
-                            {countries.map((country) => (
-                              <div
-                                key={country.code}
-                                className="flex items-center gap-3 px-4 py-3 hover:bg-[#f5f5f5] cursor-pointer border-b border-[#f0f0f0] last:border-b-0"
-                                onClick={() => {
-                                  handleCountryCodeChange(country.code)
-                                  setIsCountryOpen(false)
-                                }}
-                              >
-                                <span className="text-xl">{country.flag}</span>
-                                <div className="flex-1">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-[#000000]">{country.name}</span>
-                                    <span className="text-sm text-[#8c8c8c]">{country.code}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                      <Input
-                        value={phoneNumber}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        className="border-[#d9d9d9] focus:border-[#59d750] focus:ring-[#59d750] rounded-l-none"
-                        placeholder="Enter phone number"
-                      />
-                    </div>
+                    <CalenderYearly onDateChange={handleDateChange} initialDate={dateOfBirth} />
+                    <p className="text-xs text-[#8c8c8c]">
+                      {dateOfBirth ? `Selected: ${dateOfBirth.toLocaleDateString()}` : "No date selected"}
+                    </p>
                   </div>
+
+                  {/* Smart Phone Number Input */}
+                  <SmartPhoneInput
+                    value={phoneNumber}
+                    countryCode={countryCode}
+                    onPhoneChange={handlePhoneChange}
+                    onCountryChange={handleCountryCodeChange}
+                    error={phoneError}
+                  />
 
                   {/* Gender */}
                   <div className="space-y-3">
@@ -616,72 +488,13 @@ const [open, setOpen] = useState(false)
                     </RadioGroup>
                   </div>
 
-                  {/* ID Card Upload */}
-                  {/* <div className="space-y-3">
-                    <Label className="text-sm font-medium text-[#8c8c8c]">Upload your ID card</Label>
-
-                    {uploadedFile ? (
-                      <div className="border border-[#d9d9d9] rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            {getFileIcon(uploadedFile.type)}
-                            <div>
-                              <p className="text-sm font-medium text-[#000000]">{uploadedFile.name}</p>
-                              <p className="text-xs text-[#8c8c8c]">
-                                {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={removeFile}
-                            className="text-[#ff3d00] hover:text-[#ff3d00] hover:bg-[#ff3d00]/10"
-                          >
-                            <X size={16} />
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div
-                        className={cn(
-                          "border-2 border-dashed rounded-lg p-12 text-center transition-colors cursor-pointer",
-                          isDragOver ? "border-[#59d750] bg-[#59d750]/5" : "border-[#d9d9d9] hover:border-[#8c8c8c]",
-                        )}
-                        onDrop={handleDrop}
-                        onDragOver={handleDragOver}
-                        onDragLeave={handleDragLeave}
-                        onClick={() => document.getElementById("file-upload")?.click()}
-                      >
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="w-12 h-12 bg-[#f5f5f5] rounded-lg flex items-center justify-center">
-                            <Upload size={24} className="text-[#8c8c8c]" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-[#8c8c8c] mb-1">Upload a picture for your ID card</p>
-                            <p className="text-xs text-[#8c8c8c]">
-                              Drag and drop or click to browse • PDF, JPG, PNG up to 5MB
-                            </p>
-                          </div>
-                        </div>
-                        <input
-                          id="file-upload"
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={handleFileInputChange}
-                        />
-                      </div>
-                    )}
-                  </div> */}
-
                   {/* Save Button - Mobile */}
                   {isFormTouched && (
                     <div className="lg:hidden pt-4">
                       <Button
                         onClick={handleSave}
-                        disabled={isSaving}
-                        className="bg-[#59d750] text-white hover:bg-[#59d750]/90 w-full transition-all duration-200"
+                        disabled={isSaving || !!phoneError}
+                        className="bg-[#59d750] text-white hover:bg-[#59d750]/90 w-full transition-all duration-200 disabled:opacity-50"
                       >
                         {isSaving ? (
                           <>
@@ -704,6 +517,6 @@ const [open, setOpen] = useState(false)
         </div>
       </div>
       <Toaster />
-    </>
+    </div>
   )
 }

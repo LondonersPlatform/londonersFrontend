@@ -95,7 +95,7 @@ export default function BlogPage() {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-center items-center mt-12 space-x-2">
+        {/* <div className="flex justify-center items-center mt-12 space-x-2">
           <button className="p-2 rounded-full border border-gray-300 hover:bg-gray-50">
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -119,7 +119,7 @@ export default function BlogPage() {
           <button className="p-2 rounded-full border border-gray-300 hover:bg-gray-50">
             <ChevronRight className="h-5 w-5" />
           </button>
-        </div>
+        </div> */}
       </main>
     </div>
   );

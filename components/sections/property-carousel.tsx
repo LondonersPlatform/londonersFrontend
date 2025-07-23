@@ -15,6 +15,7 @@ import {
   Mail,
   Star,
   ChevronLeft,
+  Dot,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,11 +26,11 @@ import Gallery from "../ui/Gallery";
 import ShareModalListing from "../listings/ShareModalListing";
 import { addFavorite, deleteFavorite } from "@/app/all-listings/Listing";
 import { useLoginModal } from "@/context/login-modal-context";
+import { FavoriteButton } from "../listings/listing-client-components";
 
-export function PropertyCarousel({ imagesDummy, listingId }: any) {
+export function PropertyCarousel({ imagesDummy, listingId ,isFavorite}: any) {
   const { setRedirectPath, setLoginOpen } = useLoginModal();
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
 
   const searchParams = useSearchParams();
   const area = searchParams.get("area");
@@ -57,7 +58,7 @@ export function PropertyCarousel({ imagesDummy, listingId }: any) {
     }
 
     const newFavoriteState = !isFavorite;
-    setIsFavorite(newFavoriteState);
+    
 
     try {
       if (newFavoriteState) {
@@ -73,19 +74,58 @@ export function PropertyCarousel({ imagesDummy, listingId }: any) {
       }
     } catch (error: any) {
       console.error("Failed to update favorite:", error.message);
-      setIsFavorite(!newFavoriteState); // rollback
+  
     }
   };
-    const router = useRouter();
-  
+  const router = useRouter();
 
   return (
     <div className="space-y-4 relative">
       {/* Title and Buttons (Desktop) */}
-      <div className="hidden md:flex items-center justify-between ">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+      <div className="hidden md:flex items-start justify-between ">
+    
+        <div className="  lg:items-start      md:flex hidden     flex-col gap-2 ">
+              <h1 className="text-2xl font-bold flex items-center gap-2">
           <span>{title}</span>
         </h1>
+
+          <h1 className="text-2xl md:hidden font-bold flex items-center gap-2">
+            <span className=" text-center">{title}</span>
+          </h1>
+         
+          <div className=" flex items-center gap-2">
+ <h2 className="text-[#0000008C] font-bold">{area} .</h2>
+
+          <div className="flex-grow font-normal  flex flex-wrap ">
+            <div className="flex items-center ">
+              <span className="text-sm flex items-center">
+                {bedroom} Bedroom{" "}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-sm flex">
+                {" "}
+                <Dot />
+                {beds} Beds{" "}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm flex">
+                {" "}
+                <Dot />
+                {bath} Bath{" "}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm flex">
+                <Dot /> {guests} Guests{" "}
+              </span>
+            </div>
+          </div>
+
+          </div>
+        </div>
+
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -95,18 +135,16 @@ export function PropertyCarousel({ imagesDummy, listingId }: any) {
           >
             <Share2 className="h-5 w-5" />
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full"
-            onClick={(e) => handleFavoriteClick(e, listingId as string)}
-          >
-            <Heart
-              className={`h-5 w-5 ${
-                isFavorite ? "fill-red-600 text-red-700" : ""
-              }`}
-            />
-          </Button>
+      <div
+  onClick={(e) => handleFavoriteClick(e, listingId as string)}
+  className="inline-flex items-center justify-center rounded-full border border-input bg-background p-1 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+>
+  <FavoriteButton
+    isFavorite={isFavorite}
+    listingId={listingId}
+  />
+</div>
+
         </div>
       </div>
 
@@ -140,11 +178,10 @@ export function PropertyCarousel({ imagesDummy, listingId }: any) {
             variant="outline"
             size="icon"
             className="rounded-full bg-white/75 backdrop-blur-sm "
-                  onClick={() => router.back()}
+            onClick={() => router.back()}
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-        
         </div>
         <Gallery imagesDummy={imagesDummy} />
       </div>
@@ -161,9 +198,7 @@ export function PropertyCarousel({ imagesDummy, listingId }: any) {
         bath={bath}
         rating={rating}
       />
-      <div className=" py-2 bg-white rounded-t-2xl w-full h-4 bottom-[0px] absolute">
-
-      </div>
+      <div className=" py-2 bg-white rounded-t-2xl w-full h-4 bottom-[0px] absolute"></div>
     </div>
   );
 }

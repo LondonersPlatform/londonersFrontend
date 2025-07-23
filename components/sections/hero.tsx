@@ -12,7 +12,7 @@ export default function Hero() {
       try {
         const guestyData = await getGuestyId(email);
         localStorage.setItem("GuestyId", guestyData.guesty_user_id);
-        console.log("Guesty ID:", guestyData);
+     
       } catch (error) {
         console.error("Failed to fetch Guesty ID:", error);
       }
@@ -48,7 +48,7 @@ export default function Hero() {
     <section className="relative h-[75vh]  w-full group overflow-hidden">
       <video
         ref={videoRef}
-        src="/bgg.mov"
+        src="/Londoners.mp4"
         loop
         muted
         playsInline

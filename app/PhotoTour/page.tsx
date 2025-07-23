@@ -267,7 +267,7 @@ export default function PhotoTour() {
   return (
     <div className="container mx-auto max-w-6xl px-4 ">
       {/* Header */}
-    <div className="sticky top-0 z-50 bg-white flex items-center justify-between mb-6 py-4 shadow-sm">
+    <div className="sticky top-0  z-30 bg-white flex items-center justify-between mb-6 py-4 shadow-sm">
         <Button
           variant="ghost"
           size="icon"

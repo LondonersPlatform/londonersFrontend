@@ -57,12 +57,14 @@ const BookingCard = ({
     setAvailableDates,
     availableDates,
     setGuestCount,
-    setMinNight
+    setMinNight,
   } = useBooking();
 
   const [loadingDates, setLoadingDates] = useState(true);
   const [isOpenDate, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingMin, setLoadingMin] = useState(false); // 👈 Add loading state
+
   const { setRedirectPath, setLoginOpen } = useLoginModal();
   const [error, setError] = useState<string | null>(null);
   const basePrice = PricePerNight;
@@ -95,7 +97,26 @@ const BookingCard = ({
     currentUrl
   )}`;
 
+  useEffect(() => {
+    if (quoteData) {
+      const invoiceItems =
+        quoteData?.guesty_quote.rates.ratePlans[0].money.money.invoiceItems;
+
+      const totalAmount = invoiceItems?.reduce(
+        (sum: any, item: any) => sum + item.amount,
+        0
+      );
+
+      if (typeof totalAmount === "number") {
+        setTotal(totalAmount); // ✅ save to context
+      }
+    }
+  }, [quoteData, setTotal]);
+
   const openLoginModal = () => {
+    const checkIn = dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : "";
+    const checkOut = dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : "";
+
     const query = new URLSearchParams({
       quoteId: quoteData?.guesty_quote._id,
       PricePerNight: PricePerNight,
@@ -104,7 +125,9 @@ const BookingCard = ({
       whatsup: whatsup,
       MaxNumofGuests: MaxNumofGuests,
       listingId: listingId,
-      nameBook: nameBook
+      nameBook: nameBook,
+      checkIn,
+      checkOut,
     });
 
     setRedirectPath(`/Payment?${query.toString()}`);
@@ -114,6 +137,8 @@ const BookingCard = ({
   useEffect(() => {
     const fetchMinNights = async () => {
       if (!dateRange?.from) return;
+
+      setLoadingMin(true);
 
       try {
         const response = await getMinDaysByListingId(
@@ -126,53 +151,63 @@ const BookingCard = ({
         }
       } catch (error) {
         console.error("Error fetching min nights:", error);
+      } finally {
+        setLoadingMin(false);
       }
     };
 
     fetchMinNights();
   }, [dateRange?.from, listingId]);
 
-  useEffect(() => {
-    const fetchQuote = async () => {
-      if (!dateRange?.from || !dateRange?.to) return;
+useEffect(() => {
+  const skip = sessionStorage.getItem("skipQuoteFetch");
 
-      try {
-        setLoading(true);
-        setError(null);
+  if (skip === "true") {
+    return; // 🚫 skip the quote fetch
+  }
 
-        const payload = {
-          listing_id: listingId,
-          check_in_date_localized: format(dateRange.from, "yyyy-MM-dd"),
-          check_out_date_localized: format(dateRange.to, "yyyy-MM-dd"),
-          guests_count: guestCount,
-          number_of_adults: guestBreakdown.adults,
-          number_of_children: guestBreakdown.children,
-          number_of_infants: guestBreakdown.infants,
-          number_of_pets: guestBreakdown.pets,
-          ignore_calendar: false,
-          ignore_terms: false,
-          ignore_blocks: false,
-          source: "website",
-        };
+  const fetchQuote = async () => {
+    if (!dateRange?.from || !dateRange?.to) return;
 
-        const response = await createQuote(payload);
+    try {
+      setLoading(true);
+      setError(null);
 
-        setQuoteData(response);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch quote");
-        console.error("Error fetching quote:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const payload = {
+        listing_id: listingId,
+        check_in_date_localized: format(dateRange.from, "yyyy-MM-dd"),
+        check_out_date_localized: format(dateRange.to, "yyyy-MM-dd"),
+        guests_count: guestCount,
+        number_of_adults: guestBreakdown.adults,
+        number_of_children: guestBreakdown.children,
+        number_of_infants: guestBreakdown.infants,
+        number_of_pets: guestBreakdown.pets,
+        ignore_calendar: false,
+        ignore_terms: false,
+        ignore_blocks: false,
+        source: "website",
+      };
 
-    fetchQuote();
-  }, [dateRange, guestCount, listingId, guestBreakdown]);
+      const response = await createQuote(payload);
+      setQuoteData(response);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch quote");
+      console.error("Error fetching quote:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchQuote();
+}, [dateRange, guestCount, listingId, guestBreakdown]);
 
   const router = useRouter();
 
   const handleClick = () => {
     setLoading(true);
+sessionStorage.setItem("savedDateRange", JSON.stringify(dateRange));
+    const checkIn = dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : "";
+    const checkOut = dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : "";
 
     const query = new URLSearchParams({
       quoteId: quoteData?.guesty_quote._id,
@@ -183,11 +218,32 @@ const BookingCard = ({
       ratePlanIdParms: rate,
       MaxNumofGuests: MaxNumofGuests,
       listingId: listingId,
-      nameBook: nameBook
+      nameBook: nameBook,
+      checkIn,
+      checkOut,
     });
-
+sessionStorage.setItem("skipQuoteFetch", "true");
     router.push(`/Payment?${query.toString()}`);
   };
+
+
+  useEffect(() => {
+  const saved = sessionStorage.getItem("savedDateRange");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed?.from && parsed?.to) {
+        setDateRange({
+          from: new Date(parsed.from),
+          to: new Date(parsed.to),
+        });
+      }
+      sessionStorage.removeItem("savedDateRange"); // optional: clear after restore
+    } catch (e) {
+      console.error("Failed to parse savedDateRange", e);
+    }
+  }
+}, []);
 
   useEffect(() => {
     const fetchDates = async () => {
@@ -204,24 +260,56 @@ const BookingCard = ({
     fetchDates();
   }, [listingId]);
 
-  // ✅ Reset on listingId change
-  useEffect(() => {
-    setDateRange({ from: undefined, to: undefined });
-    setQuoteData(null);
-    setGuestCount(1);
-  }, [listingId]);
 
-  // ✅ Reset on unmount
+useEffect(() => {
+  const skip = sessionStorage.getItem("skipQuoteFetch");
+
+  if (skip === "true") {
+    sessionStorage.removeItem("skipQuoteFetch"); // optional: clear it after reload
+    window.location.reload();
+  }
+}, []);
+
+
   useEffect(() => {
-    return () => {
+  const saved = sessionStorage.getItem("savedDateRange");
+
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed?.from && parsed?.to) {
+        setDateRange({
+          from: new Date(parsed.from),
+          to: new Date(parsed.to),
+        });
+      }
+      sessionStorage.removeItem("savedDateRange");
+    } catch (e) {
+      console.error("Error parsing savedDateRange", e);
+    }
+  } else {
+    setDateRange({ from: undefined, to: undefined });
+    setQuoteData(undefined);
+    setGuestCount(1);
+        
+  }
+
+  return () => {
+    // ✅ Cleanup only if we did not restore from sessionStorage
+    const savedOnUnmount = sessionStorage.getItem("savedDateRange");
+    if (!savedOnUnmount) {
       setDateRange({ from: undefined, to: undefined });
-      setQuoteData(null);
+      setQuoteData(undefined);
       setGuestCount(1);
-    };
-  }, []);
+      
+    }
+  };
+}, []);
+
+
 
   return (
-    <>
+    <section>
       <Card className="w-full mx-auto p-6 md:block hidden shadow-xl border border-gray-200 rounded-xl bg-white">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-baseline gap-2">
@@ -229,16 +317,6 @@ const BookingCard = ({
               £{basePrice} /
             </span>
             <span className="text-gray-600">night</span>
-          </div>
-          <div className="flex font-bold gap-3 items-center mt-1">
-            <div className="flex items-center">
-              <span className="ml-1 text-sm font-semibold font-medium text-gray-900">
-                4.9
-              </span>
-            </div>
-            <span className="text-sm text-gray-600 underline">
-              (73 reviews)
-            </span>
           </div>
         </div>
 
@@ -274,9 +352,13 @@ const BookingCard = ({
                 </div>
               </div>
             </PopoverTrigger>
-            <PopoverContent className="w-auto border-none bg-transparent scale-[.85] -translate-y-36 -translate-x-[4rem] shadow-none p-0" align="start">
+            <PopoverContent
+              className="w-auto border-none bg-transparent scale-[.85] -translate-y-36 -translate-x-[4rem] shadow-none p-0"
+              align="start"
+            >
               <DateRangePicker
                 dateRange={dateRange}
+                loadingMin={loadingMin}
                 minNights={minNight}
                 onDateRangeChange={setDateRange}
                 onClose={() => setIsDatePickerOpen(false)}
@@ -315,7 +397,7 @@ const BookingCard = ({
         </Button>
 
         {quoteData && (
-          <>
+          <section>
             <p className="text-center text-sm text-gray-600 mt-4">
               You won't be charged yet
             </p>
@@ -327,7 +409,7 @@ const BookingCard = ({
               serviceFee={Cleaningfee}
               total={total}
             />
-          </>
+          </section>
         )}
       </Card>
 
@@ -346,7 +428,9 @@ const BookingCard = ({
       />
 
       <div className="flex flex-col gap-2 my-6">
-        <Button className="bg-[#8C8C8C] p-5 text-center">Contact the host</Button>
+        <Button className="bg-[#8C8C8C] p-5 text-center">
+          Contact the host
+        </Button>
         <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
           <Button className="bg-[#59D750] w-full hover:bg-[#67e15e] p-5 text-center flex items-center justify-center gap-2">
             <WIcon />
@@ -354,7 +438,7 @@ const BookingCard = ({
           </Button>
         </a>
       </div>
-    </>
+    </section>
   );
 };
 

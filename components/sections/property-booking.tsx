@@ -44,7 +44,7 @@ minNights,
   const today = new Date();
   const tomorrow = new Date();
   tomorrow.setDate(today.getDate() + 1);
-  console.log("minNights",minNights)
+
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: today,
     to: tomorrow,
@@ -65,7 +65,7 @@ minNights,
       try {
         const dates = await getCalendarByListingId(listingId);
         setAvailableDates(dates);
-        console.log("dates==>", dates);
+      
       } catch (error) {
         console.error("Error loading calendar dates:", error);
       } finally {
@@ -86,7 +86,6 @@ minNights,
       : 0;
 
   const session = JSON.parse(localStorage.getItem("session") || "{}");
-  console.log(localStorage.getItem("session"), "session in property booking");
 
   const openLoginModal = () => {
     const query = new URLSearchParams({
@@ -175,8 +174,6 @@ minNights,
     0
   );
 
-  console.log(totalAmount, "totalAmount====>");
-  console.log("rate==>", rate);
 
   return (
     <section className="sticky top-6">
@@ -279,7 +276,7 @@ minNights,
 
 
           {quoteData && (
-            <>
+            <section>
               <p className="text-center text-sm text-gray-500">
                 You won't be charged yet
               </p>
@@ -307,7 +304,7 @@ minNights,
                   </div>
                 </div>
               </div>
-            </>
+            </section>
           )}
         </div>
       </div>

@@ -22,7 +22,7 @@ function Calendar({
 
 
   return (
-    <>
+    <section>
       {showheader && (
         <div className="flex flex-col gap-1 px-4 py-3">
           <h1 className="font-semibold">Select check in date</h1>
@@ -77,7 +77,7 @@ function Calendar({
         }}
         {...props}
       />
-    </>
+    </section>
   );
 }
 

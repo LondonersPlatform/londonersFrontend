@@ -47,22 +47,22 @@ export default function ClientLayout({
   return (
      <BookingProvider>
 
-      <>
+      <main>
       {!session ? (
-        <>
+        <section>
           {!isAuthPath && <Header />}
           {children}
           {!isAuthPath && <Footer />}
-        </>
+        </section>
       ) : (
-        <>
+        <section>
           {!hideHeader && <Header />}
 
           {children}
            {!hideFooter && <Footer />}
-        </>
+        </section>
       )}
-    </>
+    </main>
      </BookingProvider>
     
   );

@@ -30,7 +30,7 @@ export function ProfileDropdown({}: ProfileDropdownProps) {
         try {
           const GuestyId = await getGuestyId(session.user.email);
           localStorage.setItem("GuestyId", GuestyId.guesty_user_id);
-          console.log("Guesty ID:", GuestyId);
+        
         } catch (error) {
           console.error("Failed to fetch Guesty ID:", error);
         }
@@ -39,7 +39,7 @@ export function ProfileDropdown({}: ProfileDropdownProps) {
 
     fetchGuestyId();
   }, [session]);
-  console.log(session, "session in profile dropdown");
+
   const handleLogout = async () => {
     try {
       await signOut();
