@@ -172,7 +172,11 @@ useEffect(() => {
     try {
       setLoading(true);
       setError(null);
-
+setGuestCount(
+  (guestBreakdown.adults ?? 0) +
+  (guestBreakdown.children ?? 0) +
+  (guestBreakdown.infants ?? 0)
+);
       const payload = {
         listing_id: listingId,
         check_in_date_localized: format(dateRange.from, "yyyy-MM-dd"),

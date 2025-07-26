@@ -331,16 +331,16 @@ const handleResetFilters = () => {
       {processedListings.length > 0 ? (
         <div className="space-y-6">
           {visibleListings.map((listing: any) => (
-            <Link
-              href={`all-listings/${listing.id}?area=${encodeURIComponent(
+            <div
+            onClick={() => router.push(`all-listings/${listing.id}?area=${encodeURIComponent(
                 listing.area
               )}&rating=${listing.rating}&bedroom=${listing.bedroom}&bath=${
                 listing.bath
               }&beds=${listing.beds}&guests=${listing.guests}&title=${
                 listing.title
-              }`}
+              }`)} 
               key={listing.id}
-              className="rounded-xl transition-shadow hover:shadow-sm"
+              className="rounded-xl transition-shadow hover:shadow-sm cursor-pointer"
             >
               <div className="flex rounded-2xl p-0 my-6 border-gray-300 border-[1px] flex-col md:flex-row">
                 {/* Desktop Images */}
@@ -395,7 +395,7 @@ const handleResetFilters = () => {
                 <div className="flex flex-1 flex-col justify-between p-6">
                   <div>
                     <div className="mb-2 flex items-center justify-between">
-                      <h2 className="text-xl font-bold">{listing.title}</h2>
+                      <h2 className="text-xl hover:underline  font-bold">{listing.title}</h2>
                       <FavoriteButton
                         isFavorite={listing.isFavorite}
                         listingId={listing.id}
@@ -475,7 +475,7 @@ const handleResetFilters = () => {
                   </div>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       ) : (

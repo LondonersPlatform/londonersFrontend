@@ -92,3 +92,26 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide the close (X) icon inside DialogContent */
+[data-state="open"] button[aria-label="Close"] {
+  display: none;
+}
+
+/* For WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #d1d5db; /* gray-300 */
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-track {
+  background-color: #f3f4f6; /* gray-100 */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f3f4f6;
+}

@@ -7,7 +7,7 @@ import { Clock, Users, Dog, PartyPopper, Cigarette } from "lucide-react"
 import Arrowright from "@/public/svg-assets/arrowright"
 import { ResponsiveModal } from "../ui/ResponsiveModal"
 
-export default function HouseRulesModal() {
+export default function HouseRulesModal({section}) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -34,24 +34,23 @@ export default function HouseRulesModal() {
         <div className="space-y-4">
           <h3 className="font-medium text-sm">Checking in and out</h3>
 
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-gray-600" />
-              <span className="text-sm">Check-in after 16:00</span>
-            </div>
+        <ul className="space-y-2 text-sm text-gray-700">
+               {section.items.map((item: any, itemIndex: number) => (
+  <li key={itemIndex} className="flex items-center gap-2">
+       {(typeof item === "string" && /guest(s)?/i.test(item)) ? (
+      <Users className="w-5 h-5 text-gray-600" />
+    ) : <Clock />}
+    
+    {item}
 
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-gray-600" />
-              <span className="text-sm">Check-out before 11:00</span>
-            </div>
-          </div>
+ 
+  </li>
+))}
+              </ul>
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <Users className="w-5 h-5 text-gray-600" />
-            <span className="text-sm">5 guests maximum</span>
-          </div>
+        
 
           <div className="flex items-center gap-3">
             <Dog className="w-5 h-5 text-gray-600" />

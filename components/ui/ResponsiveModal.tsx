@@ -15,6 +15,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
+import { X } from "lucide-react"
+import { DialogClose } from "@radix-ui/react-dialog"
 
 interface ResponsiveModalProps {
   children: React.ReactNode
@@ -54,15 +56,28 @@ export function ResponsiveModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}
+    
+
+    >
+
+
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className={`max-w-2xl py-6 ${className}`}>
+      <DialogContent className={`max-w-2xl    py-6 ${className}`}>
+
+        <DialogClose asChild className="absolute top-4 right-4 border bg-white rounded-full p-1 hover:bg-gray-100">
+  <button >
+    <X className="w-5 h-5" />
+  </button>
+</DialogClose>
+
         <DialogHeader>
           <DialogTitle className="py-6">{title}</DialogTitle>
         </DialogHeader>
-        <div>
+        <div className=" relative">
+   
           {children}
         </div>
       </DialogContent>

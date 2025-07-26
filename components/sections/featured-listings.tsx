@@ -30,7 +30,7 @@ import SkeletonCard from "../ui/SkeletonCard";
 import { useEffect, useState } from "react";
 import { useLoginModal } from "@/context/login-modal-context";
 import { FavoriteButton } from "../listings/listing-client-components";
-
+import { useRouter } from "next/navigation";
 interface Listing {
   id: string;
   title: string;
@@ -47,7 +47,7 @@ interface Listing {
 export default function FeaturedListings() {
   const [page] = useState(1);
   const [favorites, setFavorites] = useState<string[]>([]);
-
+const router = useRouter();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["featured-listings", page],
     queryFn: () => fetchListings({}, page, 8),
@@ -166,13 +166,13 @@ useEffect(() => {
   key={item.id}
   className="pl-4 md:basis-1/2 my-3  lg:basis-1/4 flex"
 >
-  <Link
-    href={`all-listings/${item.id}?area=${encodeURIComponent(
-      item.area
-    )}&rating=${item.rating}&bedroom=${item.bedroom}&bath=${
-      item.bath
-    }&beds=${item.beds}&guests=${item.guests}&title=${item.title}`}
-    className="w-full flex flex-col h-full rounded-xl transition-shadow hover:shadow-sm"
+  <div
+ onClick={()=> {
+    router.push(
+      `/all-listings/${item.id}?area=${encodeURIComponent(item.area)}&rating=${item.rating}&bedroom=${item.bedroom}&bath=${item.bath}&beds=${item.beds}&guests=${item.guests}&title=${encodeURIComponent(item.title)}`
+    );
+  }}
+    className="w-full flex flex-col cursor-pointer h-full rounded-xl transition-shadow hover:shadow-sm"
   >
     <Card className="shadow-lg border-none flex flex-col h-full">
       <CardImage className="relative w-full h-[200px]">
@@ -229,7 +229,7 @@ useEffect(() => {
         </p>
       </CardContent>
     </Card>
-  </Link>
+  </div>
 </CarouselItem>
 
             ))}

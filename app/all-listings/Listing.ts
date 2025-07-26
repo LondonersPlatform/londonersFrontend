@@ -1,7 +1,7 @@
 
 export async function getReservationsByGuestId() {
   const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-   const guestyUserId = localStorage.getItem("GuestyId") || null;
+   const guestyUserId = "68785e36c92206324c2121f1";
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-reservations`,
     {
@@ -475,6 +475,37 @@ export async function createSetupIntent(payload: {
 
   return response.json();
 }
+
+
+export async function getVideoByListingId(
+  listingId: string
+): Promise<string | null> {
+  const apiUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-property-videos`;
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ listing_id:listingId }),
+  });
+
+  if (!response.ok) {
+    console.error("Failed to fetch video");
+    return null;
+  }
+
+  const data = await response.json();
+  if (Array.isArray(data) && data.length > 0) {
+    return data[0].video_url;
+  }
+
+  return null;
+}
+
+
 
 export async function getCalendarByListingId(
   listingId: string
