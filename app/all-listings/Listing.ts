@@ -1,7 +1,7 @@
 
 export async function getReservationsByGuestId() {
   const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-   const guestyUserId = "68785e36c92206324c2121f1";
+   const guestyUserId = localStorage.getItem("GuestyId") || null;
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-reservations`,
     {
