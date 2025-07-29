@@ -29,10 +29,12 @@ import GuestSelector from "@/components/GuestSelector";
 import { useBooking } from "@/context/DatePickerContext";
 import BottomBookingBar from "@/components/layout/components/BottomBookingBar";
 
+
 const BookingCard = ({
   PricePerNight,
   serviceFee,
   rate,
+  paymentProviderId,
   nameBook,
   Cleaningfee,
   whatsup,
@@ -59,7 +61,7 @@ const BookingCard = ({
     setGuestCount,
     setMinNight,
   } = useBooking();
-
+console.log("paymentProviderId====book",paymentProviderId)
   const [loadingDates, setLoadingDates] = useState(true);
   const [isOpenDate, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -127,6 +129,8 @@ const BookingCard = ({
       listingId: listingId,
       nameBook: nameBook,
       checkIn,
+      paymentProviderId:paymentProviderId,
+      
       checkOut,
     });
 
@@ -224,6 +228,7 @@ sessionStorage.setItem("savedDateRange", JSON.stringify(dateRange));
       listingId: listingId,
       nameBook: nameBook,
       checkIn,
+       paymentProviderId: paymentProviderId,
       checkOut,
     });
 sessionStorage.setItem("skipQuoteFetch", "true");
@@ -407,6 +412,7 @@ useEffect(() => {
             </p>
             <PricingBreakdown
               basePrice={basePrice}
+              loading={loading}
               nights={nights}
               subtotal={subtotal}
               earlyBirdDiscount={earlyBirdDiscount}

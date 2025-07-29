@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
-import { CheckCircle, XCircle, ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { CheckCircle, XCircle, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 interface PaymentStatusProps {
-  status: string
-  transactionId: string
-  date: string
-  time: string
-  transactionType: string
-  amount: string
-  onTryAgain?: () => void
-  onGoToDashboard?: () => void
-  onBackToHome?: () => void
+  status: string;
+  transactionId: string;
+  date: string;
+  time: string;
+  transactionType: string;
+  amount: string;
+  onTryAgain?: () => void;
+  onGoToDashboard?: () => void;
+  onBackToHome?: () => void;
 }
 
 export default function PaymentStatus({
@@ -27,8 +28,25 @@ export default function PaymentStatus({
   onGoToDashboard,
   onBackToHome,
 }: PaymentStatusProps) {
-  const isSuccess = status === "success"
+  const isSuccess = status === "success";
+  const [dateTime, setDateTime] = useState(new Date());
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDateTime(new Date());
+    }, 1000); // update every second
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatted = dateTime.toLocaleString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
@@ -44,7 +62,11 @@ export default function PaymentStatus({
                 isSuccess ? "bg-green-500" : "bg-red-500"
               }`}
             >
-              {isSuccess ? <CheckCircle className="w-6 h-6 text-white" /> : <XCircle className="w-6 h-6 text-white" />}
+              {isSuccess ? (
+                <CheckCircle className="w-6 h-6 text-white" />
+              ) : (
+                <XCircle className="w-6 h-6 text-white" />
+              )}
             </div>
           </div>
         </div>
@@ -54,24 +76,26 @@ export default function PaymentStatus({
           <h1 className="text-2xl font-semibold text-gray-900">
             {isSuccess ? "Payment successful" : "Payment Failed"}
           </h1>
-          {isSuccess && <p className="text-gray-600">Successfully paid {amount}</p>}
+          {isSuccess && (
+            <p className="text-gray-600">Successfully paid {amount}</p>
+          )}
         </div>
 
         {/* Transaction Details Card */}
         <Card className="border border-gray-200">
           <CardContent className="p-6 space-y-4">
-        
-
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">Date</span>
-              <span className="text-gray-900 font-medium">
-                {date} | {time}
-              </span>
+              <div className="flex items-center gap-2 text-sm text-gray-600 font-medium bg-gray-100 px-4 py-2 rounded-xl shadow-sm w-fit">
+                <span>{formatted}</span>
+              </div>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">Type of transaction</span>
-              <span className="text-gray-900 font-medium">{transactionType}</span>
+              <span className="text-gray-900 font-medium">
+                {transactionType}
+              </span>
             </div>
 
             <div className="flex justify-between items-center">
@@ -82,8 +106,16 @@ export default function PaymentStatus({
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">Status</span>
               <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${isSuccess ? "bg-green-500" : "bg-red-500"}`} />
-                <span className={`text-sm font-medium ${isSuccess ? "text-green-600" : "text-red-600"}`}>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isSuccess ? "bg-green-500" : "bg-red-500"
+                  }`}
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    isSuccess ? "text-green-600" : "text-red-600"
+                  }`}
+                >
                   {isSuccess ? status : status}
                 </span>
               </div>
@@ -110,5 +142,5 @@ export default function PaymentStatus({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -81,7 +81,7 @@ export function PropertyAmenities({ amenityData }: any) {
       onOpenChange={setOpen}
       title="All Amenities"
       trigger={
-        <Button variant="outline" className="rounded-full">
+        <Button variant="outline" className="  bg-gray-200 md:py-2 py-6 md:bg-transparent w-full md:w-auto md:rounded-full">
           Show more
         </Button>
       }

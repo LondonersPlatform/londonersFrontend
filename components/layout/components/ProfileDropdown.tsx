@@ -12,8 +12,8 @@ import {
 import { BookDashed, LogOut, User } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { getGuestyId } from "@/app/all-listings/Listing";
+import { useEffect, useState } from "react";
+import { getGuestyId, getUserByGuestId } from "@/app/all-listings/Listing";
 import DashboardIcon from "@/public/svg-assets/DashboardIcon";
 
 interface ProfileDropdownProps {
@@ -21,11 +21,19 @@ interface ProfileDropdownProps {
 }
 
 export function ProfileDropdown({}: ProfileDropdownProps) {
+    const session = JSON.parse(localStorage.getItem("session") || "{}");
+  const [fullName, setFullName] = useState(null)
+    const [Icon, setIcon] = useState(null)
   const { signOut } = useAuth();
   const router = useRouter();
-  const session = JSON.parse(localStorage.getItem("session") || "{}");
+
   useEffect(() => {
     const fetchGuestyId = async () => {
+   const guestId = localStorage.getItem("GuestyId")
+       const response = await getUserByGuestId(guestId)
+       setFullName(response?.data?.fullName)
+       setIcon(response?.data?.picture?.url)
+console.log("response",response)
       if (session?.user?.email) {
         try {
           const GuestyId = await getGuestyId(session.user.email);
@@ -56,10 +64,10 @@ export function ProfileDropdown({}: ProfileDropdownProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="h-10 border-2 w-10 cursor-pointer">
-          <AvatarImage src={session?.avatarUrl} alt={email} />
+          <AvatarImage src={Icon} alt={email} />
           <AvatarFallback className="bg-primary text-primary-foreground">
             {session?.user?.email || email
-              ? email.slice(0, 2).toUpperCase()
+              ? fullName?.slice(0, 2)?.toUpperCase()
               : ""}
           </AvatarFallback>
         </Avatar>

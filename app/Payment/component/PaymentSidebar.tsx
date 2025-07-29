@@ -51,6 +51,7 @@ export function BookingSidebar({
     setAvailableDates,
     minNight,
     quoteData,
+    setTotal,
     setQuoteData,
     guestCount,
     guests,
@@ -103,7 +104,10 @@ export function BookingSidebar({
           listing_id: listingId,
           check_in_date_localized: format(dateRange.from, "yyyy-MM-dd"),
           check_out_date_localized: format(dateRange.to, "yyyy-MM-dd"),
-          guests_count: guestCount,
+          guests_count:
+            guestBreakdown.adults +
+            guestBreakdown.children +
+            guestBreakdown.infants,
           number_of_adults: guestBreakdown.adults,
           number_of_children: guestBreakdown.children,
           number_of_infants: guestBreakdown.infants,
@@ -149,6 +153,22 @@ export function BookingSidebar({
         ]
       : [];
 
+  useEffect(() => {
+    if (quoteData) {
+      const invoiceItems =
+        quoteData?.guesty_quote.rates.ratePlans[0].money.money.invoiceItems;
+
+      const totalAmount = invoiceItems?.reduce(
+        (sum: any, item: any) => sum + item.amount,
+        0
+      );
+
+      if (typeof totalAmount === "number") {
+        setTotal(totalAmount); // ✅ save to context
+      }
+    }
+  }, [quoteData, setTotal]);
+
   const extraServices = [
     {
       count: dailyCleaningCount,
@@ -164,7 +184,12 @@ export function BookingSidebar({
     },
   ];
 
-  if (isLoading) return <div className="p-8"><Loading /></div>;
+  if (isLoading)
+    return (
+      <div className="p-8">
+        <Loading />
+      </div>
+    );
 
   return (
     <div className="space-y-6">
@@ -215,7 +240,10 @@ export function BookingSidebar({
                   </div>
                 </div>
               </PopoverTrigger>
-              <PopoverContent className="w-auto border-none bg-transparent scale-[.85] -translate-y-36 -translate-x-[4rem] shadow-none p-0" align="start">
+              <PopoverContent
+                className="w-auto border-none bg-transparent scale-[.85] -translate-y-36 -translate-x-[4rem] shadow-none p-0"
+                align="start"
+              >
                 <DateRangePicker
                   dateRange={dateRange}
                   minNights={minNight}
@@ -249,7 +277,17 @@ export function BookingSidebar({
                   <p className="font-medium">Total price</p>
                   <p className="text-gray-700 text-sm">{nights} nights</p>
                 </div>
-                <p className="text-xl font-bold">{total} €</p>
+                <p className="text-xl font-bold">
+                  {loading ? (
+                    <span className="inline-flex gap-1">
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"></span>
+                    </span>
+                  ) : (
+                    `${total} €`
+                  )}
+                </p>
               </div>
             </div>
           </div>

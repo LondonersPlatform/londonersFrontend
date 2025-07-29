@@ -244,7 +244,12 @@ function PropertyPageContent({
 
   const searchParams = useSearchParams();
   const name = searchParams.get("title");
-
+const paymentObj = data.find(item => item.paymentProviderId);
+if (paymentObj) {
+  console.log("paymentProviderId:", paymentObj.paymentProviderId);
+} else {
+  console.log("paymentProviderId not found");
+}
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Sticky Header Tabs */}
@@ -328,6 +333,7 @@ function PropertyPageContent({
             <div className="w-full lg:w-1/3">
               <div className="lg:sticky  w-full lg:top-[100px] lg:h-[calc(100vh-104px)]">
                 <BookingCard
+              paymentProviderId={  paymentObj.paymentProviderId}
                   minNight={data[0].minNights}
                   whatsup={data[0].whatsup}
                   listingId={listingId}

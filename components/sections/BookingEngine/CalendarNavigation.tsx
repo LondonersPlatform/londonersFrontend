@@ -14,12 +14,15 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
   onMonthChange,
 }) => {
   return (
-    <div className="flex items-center justify-between px-8 py-4">
+
+
+    
+    <div className="flex items-center justify-between px-4 py-4">
       <Button
         variant="ghost"
         size="sm"
         onClick={() => onMonthChange(subMonths(currentMonth, 1))}
-        className="hover:bg-gray-100 rounded-full p-2"
+        className="hover:bg-gray-100 rounded-full "
       >
         <ChevronLeft className="h-5 w-5" />
       </Button>
@@ -27,7 +30,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
         variant="ghost"
         size="sm"
         onClick={() => onMonthChange(addMonths(currentMonth, 1))}
-        className="hover:bg-gray-100 rounded-full p-2"
+        className="hover:bg-gray-100 rounded-full "
       >
         <ChevronRight className="h-5 w-5" />
       </Button>

@@ -370,7 +370,7 @@ if (userData.phone && userData.phone.trim()) {
                       Saving...
                     </>
                   ) : (
-                    <div>
+                    <div className=" flex items-center">
                       <Save size={16} className="mr-2" />
                       Save
                     </div>

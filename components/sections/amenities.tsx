@@ -1,3 +1,5 @@
+import Image from "next/image"
+
 export default function Amenities() {
   const amenities = [
     {
@@ -25,7 +27,7 @@ export default function Amenities() {
       color: "blue",
     },
     {
-      icon: "./g14.png ",
+      icon: "./g14.png",
       title: "Transportation",
       description: "Minutes away from tube stations and underground stations",
       color: "red",
@@ -84,7 +86,13 @@ export default function Amenities() {
             <div
               className={`mr-4 flex h-16 w-16 items-center justify-center rounded-full bg-${amenity.color}-100 text-${amenity.color}-500`}
             >
-           <img src={`${amenity.icon}`} alt={amenity.description}/>
+        <Image
+  src={amenity.icon}
+  alt={amenity.description}
+  width={48}
+  height={48}
+  loading="lazy"
+/>
             </div>
             <div>
               <h3 className="font-bold">{amenity.title}</h3>

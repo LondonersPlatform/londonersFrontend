@@ -8,11 +8,13 @@ interface PricingBreakdownProps {
   earlyBirdDiscount: number;
   serviceFee: number;
   total: number;
+  loading?:boolean
 }
 
 export const PricingBreakdown: React.FC<PricingBreakdownProps> = ({
   basePrice,
   nights,
+  loading,
   subtotal,
   earlyBirdDiscount,
   serviceFee,
@@ -37,7 +39,19 @@ export const PricingBreakdown: React.FC<PricingBreakdownProps> = ({
       <div className="pt-4 mt-4 border-t border-gray-200">
         <div className="flex justify-between items-center">
           <span className="text-base font-semibold text-gray-900">Total</span>
-          <span className="text-base font-semibold text-gray-900">£{total} </span>
+    
+
+            <p className="text-base font-semibold text-gray-900">
+                  {loading ? (
+                    <span className="inline-flex gap-1">
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                      <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"></span>
+                    </span>
+                  ) : (
+                    `${total} £`
+                  )}
+                </p>
         </div>
       </div>
     </div>

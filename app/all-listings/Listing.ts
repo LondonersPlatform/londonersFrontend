@@ -1,3 +1,138 @@
+export async function createPaymentMethod({
+  guestId,
+  stripeCardToken,
+  paymentProviderId,
+  reservationId,
+  skipSetupIntent = false,
+  reuse = false,
+}: {
+  guestId: string;
+  stripeCardToken: string;
+  paymentProviderId: string;
+  reservationId: string;
+  skipSetupIntent?: boolean;
+  reuse?: boolean;
+}) {
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-payment-method`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        guestId,
+        stripeCardToken,
+        skipSetupIntent,
+        paymentProviderId,
+        reservationId,
+        reuse,
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(`Failed to create payment method: ${error}`);
+  }
+
+  const data = await res.json();
+  return data; // should contain paymentMethodId or similar
+}
+
+
+export async function addPayment({
+  reservationId,
+  amount,
+  note = "Advance payment",
+  method = "CREDIT_CARD",
+  paymentMethodId,
+  saveForFutureUse = true,
+  shouldBePaidAt = new Date().toISOString(), // default to current time
+  isAuthorizationHold = false,
+}: {
+  reservationId: string;
+  amount: number;
+  note?: string;
+  method?: string;
+  paymentMethodId: string;
+  saveForFutureUse?: boolean;
+  shouldBePaidAt?: string;
+  isAuthorizationHold?: boolean;
+}) {
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/add-payment`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        reservationId,
+        paymentParams: {
+          paymentMethod: {
+            method,
+            id: paymentMethodId,
+            saveForFutureUse,
+          },
+          amount,
+          shouldBePaidAt,
+          note,
+          isAuthorizationHold,
+        },
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to add payment");
+  }
+
+  const data = await res.json();
+  return data;
+}
+
+export async function updateReservationStatus({
+  reservationId,
+  status,
+}: {
+  reservationId: string;
+  status: "pending" | "confirmed" | "canceled" | "completed"; // Adjust enum as needed
+}) {
+  const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/update-reservation-status`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        reservationId,
+        status,
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(`Failed to update reservation status: ${error}`);
+  }
+
+  const data = await res.json();
+  return data;
+}
+
+
+
 
 export async function getReservationsByGuestId() {
   const token = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

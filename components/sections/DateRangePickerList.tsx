@@ -202,12 +202,15 @@ const handleDateClick = (date: Date) => {
           onDateRangeChange={onDateRangeChange}
         />
 
-        <CalendarNavigation
+ <div className=' absolute top-24  w-full'>
+       <CalendarNavigation
           currentMonth={currentMonth}
           onMonthChange={setCurrentMonth}
         />
 
-        <div className="grid lg:grid-cols-2 lg:px-4 pb-6 gap-8"
+ </div>
+
+        <div className="grid lg:grid-cols-2 py-12 lg:px-4 pb-6 gap-8"
                 key={loadingMin ? "loading" : "ready"} // ✅ This forces unmount/remount
         >
           <CalendarMonth

@@ -41,9 +41,9 @@ export default function RegisterModal({
   } = useForm<FormData>({
     defaultValues: {
       name: "",
-    phone_number: "01017732268",
-    gender: "male",
-    birthday: "1990-01-01",
+    // phone_number: "01017732268",
+    // gender: "male",
+    // birthday: "1990-01-01",
       email: "",
       password: "",
       confirmPassword: "",
@@ -91,9 +91,9 @@ export default function RegisterModal({
       const response = await signUpUser({
         password: data.password,
         user_type: "guest",
-         phone_number:"01017732268",
-         gender:"male",
-         birthday:"1990-01-01",
+        //  phone_number:"01017732268",
+        //  gender:"male",
+        //  birthday:"1990-01-01",
         email: data.email,
         fullname: data.name,
       });
