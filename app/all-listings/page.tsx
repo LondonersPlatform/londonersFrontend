@@ -38,7 +38,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import Home from "../page";
 
-const LIMIT = 5;
+const LIMIT = 100;
 
 export default function AllListingsPage() {
   const [page, setPage] = useState(1);
@@ -344,13 +344,12 @@ const handleResetFilters = () => {
             >
               <div className="flex rounded-2xl p-0 my-6 border-gray-300 border-[1px] flex-col md:flex-row">
                 {/* Desktop Images */}
-                <div className="relative gap-3 p-0 m-0 rounded-xl items-center hidden md:flex w-full md:w-2/5">
-                  <div className="relative h-full w-1/2">
+                <div className="relative gap-1 p-0 m-0 rounded-xl items-center hidden md:flex w-full md:w-2/5">
+                  <div className="relative  h-full w-1/2">
                     <img
                       src={listing.images[1] || "/placeholder.svg"}
                       alt={listing.title}
-                      width={300}
-                      height={200}
+               
                       loading="eager"
                       className="w-full h-full rounded-s-xl object-cover"
                     />
@@ -359,8 +358,7 @@ const handleResetFilters = () => {
                     <img
                       src={listing.images[0] || "/placeholder.svg"}
                       alt={listing.title}
-                      width={300}
-                      height={200}
+                  
                       loading="eager"
                       className="w-full h-full object-cover"
                     />
@@ -504,7 +502,7 @@ const handleResetFilters = () => {
         </div>
       )}
 
-      <div className="mt-10 text-center space-x-4">
+      {/* <div className="mt-10 text-center space-x-4">
         {visibleListings.length < processedListings.length && (
           <Button
             onClick={showMore}
@@ -523,7 +521,7 @@ const handleResetFilters = () => {
             Show Less
           </Button>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }

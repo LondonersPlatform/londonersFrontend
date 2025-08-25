@@ -32,23 +32,24 @@ export default function Hero() {
     <>
       
 
-      <section className="relative h-[75vh] w-full overflow-hidden">
-
-<video
+<section className="relative lg:h-[80vh] h-[60vh] w-full overflow-hidden">
+  {/* Background Video */}
+  <video
   autoPlay
   muted
   loop
   playsInline
   preload="auto"
-  poster="./hero.gif" // Add this image
-  className="object-cover w-full h-full brightness-50 transition-all duration-300"
+  className="absolute inset-0 w-full h-full object-fill"
 >
   <source src="/lond.mp4" type="video/mp4" />
 </video>
 
-       
 
-      </section>
+  {/* Content inside video bg */}
+ 
+</section>
+
     </>
   );
 }

@@ -241,7 +241,7 @@ export function BookingSidebar({
                 </div>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto border-none bg-transparent scale-[.85] -translate-y-36 -translate-x-[4rem] shadow-none p-0"
+                className="md:w-auto border-none w-full  bg-transparent lg:scale-[.85] -translate-y-36 :-translate-x-[4rem] shadow-none p-0"
                 align="start"
               >
                 <DateRangePicker

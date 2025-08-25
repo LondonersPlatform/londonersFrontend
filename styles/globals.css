@@ -4,12 +4,28 @@
 
 @font-face {
  font-family: 'Helvetica Neue';
-  src: url('/fonts/HelveticaNeue.otf') format('opentype');
+  src: url('/font/HelveticaNeue.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Rage Italic";
+  src: url("/font/RageItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Allison";
+  src: url("/font/Allison.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+.Title_list{
+  font-family: "Allison";
+  font-style: italic; /* works only if the font has italic variant */
+}
 body {
   font-family: "Helvetica Neue", sans-serif !important;
 }
@@ -115,3 +131,5 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #d1d5db #f3f4f6;
 }
+
+

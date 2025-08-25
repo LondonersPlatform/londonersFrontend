@@ -38,17 +38,18 @@ import { BookingSidebar } from "./PaymentSidebar";
 import { useAuth } from "@/context/auth-context";
 import PaymentStatus from "./PaymentFailure";
 import { useSearchParams } from "next/navigation";
+import { useBooking } from "@/context/DatePickerContext";
 
 // Add these components
-const PaymentSuccess = () => (
+const PaymentSuccess = ({total}:any) => (
   <React.Fragment>
-    <PaymentStatus status="success" />
+    <PaymentStatus status={"success"}  amount={total} />
   </React.Fragment>
 );
 
-const PaymentFailed = ({ error }: { error: string }) => (
+const PaymentFailed = ({ error ,total }: { error: string ,total:any}) => (
   <React.Fragment>
-    <PaymentStatus status={"error"} amount={"180$"} transactionType="visa" />
+    <PaymentStatus status={"error"} amount={total} transactionType="visa" />
     <div className="p-4 mb-4 bg-red-100 text-red-700 rounded-md">{error}</div>
   </React.Fragment>
 );
@@ -62,6 +63,12 @@ export default function Payment() {
   const listingId = searchParams.get("listingId");
 
   const GuestyId = localStorage.getItem("GuestyId") || "";
+
+ const {
+   
+    total,
+  } = useBooking();
+
   // useEffect(() => {
   //   const callReservation = async () => {
   //     try {

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { ArrowBigLeft, ArrowLeft, ArrowRight, ArrowRightIcon, Heart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import Bedrooms from "../../public/svg-assets/Bedrooms";
@@ -31,6 +31,7 @@ import { useEffect, useState } from "react";
 import { useLoginModal } from "@/context/login-modal-context";
 import { FavoriteButton } from "../listings/listing-client-components";
 import { useRouter } from "next/navigation";
+import Arrowright from "@/public/svg-assets/arrowright";
 interface Listing {
   id: string;
   title: string;
@@ -133,7 +134,7 @@ useEffect(() => {
 
   if (isError) {
     return (
-      <section className="md:w-[85%]  w-[96%] mx-auto py-16 px-4 md:px-6">
+      <section className="md:w-[85%]  w-[96%] mx-auto py-12 px-4 md:px-6">
         <div className="text-center text-red-500">
           Failed to load featured listings
         </div>
@@ -142,7 +143,7 @@ useEffect(() => {
   }
 
   return (
-    <section className="md:w-[85%]  w-[96%] mx-auto py-16 px-4 md:px-6">
+    <section className="md:w-[85%]  w-[96%] mx-auto py-12 px-4 md:px-6">
       <div className="text-center w-full">
         <h2 className="text-2xl font-bold">Featured listings</h2>
       </div>
@@ -155,7 +156,7 @@ useEffect(() => {
         </div>
       ) : (
         <Carousel opts={{ align: "start", loop: false }} className="w-full">
-          <div className="flex justify-end py-6 space-x-2">
+          <div className="flex justify-end py-3 space-x-2">
             <CarouselPrevious className="static translate-y-0 mr-2" />
             <CarouselNext className="static translate-y-0" />
           </div>
@@ -172,22 +173,34 @@ useEffect(() => {
       `/all-listings/${item.id}?area=${encodeURIComponent(item.area)}&rating=${item.rating}&bedroom=${item.bedroom}&bath=${item.bath}&beds=${item.beds}&guests=${item.guests}&title=${encodeURIComponent(item.title)}`
     );
   }}
-    className="w-full flex flex-col cursor-pointer h-full rounded-xl transition-shadow hover:shadow-sm"
+    className="w-full flex flex-col cursor-pointer h-full rounded-3xl transition-shadow   pb-3 border shadow-sm"
   >
-    <Card className="shadow-lg border-none flex flex-col h-full">
+   <div
+  className=" flex rounded-3xl  flex-col h-full"
+  style={{
+  
+    borderStyle: "solid",
+    borderColor: "#D9D9D9",
+    boxShadow: "0px 0px 22px 0px #F5F5F5",
+  }}
+>
       <CardImage className="relative w-full h-[200px]">
         <Image
           src={item.images?.[0] ?? "/placeholder.svg"}
           alt={item.title}
           fill
-          className="transition-transform duration-300 group-hover:scale-105 object-cover rounded-t-xl"
+          className="transition-transform rounded-3xl duration-300 group-hover:scale-105 object-cover rounded-t-xl"
         />
-        <button className="absolute right-3 top-3 rounded-full bg-white p-0.5 scale-90 flex items-center justify-center transition-colors">
-          <FavoriteButton
-            listingId={item.id}
-            isFavorite={item.isFavorite}
-          />
-        </button>
+   <div
+  className="absolute right-3 top-3 rounded-full bg-white p-0.5 scale-90 flex items-center justify-center transition-colors"
+  onClick={(e) => e.stopPropagation()}
+>
+  <FavoriteButton
+    listingId={item.id}
+    isFavorite={item.isFavorite}
+  />
+</div>
+
       </CardImage>
 
       <CardContent className="flex flex-col justify-between flex-grow p-4">
@@ -223,12 +236,12 @@ useEffect(() => {
           </div>
         </div>
 
-        <p className="mt-4 flex flex-col gap-2 text-xs text-gray-400">
+        {/* <p className="mt-4 flex flex-col gap-2 text-xs text-gray-400">
           Price per night
           <span className="text-[14px] font-bold text-black">£ {item?.pricePerNight} /night</span>
-        </p>
+        </p> */}
       </CardContent>
-    </Card>
+    </div>
   </div>
 </CarouselItem>
 
@@ -240,24 +253,10 @@ useEffect(() => {
       <div className="flex justify-end">
         <Link
           href="/all-listings"
-          className="flex items-center text-sm font-medium"
+          className="flex border rounded-3xl  hover:bg-[#F5F5F5] px-6 h-10 border-[#D9D9D9] items-center text-sm font-medium"
         >
           See all
-          <svg
-            className="ml-1 h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8.91003 19.9201L15.43 13.4001C16.2 12.6301 16.2 11.3701 15.43 10.6001L8.91003 4.08008"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeMiterlimit="10"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+         <Arrowright />
         </Link>
       </div>
     </section>

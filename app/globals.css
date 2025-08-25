@@ -47,10 +47,30 @@
     @apply bg-background text-foreground;
   }
 }
+@font-face {
+  font-family: "Rage Italic";
+  src: url("/font/RageItalic.ttf") format("truetype");
+  font-weight: normal;
+
+}
+
+@font-face {
+  font-family: "Allison";
+  src: url("/font/Allison.ttf") format("truetype");
+  font-weight: normal;
+
+}
+.Title_list{
+  font-family: "Allison";
+  font-style: italic; /* works only if the font has italic variant */
+}
+
+
+
 
 @font-face {
   font-family: 'Helvetica Neue' !important;
-  src: url('/fonts/HelveticaNeue.otf') format('opentype');
+  src: url('/font/HelveticaNeue.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -116,4 +136,9 @@ body {
 /* Hide the close (X) icon inside DialogContent */
 [data-state="open"] button[aria-label="Close"] {
   display: none;
+}
+iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* or 'fill' to stretch */
 }

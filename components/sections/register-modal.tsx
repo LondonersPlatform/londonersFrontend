@@ -178,7 +178,7 @@ export default function RegisterModal({
 
         <div className="flex justify-center mb-6">
           <Image
-            src="/logo.png"
+            src="/LonD.svg"
             alt="LONDONERS"
             width={200}
             height={50}

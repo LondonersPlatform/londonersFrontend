@@ -69,7 +69,7 @@ React.useEffect(() => {
             ref={triggerRef}
   
             className={cn(
-              "w-auto border-none p-0 flex items-center bg-transparent hover:bg-transparent text-black justify-start text-left font-normal",
+              "w-auto border-none  flex items-center bg-transparent hover:bg-transparent text-black justify-start text-left font-normal",
               !date && "text-muted-foreground"
             )}
           >
@@ -78,7 +78,7 @@ React.useEffect(() => {
                 <React.Fragment>
                   <div
                     className={cn(
-                      "flex md:w-auto w-1/2 border-e-2 h-full items-center px-6 gap-2 lg:rounded-s-full rounded-s-lg  mr-2",
+                      "flex md:w-auto  w-1/2 border-e-2 h-full items-center lg:pe-16 ps-6 gap-2 lg:rounded-s-full rounded-s-lg  mr-2",
                       clickStep === "from" && open && "bg-[#EDEDED]"
                     )}
                   >
@@ -99,7 +99,7 @@ React.useEffect(() => {
                   </div>
                   <div
                     className={cn(
-                      "flex gap-2 p-2 pe-6",
+                      "flex gap-2 p-2 lg:pe-16 ps-6 ",
                       clickStep === "to" && open && "bg-[#EDEDED]"
                     )}
                   >
@@ -123,7 +123,7 @@ React.useEffect(() => {
                 <React.Fragment>
                   <div
                     className={cn(
-                      "flex gap-2 mr-2 rounded-lg p-2 px-6",
+                      "flex gap-2 mr-2 rounded-lg p-2 lg:pe-16 ps-6 ",
                       clickStep === "from" && open && "bg-[#EDEDED]"
                     )}
                   >
@@ -144,7 +144,7 @@ React.useEffect(() => {
                   </div>
                   <div
                     className={cn(
-                      "flex gap-2 p-2 pe-6 py-2",
+                      "flex gap-2 p-2 lg:pe-16 ps-6  py-2",
                       clickStep === "to" && open && "bg-[#EDEDED]"
                     )}
                   >
@@ -158,7 +158,7 @@ React.useEffect(() => {
                     <h5>
                       <span className="font-bold text-sm">Check Out</span>
                       <br />
-                      <span className="text-gray-500">Pick a date</span>
+                      <span className="text-gray-500 ">Pick a date</span>
                     </h5>
                   </div>
                 </React.Fragment>
@@ -167,7 +167,7 @@ React.useEffect(() => {
               <React.Fragment>
                 <div
                   className={cn(
-                    "flex md:w-auto w-1/2 border-e-2 h-full  items-center px-6 gap-2 lg:rounded-s-full rounded-s-lg  mr-2",
+                    "flex md:w-auto w-1/2 border-e-2 h-full  items-center lg:pe-16 ps-6  gap-2 lg:rounded-s-full rounded-s-lg  mr-2",
                     clickStep === "from" && open && "bg-[#EDEDED]"
                   )}
                 >
@@ -188,7 +188,7 @@ React.useEffect(() => {
                 </div>
                 <div
                   className={cn(
-                    "flex gap-2 p-2 pe-6",
+                    "flex gap-2 p-2 lg:pe-16 ps-6 ",
                     clickStep === "to" && open && "bg-[#EDEDED]"
                   )}
                 >
@@ -216,7 +216,7 @@ React.useEffect(() => {
         
           // style={{ width: triggerWidth }}
         >
-          <div className="flex flex-col gap-1 px-4 py-3">
+          <div className="flex flex-col gap-1 lg:pe-16 ps-6 py-3">
             <div></div>
             <h1 className="font-semibold">
               {clickStep === "from"
@@ -231,7 +231,7 @@ React.useEffect(() => {
             currentMonth={currentMonth}
             onMonthChange={setCurrentMonth}
           />
-          <div className="flex flex-col  sm:flex-row gap-4 p-4">
+          <div className="flex flex-col  sm:flex-row gap-12 p-4">
             <div className=" md:w-auto w-full">
               <CalendarMonth
                 month={currentMonth}

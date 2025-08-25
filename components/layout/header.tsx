@@ -57,21 +57,21 @@ export default function Header() {
     pathname?.includes("/Dashboard") || pathname?.includes("/favourite");
   return (
     <React.Fragment>
-      <header className=" mx-auto md:w-[85%]  w-[96%]  flex items-center justify-between py-4 px-4 md:px-6">
+      <header className=" mx-auto md:w-[79%]  w-[96%]  flex items-center justify-between py-4 px-4 md:px-6">
         {!isLoading || (!session && hideLogo) ? (
-          <Link href="/" className="mr-8">
+          <Link href="/" className="mr-8 ">
             <Image
-              src="/logo.png"
+              src="/LonD.svg"
               alt="LONDONERS"
-              width={150}
-              height={30}
-              className="h-8"
+              width={225}
+              height={45}
+              className="   "
             />
           </Link>
         ) : (
           <Link href="/" className="mr-8 opacity-25 ">
             <Image
-              src="/logo.png"
+              src="/LonD.svg"
               alt="LONDONERS"
               width={150}
               height={30}
@@ -80,11 +80,11 @@ export default function Header() {
           </Link>
         )}
 
-        <div className="  flex items-center">
-          <nav className=" hidden border pe-3 w-full rounded-full px-0 p-0 lg:flex items-center  ">
+        <div className="   flex items-center">
+          <nav className=" hidden border pe-3 w-full py-0 rounded-full px-0 p-0 lg:flex items-center  ">
             <div className="relative border-e-2 ">
               <div
-                className="flex items-center text-sm cursor-pointer"
+                className="flex items-center  text-sm cursor-pointer"
                 onClick={() => {
                   setCheckInOpen(!checkInOpen);
                   setCheckOutOpen(false);
@@ -95,7 +95,7 @@ export default function Header() {
               </div>
             </div>
 
-            <div className="relative px-6">
+            <div className="relative pe-16 ps-6">
               <div
                 className="flex items-center text-sm cursor-pointer"
                 onClick={() => {
@@ -112,7 +112,7 @@ export default function Header() {
             </div>
             <Button
               variant="primary"
-              className="hidden  md:flex items-center rounded-full px-4  text-sm"
+              className="hidden  my-1 md:flex items-center rounded-full px-4 py-6 text-sm"
               onClick={() => {
                 const checkIn = selectedDateRange?.from
                 

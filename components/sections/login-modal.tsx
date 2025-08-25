@@ -215,7 +215,7 @@ const { redirectPath } = useLoginModal();
 
         <div className="flex justify-center mb-6">
           <Image
-            src="/logo.png"
+            src="/LonD.svg"
             alt="Logo"
             width={200}
             height={50}

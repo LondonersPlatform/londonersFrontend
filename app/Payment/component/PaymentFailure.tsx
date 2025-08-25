@@ -4,6 +4,7 @@ import { CheckCircle, XCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface PaymentStatusProps {
   status: string;
@@ -25,8 +26,8 @@ export default function PaymentStatus({
   transactionType,
   amount,
   onTryAgain,
-  onGoToDashboard,
-  onBackToHome,
+ 
+ 
 }: PaymentStatusProps) {
   const isSuccess = status === "success";
   const [dateTime, setDateTime] = useState(new Date());
@@ -47,6 +48,15 @@ export default function PaymentStatus({
     minute: "2-digit",
     second: "2-digit",
   });
+    const router = useRouter();
+    const onBackToHome = () => {
+    router.push('/');
+  };
+
+  const onGoToDashboard = () => {
+    router.push('/');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">

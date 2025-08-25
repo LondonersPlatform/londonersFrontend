@@ -193,7 +193,7 @@ const handleDateClick = (date: Date) => {
 
   return (
     <div className="relative">
-      <div className="bg-white scale-100 rounded-3xl border-gray-200 w-[850px] max max-w-[90vw]">
+      <div className="bg-white scale-100 rounded-3xl border-gray-200 max max-w-[90vw]">
         <DateRangeHeader
           dateRange={dateRange}
           className=""
@@ -202,7 +202,7 @@ const handleDateClick = (date: Date) => {
           onDateRangeChange={onDateRangeChange}
         />
 
- <div className=' absolute top-24  w-full'>
+ <div className=' absolute top-24   w-full'>
        <CalendarNavigation
           currentMonth={currentMonth}
           onMonthChange={setCurrentMonth}

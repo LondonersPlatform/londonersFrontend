@@ -61,7 +61,7 @@ const BookingCard = ({
     setGuestCount,
     setMinNight,
   } = useBooking();
-console.log("paymentProviderId====book",paymentProviderId)
+
   const [loadingDates, setLoadingDates] = useState(true);
   const [isOpenDate, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);

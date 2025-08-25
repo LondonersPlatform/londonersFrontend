@@ -77,28 +77,26 @@ export function PropertyOverview({ dummyPropertyData, stars, reviews }: any) {
         </div>
       </div>
       <div className="w-full  ">
-        <div className="bg-white border border-[#D9D9D9] shadow-lg rounded-2xl p-4 mb-6">
+        <div className="bg-white border border-[#D9D9D9] shadow-lg rounded-2xl p-4 py-0">
           <div className=" grid md:grid-cols-3 grid-cols-1 justify-center items-center">
             {/* Left side with award icons and text */}
-            <div className="flex justify-center items-center gap-4">
+            <div className="flex flex-col justify-center items-center ">
               <Image
-                src="/award-left.png"
+                src="/star1.svg"
                 alt="Award trophy"
-                width={60}
-                height={80}
+                width={45}
+                height={60}
                 className="object-contain"
               />
               <div className="text-center">
-                <div className="font-semibold text-lg text-gray-900">Guest</div>
-                <div className="font-semibold text-lg text-gray-900">
-                  favourite
-                </div>
+                <div className="font-semibold text-lg text-gray-900">Guest  favourite</div>
+        
               </div>
               <Image
-                src="/award-right.png"
+                 src="/start2.svg"
                 alt="Award trophy"
-                width={60}
-                height={80}
+                width={45}
+                height={60}
                 className="object-contain"
               />
             </div>

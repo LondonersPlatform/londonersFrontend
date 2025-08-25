@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight, Expand, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+import ReactPlayer from "react-player";
+
 import { useToast } from "@/components/ui/use-toast";
 import {
   Carousel,
@@ -12,6 +15,8 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { getVideoByListingId } from "@/app/all-listings/Listing";
+import { getVideoByListingIdjson } from "@/lib/utils";
+import dynamic from "next/dynamic";
 
 interface ImageGalleryProps {
   imagesDummy: string[];
@@ -42,6 +47,12 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
     if (api) api.scrollTo(index);
   }, [api]);
 
+  function extractYouTubeId(url: string): string {
+  const regExp =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = url.match(regExp);
+  return match ? match[1] : "";
+}
   useEffect(() => {
     if (!api) return;
     const onSelect = () => setCurrentIndex(api.selectedScrollSnap());
@@ -58,18 +69,10 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  useEffect(() => {
-    async function fetchVideoAndCombine() {
-      const videoUrl = await getVideoByListingId(String(listingId));
-      if (videoUrl) {
-        setMediaList([videoUrl, ...imagesDummy]);
-      } else {
-        setMediaList(imagesDummy);
-      }
-    }
-    fetchVideoAndCombine();
-  }, [listingId, imagesDummy]);
-
+ 
+useEffect(() => {
+  import("react-player/lazy");
+}, []);
   const toggleVideoPlay = () => {
     if (!videoRef.current) return;
     if (isVideoPlaying) {
@@ -85,6 +88,14 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
     videoRef.current.requestFullscreen?.();
   };
 
+  useEffect(() => {
+  const videoUrl = getVideoByListingIdjson(String(listingId));
+  if (videoUrl) {
+    setMediaList([videoUrl, ...imagesDummy]);
+  } else {
+    setMediaList(imagesDummy);
+  }
+}, [listingId, imagesDummy]);
   return (
     <div
       id="gallery-container"
@@ -100,57 +111,57 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
             {mediaList.map((media, index) => (
               <CarouselItem key={index} className="overflow-hidden relative">
                 <div
-                  className="w-full h-[300px] md:h-[500px] relative rounded-xl"
+                  className="w-full h-[300px] md:h-[450px] relative rounded-xl"
                   onClick={() => {
                     if (window.innerWidth < 768) {
                       router.push(`/PhotoTour?listingId=${listingId}`);
                     }
                   }}
                 >
-                  {media.endsWith(".mp4") || media.includes("video") ? (
-                    <div className="relative w-full h-full">
-                      <video
-                        ref={index === 0 ? videoRef : undefined}
-                        src={media}
-                        className="object-cover w-full h-full rounded-xl"
-                
-                      />
-                      {/* Dim overlay */}
-                      <div className="absolute inset-0 bg-black/20 rounded-xl" />
-                      {/* Play/Pause toggle */}
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleVideoPlay();
-                        }}
-                        className="absolute inset-0 m-auto hover:text-white w-14 h-14 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center rounded-full z-20"
-                        variant="ghost"
-                      >
-                        {isVideoPlaying ? <Pause size={28} /> : <Play size={28} />}
-                      </Button>
-                      {/* Expand */}
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          expandFullscreen();
-                        }}
-                        className="absolute lg:block none hover:text-white top-3 left-3 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full z-20"
-                        size="icon"
-                        variant="ghost"
-                      >
-                        <Expand size={20} />
-                      </Button>
-                    </div>
-                  ) : (
-                    <Image
-                      src={media}
-                      alt={`Slide ${index + 1}`}
-                      fill
-                      className="object-cover lg:rounded-xl"
-                      sizes="(min-width: 768px) 100vw, 100vw"
-                      priority={index === 0}
-                    />
-                  )}
+
+
+{media.includes("youtube.com") || media.includes("youtu.be") ? (
+
+  <div
+    className="h-[300px] md:h-[450px] mx-auto   relative rounded-xl overflow-hidden"
+    onClick={() => {
+      if (window.innerWidth < 768) {
+        router.push(`/PhotoTour?listingId=${listingId}`);
+      }
+    }}
+  >
+   
+<div className=" h-full   w-full  rounded-xl overflow-hidden">
+  <iframe
+    src={`https://www.youtube.com/embed/${extractYouTubeId(media)}?rel=0`}
+    className="w-full h-full"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+    title={`YouTube video ${index}`}
+  />
+</div>
+
+
+
+
+
+  </div>
+
+
+
+) : (
+<div className="aspect-video  w-full rounded-xl overflow-hidden">
+  <Image
+    src={media}
+    alt={`Slide ${index + 1}`}
+    fill
+    className="object-cover"
+    sizes="(min-width: 768px) 100vw, 100vw"
+    priority={index === 0}
+  />
+</div>
+)}
+
                 </div>
               </CarouselItem>
             ))}
@@ -159,7 +170,7 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
           {/* Navigation Arrows */}
           <Button
             onClick={goToPrevious}
-            className="absolute md:block hidden left-4 bg-gray-900 hover:bg-gray-900 top-1/2 transform -translate-y-1/2 p-2 rounded-full z-10"
+            className="absolute md:block hidden left-6 bg-gray-900 hover:bg-gray-900 top-1/2 transform -translate-y-1/2 p-2 rounded-full z-10"
             size="icon"
             variant="ghost"
             aria-label="Previous slide"
@@ -178,7 +189,7 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
         </Carousel>
 
         {/* Counter */}
-        <div className="absolute bottom-6 left-4 bg-black/40 text-white px-3 py-1 rounded-full text-sm">
+        <div className="absolute bottom-6 left-12 bg-black/40 text-white px-3 py-1 rounded-full text-sm">
           {currentIndex + 1} / {mediaList.length}
         </div>
       </div>
@@ -195,19 +206,22 @@ export default function ImageGallery({ imagesDummy }: ImageGalleryProps) {
       }`}
       onClick={() => goToSlide(index)}
     >
-      {media.endsWith(".mp4") || media.includes("video") ? (
-        <video
-          src={media}
-          className="object-cover w-full h-full rounded-md"
-        />
-      ) : (
-        <Image
-          src={media}
-          alt={`Thumbnail ${index + 1}`}
-          fill
-          className="object-cover rounded-md"
-        />
-      )}
+{media.includes("youtube.com") || media.includes("youtu.be") ? (
+  <Image
+    src={`https://img.youtube.com/vi/${extractYouTubeId(media)}/0.jpg`}
+    alt={`Video Thumbnail ${index + 1}`}
+    fill
+    className="object-cover aspect-video  rounded-md"
+  />
+) : (
+  <Image
+    src={media}
+    alt={`Thumbnail ${index + 1}`}
+    fill
+    className="object-cover aspect-video rounded-md"
+  />
+)}
+
 
       {/* Last thumbnail button */}
       {index === 6 - 1 && (

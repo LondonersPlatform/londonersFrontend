@@ -34,7 +34,7 @@ export const DateRangeHeader: React.FC<DateRangeHeaderProps> = ({
 
   return (
     <div className={className}>
-      <div className="lg:flex items-center justify-between mb-4">
+      <div className="lg:flex    w-full items-center justify-between mb-4">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">
             {nights > 0 ? `${nights} nights` : "Select dates"}
@@ -51,12 +51,12 @@ export const DateRangeHeader: React.FC<DateRangeHeaderProps> = ({
         </div>
 
         {!hideDatesPreview && (
-          <div className="flex shadow rounded-xl gap-0">
+          <div className="flex shadow lg:mt-auto mt-6 lg:w-auto w-full   rounded-xl gap-0">
             {/* Check-in */}
-            <div className="flex">
+            <div className="flex w-1/2 lg:w-auto">
               <div
                 onClick={() => setActiveField("from")}
-                className={` border rounded-s-lg p-3 py-1 bg-white relative lg:w-[200px] cursor-pointer transition-colors duration-300
+                className={` border w-full rounded-s-lg p-3 py-1 bg-white relative lg:w-[200px] cursor-pointer transition-colors duration-300
                 ${
                   activeField === "from"
                     ? "border-[2px] border-black"
@@ -87,13 +87,13 @@ export const DateRangeHeader: React.FC<DateRangeHeaderProps> = ({
             </div>
 
             {/* Check-out */}
-            <div className="flex">
+            <div className="flex  w-1/2 lg:w-auto">
               <div
                 onClick={() => {
                   if (!dateRange.from) return;
                   setActiveField("to");
                 }}
-                className={`border rounded-e-lg p-3 py-1 bg-white relative lg:w-[200px] transition-colors duration-300
+                className={`border w-full rounded-e-lg p-3 py-1 bg-white relative lg:w-[200px] transition-colors duration-300
                 ${
                   !dateRange.from && !dateRange.to
                     ? "border-gray-300 opacity-50 cursor-not-allowed"

@@ -251,11 +251,11 @@ if (paymentObj) {
   console.log("paymentProviderId not found");
 }
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen    mx-6  flex flex-col bg-white">
       {/* Sticky Header Tabs */}
       {showStickyTabs && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b shadow-sm h-[80px] flex items-center">
-          <div className="w-[83%] mx-auto">
+          <div className="w-[78%] mx-auto">
             <Tabs defaultValue="overview">
               <TabsList className="bg-white space-x-6 p-0">
                 <TabsTrigger
@@ -285,9 +285,9 @@ if (paymentObj) {
         </div>
       )}
 
-      <main className="flex-1">
+      <main className="flex-1 ">
         <div className="">
-          <div className="mx-auto md:w-[83%]">
+          <div className="mx-auto md:w-[78%]">
             <PropertyCarousel
               isFavorite={data[0].isFavorite}
               imagesDummy={data[0].imagesDummy}
@@ -297,7 +297,7 @@ if (paymentObj) {
 
           <div
             ref={tabsContainerRef}
-            className="flex div-content flex-col mx-auto w-[83%] lg:flex-row gap-8 relative"
+            className="flex div-content flex-col mx-auto w-[78%] lg:flex-row gap-8 relative"
           >
             {/* Left Content Column */}
             <div className="w-full lg:w-2/3 space-y-6 ">

@@ -35,7 +35,7 @@ export default function LogoLoader({ isLoading = true, onLoadingComplete, timeou
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-100">
       <div className="relative flex flex-col items-center">
         <div className="animate-pulse">
-          <Image src="/imglogo.png" alt="LONDONERS.com" width={300} height={80} priority />
+          <Image  src="/LonD.svg" alt="LONDONERS.com" width={300} height={80} priority />
         </div>
         <div className="mt-6 flex space-x-2">
           <div className="h-3 w-3 animate-bounce rounded-full bg-black" style={{ animationDelay: "0ms" }}></div>

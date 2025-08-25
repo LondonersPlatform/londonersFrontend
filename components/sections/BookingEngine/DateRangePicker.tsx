@@ -165,7 +165,7 @@ useEffect(() => {
 }, [dateRange.from, dateRange.to]);
   return (
     <div className=" relative">
-      <div className="bg-white scale-100 rounded-3xl shadow-2xl border border-gray-200 w-[850px] max-w-[90vw] ">
+      <div className="  scale-100 rounded-3xl shadow-2xl border border-gray-200 md:w-[850px] w-full  bg-white   md:max-w-[90vw] ">
      <DateRangeHeader
   key={dateRange.from ? "editing" : "cleared"}
   dateRange={dateRange}

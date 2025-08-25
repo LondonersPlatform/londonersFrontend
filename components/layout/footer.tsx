@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between space-y-6 md:flex-row md:space-y-0">
           <div>
             <Image
-              src="/f1.png"
+              src="/LonD.svg"
               alt="Stamp"
               width={200}
               height={200}
@@ -43,13 +43,13 @@ export default function Footer() {
 
             <div>
               <div className="mt-8 text-center text-sm text-gray-500">
-                Londoners - 2023 All rights reserved
+                Londoners - 2025 All rights reserved
               </div>
             </div>
           </div>
           <div className=" mt-12  md:relative">
             <Image
-              src="/f0.png"
+              src="/f0.svg"
               alt="LONDONERS"
               width={150}
               height={200}

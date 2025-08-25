@@ -13,11 +13,18 @@ import { BookingProvider } from "@/context/DatePickerContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// app/layout.tsx (or layout.js)
 export const metadata = {
   title: "Londoners - Premium London Accommodations",
   description:
     "Find your perfect stay in London with Londoners premium accommodations",
+  icons: {
+    icon: "/lo.ico", // place favicon.ico in public/ folder
+    shortcut: "/favicon.ico",
+    apple: "/lo.png", // optional for iOS devices
+  },
 };
+
 
 export default function RootLayout({
   children,

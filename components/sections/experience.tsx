@@ -7,23 +7,24 @@ export default function Experience() {
         <div className="relative mb-8 flex w-full justify-between">
           <div className="lg:absolute left-0 top-1/2 -translate-y-1/2 transform">
             <Image
-              src="/l0.png"
+              src="/bq.png"
               alt="Stamp"
               width={100}
               height={100}
-              className="h-32 w-32 object-contain"
+              className="h-32 w-32  rotate-45 object-contain"
             />
           </div>
           <h2 className="mx-auto text-3xl font-bold">The Londoners experience</h2>
           <div className="lg:absolute right-0 top-1/2 -translate-y-1/2 transform">
             <Image
-             src="/l1.png"
+             src="/gq.png"
               alt="Stamp"
               width={100}
               height={100}
-              className="h-32 w-32 object-contain"
+              className="h-32 w-32 -rotate-12 object-contain"
             />
           </div>
+           
         </div>
         <div className="max-w-3xl text-center">
           <p className="mb-6 text-gray-700">
